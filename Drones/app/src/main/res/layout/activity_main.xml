@@ -1,10 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="texium.mx.drones.MainActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <View
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/angel"
+                android:layout_gravity="center_vertical"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="80dp"
+                android:background="#d1d2d3"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginRight="20dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CD"
+                        android:textSize="50sp"
+                        android:textColor="@color/colorPrimary"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MX"
+                        android:textSize="50sp"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CIUDAD DE MÉXICO"
+                    android:textSize="10sp"
+                    android:textAlignment="center"/>
+            </LinearLayout>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="80dp"
+                android:background="#d1d2d3"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"/>
+            <View
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/angel"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SISTEMA DE MONITOREO\nDE CUADRILLAS"
+            android:textAlignment="center"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="@color/colorAccent"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>
 
     <!--
     <android.support.design.widget.AppBarLayout
@@ -13,7 +89,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
     </android.support.design.widget.AppBarLayout>
-    -->
+
 
     <include layout="@layout/content_main" />
 
@@ -24,5 +100,5 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_dialog_email" />
+        -->
 
-</android.support.design.widget.CoordinatorLayout>

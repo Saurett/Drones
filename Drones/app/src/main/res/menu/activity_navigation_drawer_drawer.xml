@@ -3,34 +3,38 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_news_task"
+            android:icon="@drawable/icon_news"
+            android:title="Nuevas Tareas" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/nav_progress_task"
+            android:icon="@drawable/icon_progress"
+            android:title="Tareas en Proceso" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/nav_pending_task"
+            android:icon="@drawable/icon_pending"
+            android:title="Tareas Pendientes" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_revision_task"
+            android:icon="@drawable/icon_revision"
+            android:title="Tareas Cerradas" />
+        <item
+            android:id="@+id/nav_close_task"
+            android:icon="@drawable/icon_complete"
+            android:title="Tareas Cerradas" />
     </group>
-
-    <item android:title="Communicate">
+    <item android:title="No se quitar este titulo">
         <menu>
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Nueva Incidencia" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="Historial de Incidencias" />
         </menu>
     </item>
+
 
 </menu>

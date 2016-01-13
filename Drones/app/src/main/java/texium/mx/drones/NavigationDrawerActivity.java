@@ -80,13 +80,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_news_task) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_progress_task) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_pending_task) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_revision_task) {
+
+        } else if (id == R.id.nav_close_task) {
 
         } else if (id == R.id.nav_share) {
 

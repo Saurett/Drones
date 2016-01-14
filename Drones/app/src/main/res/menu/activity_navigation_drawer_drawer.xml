@@ -21,7 +21,8 @@
         <item
             android:id="@+id/nav_close_task"
             android:icon="@drawable/icon_complete"
-            android:title="Tareas Cerradas" />
+            android:title="Tareas Cerradas"
+            />
     </group>
     <item android:title="No se quitar este titulo">
         <menu>

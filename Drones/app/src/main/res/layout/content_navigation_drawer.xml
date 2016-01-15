@@ -30,9 +30,15 @@
     </LinearLayout>
     -->
 
+    <FrameLayout
+        android:id="@+id/tasks_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"></FrameLayout>
+
     <View
     android:layout_width="match_parent"
-    android:layout_height="20dp"
+    android:layout_height="10dp"
     android:background="@color/colorAccent"
     android:layout_alignParentBottom="true"/>
 

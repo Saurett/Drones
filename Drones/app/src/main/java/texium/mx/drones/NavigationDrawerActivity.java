@@ -19,10 +19,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
 import texium.mx.drones.fragments.NewsTasksFragment;
 
@@ -36,23 +39,35 @@ public class NavigationDrawerActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         setTitle("");
+
+        Button closeTaskTitleButton = (Button) findViewById(R.id.task_title_close_button);
+        //closeTaskTitleButton.setOnClickListener(null);
+
+        /*new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                Fragment fragment = fragmentManager.findFragmentByTag("fragment_news_taks");
+                if (null != fragment) {
+                    fragmentManager.beginTransaction().remove(fragment).commit();
+                }
+            }
+        }*/
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                Fragment fragment = fragmentManager.findFragmentByTag("fragment_news_taks");
-                if (null != fragment) {
-                    fragmentManager.beginTransaction().remove(fragment).commit();
-                }
-
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Mi ubicación ha sido enviada", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                onMapReady(mMap);
             }
         });
 
@@ -63,14 +78,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         toggle.syncState();
 
 
-
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+
     }
 
     @Override
@@ -142,13 +157,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
     //TODO MOVER A MapsActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        LatLng cdmx = new LatLng(19.4265606,-99.0672223);
+
         mMap = googleMap;
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.setMyLocationEnabled(true);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdmx, 10));
+
         //Seteamos el tipo de mapa
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -160,5 +177,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             return;
         }
         mMap.setMyLocationEnabled(true);
+
+
     }
 }

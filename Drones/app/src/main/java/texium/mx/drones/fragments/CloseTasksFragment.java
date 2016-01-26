@@ -19,7 +19,7 @@ import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksTitle;
 
 
-public class NewsTasksFragment extends Fragment {
+public class CloseTasksFragment extends Fragment {
 
     static List<Tasks> newsTask;
     static List<TasksTitle> newsTaskTitle;

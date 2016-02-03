@@ -24,7 +24,7 @@
             android:title="Tareas Cerradas"
             />
     </group>
-    <item android:title="No se quitar este titulo">
+    <item android:title="Opciones">
         <menu>
             <item
                 android:id="@+id/nav_share"

@@ -1,6 +1,7 @@
 package texium.mx.drones.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,11 @@ import texium.mx.drones.models.TasksTitle;
 
 public class NewsTasksFragment extends Fragment {
 
+    public interface NewTaskListener {
+        void closeNewTaskFragment();
+    }
+
+    NewTaskListener activityListener;
     static List<Tasks> newsTask;
     static List<TasksTitle> newsTaskTitle;
 
@@ -53,7 +60,7 @@ public class NewsTasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_news_tasks,container,false);
+        View view = inflater.inflate(R.layout.fragment_news_tasks, container, false);
 
         tasks_list_tittle = (RecyclerView) view.findViewById(R.id.news_taks_list_title);
         tasks_list = (RecyclerView) view.findViewById(R.id.news_taks_list);
@@ -61,6 +68,13 @@ public class NewsTasksFragment extends Fragment {
 
         task_list_adapter = new TaskListAdapter();
         task_list_title_adapter = new TaskListTitleAdapter();
+
+        task_list_title_adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activityListener.closeNewTaskFragment();
+            }
+        });
 
         task_list_adapter.addAll(newsTask);
         task_list_title_adapter.addAll(newsTaskTitle);
@@ -82,5 +96,15 @@ public class NewsTasksFragment extends Fragment {
         super.onCreate(saveInstanceState);
         //Aqui cargar la cosas de fred
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            activityListener = (NewTaskListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString() + " debe implementar NewTaskListener");
+        }
     }
 }

@@ -33,7 +33,7 @@ import texium.mx.drones.fragments.RevisionTasksFragment;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, NewsTasksFragment.NewTaskListener {
 
     private GoogleMap mMap;
 
@@ -247,7 +247,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
+    @Override
+    public void closeNewTaskFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("fragment_news_taks");
+        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        //Notify datasetChange
+    }
 }

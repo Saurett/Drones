@@ -1,6 +1,7 @@
 package texium.mx.drones.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,12 +16,15 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
+import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksTitle;
 
 
-public class PendingTasksFragment extends Fragment {
+public class PendingTasksFragment extends Fragment implements View.OnClickListener {
 
+
+    FragmentTaskListener activityListener;
     static List<Tasks> pendingTask;
     static List<TasksTitle> pendingTaskTitle;
 
@@ -31,7 +35,7 @@ public class PendingTasksFragment extends Fragment {
 
     static {
         pendingTaskTitle = new ArrayList<>();
-        pendingTaskTitle.add(new TasksTitle("RESUMEN DE ÚLTIMAS CONEXIONES", "CUADRILLA"));
+        pendingTaskTitle.add(new TasksTitle("TAREAS PENDIENTES", "CUADRILLA"));
     }
 
     RecyclerView tasks_list, tasks_list_tittle;
@@ -44,13 +48,15 @@ public class PendingTasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_pending_tasks,container,false);
+        final View view = inflater.inflate(R.layout.fragment_pending_tasks,container,false);
 
         tasks_list_tittle = (RecyclerView) view.findViewById(R.id.pending_taks_list_title);
         tasks_list = (RecyclerView) view.findViewById(R.id.pending_taks_list);
 
         task_list_adapter = new TaskListAdapter();
         task_list_title_adapter = new TaskListTitleAdapter();
+
+        task_list_title_adapter.setOnClickListener(this);
 
         task_list_adapter.addAll(pendingTask);
         task_list_title_adapter.addAll(pendingTaskTitle);
@@ -72,5 +78,27 @@ public class PendingTasksFragment extends Fragment {
         super.onCreate(saveInstanceState);
         //Aqui cargar la cosas de fred
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            activityListener = (FragmentTaskListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString() + " debe implementar TaskListener");
+        }
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+            case R.id.task_title_close_button:
+                activityListener.closeActiveTaskFragment(v);
+                break;
+            default:
+                break;
+        }
     }
 }

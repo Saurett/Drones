@@ -3,7 +3,9 @@
     android:layout_width="500dp"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:alpha="80"
+    >
 
     <TextView
         android:id="@+id/task_title"
@@ -154,6 +156,7 @@
             />
 
         <Button
+            android:id="@+id/agree_task_button"
             android:layout_width="70dp"
             android:layout_height="30dp"
             android:text="  ACEPTAR  "

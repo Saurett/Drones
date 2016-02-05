@@ -26,6 +26,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.fragments.CloseTasksFragment;
+import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
@@ -33,7 +36,7 @@ import texium.mx.drones.fragments.RevisionTasksFragment;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, NewsTasksFragment.NewTaskListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, FragmentTaskListener {
 
     private GoogleMap mMap;
 
@@ -120,8 +123,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         int id = item.getItemId();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         removeAllFragment(fragmentManager);
+
         if (id == R.id.nav_news_task) {
 
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -145,7 +148,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_close_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container,new RevisionTasksFragment(),"fragment_close_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container,new CloseTasksFragment(),"fragment_close_taks");
             fragmentTransaction.commit();
 
         } else if (id == R.id.nav_share) {
@@ -248,9 +251,24 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public void closeNewTaskFragment() {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag("fragment_news_taks");
-        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+    public void closeActiveTaskFragment(View view) {
+
+        switch (view.getId()) {
+
+            case R.id.task_title_close_button:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                removeAllFragment(fragmentManager);
+                break;
+            default: break;
+        }
+
         //Notify datasetChange
+    }
+
+    @Override
+    public void agreeTask(View v, TaskListAdapter taskListAdapter, int position) {
+        Snackbar.make(v, "Tarea aceptada # "+ position, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        taskListAdapter.remove(position);
     }
 }

@@ -37,6 +37,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.math.BigDecimal;
+
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
@@ -109,10 +111,30 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         getLocation();
 
-
         if (locationGPS != null) {
-            task_force_latitude.setText(String.valueOf(locationGPS.getLatitude()));
-            task_force_longitude.setText(String.valueOf(locationGPS.getLongitude()));
+
+            double lat = locationGPS.getLatitude();
+            double lon = locationGPS.getLongitude();
+
+            double x = Math.abs(lat);
+            double dx = Math.floor(x);
+            double mx = Math.floor((x - dx) * 60);
+            double sx = Math.floor(((x - dx) - (mx / 60)) * 3600);
+
+            if (lat < 0) dx = -dx;
+
+            double y = Math.abs(lon);
+            double dy = Math.floor(y);
+            double my = Math.floor((y - dy) * 60);
+            double sy = Math.floor(((y - dy) - (my / 60)) * 3600);
+
+            if (lon < 0) dy = -dy;
+
+            /* task_force_latitude.setText(String.valueOf(locationGPS.getLatitude()));
+            task_force_longitude.setText(String.valueOf(locationGPS.getLongitude()))*/
+
+            task_force_latitude.setText(BigDecimal.valueOf(dx).longValue() + "° " + BigDecimal.valueOf(mx).longValue() + "' " + BigDecimal.valueOf(sx).longValue() + "'' N");
+            task_force_longitude.setText(BigDecimal.valueOf(dy).longValue() + "° " + BigDecimal.valueOf(my).longValue() + "' " + BigDecimal.valueOf(sy).longValue() + "'' O");
         }
 
     }

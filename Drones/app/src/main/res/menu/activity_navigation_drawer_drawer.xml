@@ -3,13 +3,12 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_news_task"
-            android:icon="@drawable/icon_news"
             android:title="Nuevas Tareas"
-            />
+            android:icon="@drawable/icon_news" />
         <item
             android:id="@+id/nav_progress_task"
             android:icon="@drawable/icon_progress"
-            android:title="Tareas en Proceso" />
+            android:title="Tareas en Proceso"/>
         <item
             android:id="@+id/nav_pending_task"
             android:icon="@drawable/icon_pending"

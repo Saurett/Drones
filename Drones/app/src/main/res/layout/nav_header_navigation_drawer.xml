@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_header_navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/side_nav_bar"
@@ -33,11 +34,12 @@
         android:text="android.studio@android.com" />
         -->
     <TextView
+        android:id="@+id/task_force_name"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorAccent"
         android:paddingTop="0dp"
-        android:text="CUAMX-HISTORICO-C"
+        android:text="Task force name"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_gravity="center_horizontal"
@@ -45,19 +47,21 @@
         android:textColor="@color/colorPrimaryWhite"
         />
    <TextView
+       android:id="@+id/task_element_name"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:text="Francisco Javier\nDíaz\nSaurett"
-       android:textSize="15sp"
+       android:text="Task element name\nTask element second name"
+       android:textSize="20sp"
        android:paddingStart="10dp"
        android:layout_gravity="top"
        android:textColor="@color/colorPrimaryWhite"
        />
     <TextView
+        android:id="@+id/task_force_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CIUDAD DE MÉXICO"
-        android:textSize="10sp"
+        android:text="Task force location"
+        android:textSize="15sp"
         android:textStyle="bold"
         android:paddingStart="10dp"
         android:layout_marginTop="10dp"
@@ -71,15 +75,16 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:text="LAT"
-          android:textSize="10sp"
+          android:textSize="15sp"
           android:paddingStart="10dp"
           />
       <TextView
+          android:id="@+id/task_force_latitude"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:text="19°25'10''N"
           android:textStyle="bold"
-          android:textSize="10sp"
+          android:textSize="15sp"
           android:paddingStart="10dp"
           android:textColor="@color/colorPrimaryWhite"
           />
@@ -92,15 +97,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="LONG"
-            android:textSize="10sp"
+            android:textSize="15sp"
             android:paddingStart="10dp"
             />
         <TextView
+            android:id="@+id/task_force_longitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="19°25'10''O"
             android:textStyle="bold"
-            android:textSize="10sp"
+            android:textSize="15sp"
             android:paddingStart="10dp"
             android:textColor="@color/colorPrimaryWhite"
             />

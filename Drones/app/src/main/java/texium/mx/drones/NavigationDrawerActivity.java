@@ -2,6 +2,8 @@ package texium.mx.drones;
 
 import android.Manifest;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.pm.PackageManager;
@@ -19,7 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -40,7 +46,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     private GoogleMap mMap;
 
-    FloatingActionButton fab, chat_fab;
+    private FloatingActionButton fab, chat_fab;
+    private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,23 +65,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
         fab.setOnClickListener(this);
         chat_fab.setOnClickListener(this);
 
-        /*new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                Fragment fragment = fragmentManager.findFragmentByTag("fragment_news_taks");
-                if (null != fragment) {
-                    fragmentManager.beginTransaction().remove(fragment).commit();
-                }
-            }
-        }*/
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -82,7 +77,25 @@ public class NavigationDrawerActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        getTaskForceData(navigationView);
 
+    }
+
+    public void getTaskForceData(NavigationView navigationView) {
+
+        View headerLayout = navigationView.getHeaderView(0);
+
+        task_force_name = (TextView) headerLayout.findViewById(R.id.task_force_name);
+        task_element_name = (TextView) headerLayout.findViewById(R.id.task_element_name);
+        task_force_location = (TextView) headerLayout.findViewById(R.id.task_force_location);
+        task_force_latitude = (TextView) headerLayout.findViewById(R.id.task_force_latitude);
+        task_force_longitude = (TextView) headerLayout.findViewById(R.id.task_force_longitude);
+
+        task_force_name.setText("CUAMX-HISTORICO-C");
+        task_element_name.setText("Francisco Javier\nDíaz\nSaurett");
+        task_force_location.setText("CIUDAD DE MÉXICO");
+        task_force_latitude.setText("19°25'10''N");
+        task_force_longitude.setText("19°25'10''N");
 
     }
 
@@ -90,23 +103,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
 
-            case R.id.task_title_close_button:
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                Fragment fragment = fragmentManager.findFragmentByTag("fragment_news_taks");
-                if (null != fragment) {
-                    fragmentManager.beginTransaction().remove(fragment).commit();
-                }
-
-                break;
-            case  R.id.fab:
+            case R.id.fab:
 
                 Snackbar.make(v, "Mi ubicación ha sido enviada", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
                 onMapReady(mMap);
                 break;
-            case  R.id.chat_fab:
+            case R.id.chat_fab:
 
                 Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -119,6 +123,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -128,27 +133,27 @@ public class NavigationDrawerActivity extends AppCompatActivity
         if (id == R.id.nav_news_task) {
 
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container,new NewsTasksFragment(),"fragment_news_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new NewsTasksFragment(), "fragment_news_taks");
             fragmentTransaction.commit();
 
         } else if (id == R.id.nav_progress_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container,new ProgressTasksFragment(),"fragment_progress_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), "fragment_progress_taks");
             fragmentTransaction.commit();
 
         } else if (id == R.id.nav_pending_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container,new PendingTasksFragment(),"fragment_pending_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), "fragment_pending_taks");
             fragmentTransaction.commit();
 
         } else if (id == R.id.nav_revision_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container,new RevisionTasksFragment(),"fragment_revision_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), "fragment_revision_taks");
             fragmentTransaction.commit();
 
         } else if (id == R.id.nav_close_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container,new CloseTasksFragment(),"fragment_close_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), "fragment_close_taks");
             fragmentTransaction.commit();
 
         } else if (id == R.id.nav_share) {
@@ -162,7 +167,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         return true;
     }
 
-    public void removeAllFragment(FragmentManager fragmentManager ) {
+    public void removeAllFragment(FragmentManager fragmentManager) {
 
         Fragment news = fragmentManager.findFragmentByTag("fragment_news_taks");
         if (null != news) {
@@ -194,7 +199,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng cdMx = new LatLng(19.4265606,-99.0672223);
+        LatLng cdMx = new LatLng(19.4265606, -99.0672223);
 
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
@@ -202,6 +207,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //Seteamos el tipo de mapa
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -226,6 +232,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+
     }
 
     @Override
@@ -250,6 +257,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void closeActiveTaskFragment(View view) {
 
@@ -259,15 +267,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 removeAllFragment(fragmentManager);
                 break;
-            default: break;
+            default:
+                break;
         }
-
-        //Notify datasetChange
     }
 
     @Override
     public void agreeTask(View v, TaskListAdapter taskListAdapter, int position) {
-        Snackbar.make(v, "Tarea aceptada # "+ position, Snackbar.LENGTH_LONG)
+        Snackbar.make(v, "Tarea aceptada # " + position, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         taskListAdapter.remove(position);
     }

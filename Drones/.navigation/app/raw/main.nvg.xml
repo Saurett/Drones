@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigationModel
+  ns = "http://schemas.android.com?import=com.android.tools.idea.editors.navigation.model.*">
+  <locations  
+    class = "java.util.ArrayList">
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "texium.mx.drones.MainActivity"/>
+      <point      
+        x = "2868"      
+        y = "68"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "texium.mx.drones.MapsActivity"/>
+      <point      
+        x = "1304"      
+        y = "1272"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "texium.mx.drones.NavigationDrawerActivity"/>
+      <point      
+        x = "156"      
+        y = "76"/>
+    </statePointEntry>
+  </locations>
+</navigationModel>

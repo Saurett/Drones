@@ -2,8 +2,13 @@ package texium.mx.drones;
 
 import android.Manifest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.pm.PackageManager;
@@ -42,12 +47,19 @@ import texium.mx.drones.fragments.RevisionTasksFragment;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, FragmentTaskListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, FragmentTaskListener, LocationListener {
+
+    private static final String provider = LocationManager.GPS_PROVIDER; //Recomendado GPS
 
     private GoogleMap mMap;
 
     private FloatingActionButton fab, chat_fab;
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
+    private LocationManager locationManagerGPS;
+    private Location locationGPS;
+    private Context ctx;
+
+    private boolean providerEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +89,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        defineLocationManager(this);
         getTaskForceData(navigationView);
-
     }
 
-    public void getTaskForceData(NavigationView navigationView) {
+    private void getTaskForceData(NavigationView navigationView) {
 
         View headerLayout = navigationView.getHeaderView(0);
 
@@ -94,8 +106,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         task_force_name.setText("CUAMX-HISTORICO-C");
         task_element_name.setText("Francisco Javier\nDíaz\nSaurett");
         task_force_location.setText("CIUDAD DE MÉXICO");
-        task_force_latitude.setText("19°25'10''N");
-        task_force_longitude.setText("19°25'10''N");
+
+        getLocation();
+
+
+        if (locationGPS != null) {
+            task_force_latitude.setText(String.valueOf(locationGPS.getLatitude()));
+            task_force_longitude.setText(String.valueOf(locationGPS.getLongitude()));
+        }
 
     }
 
@@ -115,9 +133,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
-
         }
-
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -277,5 +293,58 @@ public class NavigationDrawerActivity extends AppCompatActivity
         Snackbar.make(v, "Tarea aceptada # " + position, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         taskListAdapter.remove(position);
+    }
+
+    private void defineLocationManager(Context context) {
+        this.ctx = context;
+
+        locationManagerGPS = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        providerEnabled = locationManagerGPS.isProviderEnabled(provider);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            } else {
+                locationManagerGPS.requestLocationUpdates(provider, 1000, 0, this);
+            }
+        } else {
+            locationManagerGPS.requestLocationUpdates(provider, 1000, 0, this);
+        }
+    }
+
+    private void getLocation() {
+        if (providerEnabled) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationGPS = locationManagerGPS.getLastKnownLocation(provider);
+            } else {
+                locationGPS = locationManagerGPS.getLastKnownLocation(provider);
+            }
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        getLocation();
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

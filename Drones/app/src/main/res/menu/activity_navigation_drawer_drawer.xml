@@ -23,16 +23,16 @@
             android:title="Tareas Cerradas"
             />
     </group>
-    <item android:title="Opciones">
+    <item android:title="Opciones" >
         <menu>
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Nueva Incidencia"/>
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Historial de Incidencias" />
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/common_full_open_on_phone"
+                android:title="Cerrar Sesión" />
         </menu>
     </item>
 

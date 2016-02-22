@@ -1,24 +1,22 @@
 package texium.mx.drones;
 
 import android.Manifest;
-
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.view.View;
-import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,11 +24,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -41,27 +38,38 @@ import java.math.BigDecimal;
 
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.fragments.CloseTasksFragment;
-import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
+import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, FragmentTaskListener, LocationListener {
 
-    private static final String provider = LocationManager.GPS_PROVIDER; //Recomendado GPS
-
+    //Activación Google Maps//
     private GoogleMap mMap;
 
-    private FloatingActionButton fab, chat_fab;
+    //Botones Principales//
+    private FloatingActionButton fab, chat_fab,camera_fab,video_fab;
+
+    //Header Dinamico//
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
+
+
+    //Administración del GPS//
+    private static final String provider = LocationManager.GPS_PROVIDER; //Recomendado GPS
     private LocationManager locationManagerGPS;
     private Location locationGPS;
     private Context ctx;
-
     private boolean providerEnabled;
+
+    //Administración  de la Camara//
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
+    private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
+    private Intent cameraIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +79,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setTitle("");
+        setTitle(""); //Quita el titulo del activity
 
+        //Botones flotantes principales//
         fab = (FloatingActionButton) findViewById(R.id.fab);
         chat_fab = (FloatingActionButton) findViewById(R.id.chat_fab);
+        camera_fab = (FloatingActionButton) findViewById(R.id.camera_fab);
+        video_fab = (FloatingActionButton) findViewById(R.id.video_fab);
 
+        //Listeres de los botones//
         fab.setOnClickListener(this);
         chat_fab.setOnClickListener(this);
+        camera_fab.setOnClickListener(this);
+        video_fab.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -88,10 +102,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //Activación del Google Maps//
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //Administar ubicación por GPS//
         defineLocationManager(this);
+
+        //Administrar Header dinamico//
         getTaskForceData(navigationView);
     }
 
@@ -130,31 +148,73 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             if (lon < 0) dy = -dy;
 
-            /* task_force_latitude.setText(String.valueOf(locationGPS.getLatitude()));
-            task_force_longitude.setText(String.valueOf(locationGPS.getLongitude()))*/
-
             task_force_latitude.setText(BigDecimal.valueOf(dx).longValue() + "° " + BigDecimal.valueOf(mx).longValue() + "' " + BigDecimal.valueOf(sx).longValue() + "'' N");
             task_force_longitude.setText(BigDecimal.valueOf(dy).longValue() + "° " + BigDecimal.valueOf(my).longValue() + "' " + BigDecimal.valueOf(sy).longValue() + "'' O");
         }
 
     }
 
+    //fab action onClik
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
 
             case R.id.fab:
-
+                //TODO Enviar WEB SERVICES
                 Snackbar.make(v, "Mi ubicación ha sido enviada", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-
                 onMapReady(mMap);
                 break;
             case R.id.chat_fab:
-
                 Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
+            case R.id.camera_fab:
+                mediaContent(MediaStore.ACTION_IMAGE_CAPTURE,CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                break;
+            case R.id.video_fab:
+                mediaContent(MediaStore.ACTION_VIDEO_CAPTURE,CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+                break;
+            default:
+                Snackbar.make(v, "La opción no esta habilitada", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                break;
+        }
+    }
+
+    //Save media content
+    private void mediaContent(String mediaType, int requestType) {
+        cameraIntent = new Intent(mediaType);
+
+        if(cameraIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(cameraIntent, requestType);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // Image captured and saved to fileUri specified in the Intent
+                Toast.makeText(this, "Image saved to:\n" +
+                        data.getData(), Toast.LENGTH_LONG).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled the image capture
+            } else {
+                // Image capture failed, advise user
+            }
+        }
+
+        if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // Video captured and saved to fileUri specified in the Intent
+                Toast.makeText(this, "Video saved to:\n" +
+                        data.getData(), Toast.LENGTH_LONG).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled the video capture
+            } else {
+                // Video capture failed, advise user
+            }
         }
     }
 

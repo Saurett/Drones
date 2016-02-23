@@ -22,7 +22,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -255,8 +254,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), "fragment_close_taks");
             fragmentTransaction.commit();
 
-        } else if (id == R.id.nav_share) {
-
         } else if (id == R.id.nav_logout) {
             finish();
         }
@@ -307,16 +304,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         //Seteamos el tipo de mapa
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+           return;
         }
         mMap.setMyLocationEnabled(true);
 

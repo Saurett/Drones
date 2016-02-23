@@ -130,6 +130,7 @@
         android:gravity="center"
         android:layout_marginBottom="20dp">
         <Button
+            android:id="@+id/decline_task_button"
             android:layout_width="70dp"
             android:layout_height="30dp"
             android:text="  POSPONER  "
@@ -153,6 +154,8 @@
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
             android:gravity="center"
+            android:visibility="invisible"
+            android:enabled="false"
             />
 
         <Button

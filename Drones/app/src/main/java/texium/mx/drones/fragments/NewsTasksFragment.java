@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -23,8 +25,7 @@ import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksTitle;
 
 
-public class NewsTasksFragment extends Fragment
-        implements View.OnClickListener {
+public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
     FragmentTaskListener activityListener;
     static List<Tasks> newsTask;
@@ -82,8 +83,6 @@ public class NewsTasksFragment extends Fragment
 
         LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
         tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
-
-        //task_list_adapter.remove(1);
 
         return view;
     }

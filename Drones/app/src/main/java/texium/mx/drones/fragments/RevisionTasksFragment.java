@@ -56,7 +56,6 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
         tasks_list_tittle = (RecyclerView) view.findViewById(R.id.revision_taks_list_title);
         tasks_list = (RecyclerView) view.findViewById(R.id.revision_taks_list);
 
-
         task_list_adapter = new TaskListAdapter();
         task_list_title_adapter = new TaskListTitleAdapter();
 

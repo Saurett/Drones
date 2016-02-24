@@ -6,7 +6,14 @@
     android:orientation="vertical"
     android:alpha="80"
     >
-
+    <TextView
+        android:id="@+id/hidden_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="{jsonArray}"
+        android:visibility="invisible"
+        android:textSize="0sp"
+        />
     <TextView
         android:id="@+id/task_title"
         android:layout_width="500dp"

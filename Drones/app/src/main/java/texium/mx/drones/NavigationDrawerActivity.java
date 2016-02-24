@@ -43,6 +43,7 @@ import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.Tasks;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
@@ -364,7 +365,24 @@ public class NavigationDrawerActivity extends AppCompatActivity
     public void agreeTask(View v, TaskListAdapter taskListAdapter, int position) {
         Snackbar.make(v, "Tarea aceptada # " + position, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+
         taskListAdapter.remove(position);
+        taskListAdapter.notifyItemRemoved(position);
+        taskListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void agreeTask2(View v, TaskListAdapter taskListAdapter, Tasks task,int position) {
+
+        Snackbar.make(v, "Tarea aceptada :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+
+        taskListAdapter.remove(position);
+        taskListAdapter.notifyItemRemoved(position);
+        taskListAdapter.notifyDataSetChanged();
+
+        //FragmentManager fragmentManager = getSupportFragmentManager();
+        //removeAllFragment(fragmentManager);
     }
 
     private void defineLocationManager(Context context) {

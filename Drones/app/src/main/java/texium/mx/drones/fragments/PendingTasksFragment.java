@@ -30,7 +30,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
     static {
         pendingTask = new ArrayList<>();
-        pendingTask.add(new Tasks("Patrulla de inspección de zonas verdes en Tierra Colorada.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
+        pendingTask.add(new Tasks("Patrulla de inspección de zonas verdes en Tierra Colorada.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{5}"));
     }
 
     static {

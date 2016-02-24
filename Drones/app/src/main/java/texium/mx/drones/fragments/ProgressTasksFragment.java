@@ -23,15 +23,15 @@ import texium.mx.drones.models.TasksTitle;
 
 public class ProgressTasksFragment extends Fragment implements View.OnClickListener {
 
-    FragmentTaskListener activityListener;
+    static FragmentTaskListener activityListener;
     static List<Tasks> progressTask;
     static List<TasksTitle> progressTaskTitle;
 
     static {
         progressTask = new ArrayList<>();
-        progressTask.add(new Tasks("Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        progressTask.add(new Tasks("Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Baja", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        progressTask.add(new Tasks("Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Alta", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
+        progressTask.add(new Tasks("Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{4}"));
+        progressTask.add(new Tasks("Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Baja", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{4}"));
+        progressTask.add(new Tasks("Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Alta", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{4}"));
     }
 
     static {
@@ -41,7 +41,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
     RecyclerView tasks_list, tasks_list_tittle;
 
-    TaskListAdapter task_list_adapter;
+    static TaskListAdapter task_list_adapter;
     TaskListTitleAdapter task_list_title_adapter;
 
 
@@ -101,5 +101,9 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    public static void fragmentJump(View view,Tasks task, int position) {
+        activityListener.agreeTask2(view,task_list_adapter,task,position);
     }
 }

@@ -27,22 +27,22 @@ import texium.mx.drones.models.TasksTitle;
 
 public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
-    FragmentTaskListener activityListener;
+    static FragmentTaskListener activityListener;
     static List<Tasks> newsTask;
     static List<TasksTitle> newsTaskTitle;
 
     static {
         newsTask = new ArrayList<>();
-        newsTask.add(new Tasks("0-Patrulla de inspección de zonas verdes en la polvora.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("1-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("2-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("3-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("4-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("5-Patrulla de inspección de zonas verdes en Churubusco y Patrulla de inspección de zonas verdes en Churubusco v2.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("6-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("7-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("8-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
-        newsTask.add(new Tasks("9-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs"));
+        newsTask.add(new Tasks("0-Patrulla de inspección de zonas verdes en la polvora.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("1-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("2-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("3-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("4-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("5-Patrulla de inspección de zonas verdes en Churubusco y Patrulla de inspección de zonas verdes en Churubusco v2.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("6-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("7-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("8-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
+        newsTask.add(new Tasks("9-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{3}"));
     }
 
     static {
@@ -52,7 +52,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
     RecyclerView tasks_list, tasks_list_tittle;
 
-    TaskListAdapter task_list_adapter;
+    static TaskListAdapter task_list_adapter;
     TaskListTitleAdapter task_list_title_adapter;
 
 
@@ -90,7 +90,10 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
-        //Aqui cargar la cosas de fred
+
+        //TODO AQUI VA LO DE FRED
+
+
 
     }
 
@@ -111,9 +114,16 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                 activityListener.closeActiveTaskFragment(v);
             break;
             case R.id.agree_task_button:
+                //TODO NO SE COMO OBTENER POR AQUI LA POSICION
                 activityListener.agreeTask(v, task_list_adapter, 1);
             default:
                 break;
         }
     }
+
+    public static void fragmentJump(View view,Tasks task, int position) {
+        activityListener.agreeTask2(view, task_list_adapter, task, position);
+    }
+
+
 }

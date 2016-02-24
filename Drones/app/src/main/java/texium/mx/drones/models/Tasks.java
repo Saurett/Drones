@@ -10,14 +10,16 @@ public class Tasks {
     private String task_priority;
     private String task_begin_date;
     private String task_end_date;
+    private String hidden_data;
 
-    public Tasks(String task_tittle,String task_content, String task_priority, String task_begin_date, String task_end_date){
+    public Tasks(String task_tittle,String task_content, String task_priority, String task_begin_date, String task_end_date, String hidden_data){
         super();
         this.task_tittle = task_tittle;
         this.task_content = task_content;
         this.task_priority = task_priority;
         this.task_begin_date = task_begin_date;
         this.task_end_date = task_end_date;
+        this.hidden_data = hidden_data;
     }
 
     public String getTask_tittle() { return task_tittle;}
@@ -39,4 +41,8 @@ public class Tasks {
     public String getTask_end_date() { return task_end_date;}
 
     public void setTask_end_date(String task_end_date) { this.task_end_date = task_end_date; }
+
+    public String getHidden_data() { return hidden_data;}
+
+    public void setHidden_data(String hidden_data) { this.hidden_data = hidden_data;}
 }

@@ -22,6 +22,7 @@ import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
+import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
 
 
@@ -113,16 +114,13 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
             case R.id.task_title_close_button:
                 activityListener.closeActiveTaskFragment(v);
             break;
-            case R.id.agree_task_button:
-                //TODO NO SE COMO OBTENER POR AQUI LA POSICION
-                activityListener.agreeTask(v, task_list_adapter, 1);
             default:
                 break;
         }
     }
 
-    public static void fragmentJump(View view,Tasks task, int position) {
-        activityListener.agreeTask2(view, task_list_adapter, task, position);
+    public static void fragmentJump(View view,Tasks task,TasksDecode tasksDecode) {
+        activityListener.taskActions(view, task_list_adapter, task,tasksDecode);
     }
 
 

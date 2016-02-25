@@ -162,8 +162,6 @@
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
             android:gravity="center"
-            android:visibility="invisible"
-            android:enabled="false"
             />
 
         <Button

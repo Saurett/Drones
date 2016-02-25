@@ -18,6 +18,7 @@ import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
+import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
 
 
@@ -104,7 +105,7 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public static void fragmentJump(View view,Tasks task, int position) {
-        activityListener.agreeTask2(view, task_list_adapter, task, position);
+    public static void fragmentJump(View view,Tasks task,TasksDecode tasksDecode) {
+        activityListener.taskActions(view, task_list_adapter, task, tasksDecode);
     }
 }

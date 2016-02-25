@@ -44,6 +44,7 @@ import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
+import texium.mx.drones.models.TasksDecode;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
@@ -350,36 +351,52 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @Override
     public void closeActiveTaskFragment(View view) {
 
-        switch (view.getId()) {
+        /*switch (view.getId()) {
 
-            case R.id.task_title_close_button:
+            case R.id.task_title_close_button:*/
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 removeAllFragment(fragmentManager);
+                /*break;
+            default:
+                break;
+        }*/
+    }
+
+    @Override
+    public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
+
+        switch (v.getId()) {
+            case R.id.agree_task_button:
+                Snackbar.make(v, "Tarea aceptada :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                taskListAdapter.remove(tasksDecode.getTask_position());
+                taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
+                taskListAdapter.notifyDataSetChanged();
+                break;
+            case R.id.decline_task_button:
+                Snackbar.make(v, "Tarea pospuesta :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                taskListAdapter.remove(tasksDecode.getTask_position());
+                taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
+                taskListAdapter.notifyDataSetChanged();
+                break;
+            case R.id.finish_task_button:
+                Snackbar.make(v, "Tarea finalizada :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                taskListAdapter.remove(tasksDecode.getTask_position());
+                taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
+                taskListAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;
         }
-    }
 
-    @Override
-    public void agreeTask(View v, TaskListAdapter taskListAdapter, int position) {
-        Snackbar.make(v, "Tarea aceptada # " + position, Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-
-        taskListAdapter.remove(position);
-        taskListAdapter.notifyItemRemoved(position);
-        taskListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void agreeTask2(View v, TaskListAdapter taskListAdapter, Tasks task,int position) {
-
-        Snackbar.make(v, "Tarea aceptada :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-
-        taskListAdapter.remove(position);
-        taskListAdapter.notifyItemRemoved(position);
-        taskListAdapter.notifyDataSetChanged();
+        if (taskListAdapter.getItemCount() == 0) {
+            closeActiveTaskFragment(v);
+        }
 
         //FragmentManager fragmentManager = getSupportFragmentManager();
         //removeAllFragment(fragmentManager);

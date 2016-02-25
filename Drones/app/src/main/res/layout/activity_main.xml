@@ -27,35 +27,12 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="20dp"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginRight="20dp">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="CD"
-                        android:textSize="50sp"
-                        android:textColor="@color/colorPrimary"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MX"
-                        android:textSize="50sp"
-                        android:textColor="@color/colorAccent"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="CIUDAD DE MÉXICO"
-                    android:textSize="10sp"
-                    android:textAlignment="center"/>
-            </LinearLayout>
+            <View
+                android:layout_width="280dp"
+                android:layout_height="80dp"
+                android:background="@drawable/cdmx"
+                android:layout_gravity="center_vertical"
+                />
             <View
                 android:layout_width="1dp"
                 android:layout_height="80dp"
@@ -66,7 +43,7 @@
             <View
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="@drawable/angel"
+                android:background="@drawable/sedema"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
 
@@ -164,7 +141,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="Recuperar contraseña"
+                android:text="Restablecer contraseña"
                 android:textColor="@color/colorAccent"
                 android:layout_marginLeft="30dp"/>
         </LinearLayout>
@@ -178,6 +155,37 @@
 </RelativeLayout>
 
     <!--
+
+    <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginRight="20dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CD"
+                        android:textSize="50sp"
+                        android:textColor="@color/colorPrimary"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MX"
+                        android:textSize="50sp"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CIUDAD DE MÉXICO"
+                    android:textSize="10sp"
+                    android:textAlignment="center"/>
+            </LinearLayout>
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

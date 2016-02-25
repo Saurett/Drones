@@ -27,14 +27,17 @@ import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
+import texium.mx.drones.helpers.DecodeJSONHelper;
 import texium.mx.drones.models.Tasks;
+import texium.mx.drones.models.TasksDecode;
+import texium.mx.drones.utils.Constants;
 
 /**
  * Created by saurett on 14/01/2016.
  */
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHolder>{
 
-    /*
+    /* En caso de llamar una actividad desde el adapter
     Context context = v.getContext();
     Intent intent = new Intent(context, MainActivity.class);
     context.startActivity(intent);
@@ -87,14 +90,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task_list, parent, false);
         ViewHolder vh = new ViewHolder(view);
-        vh.agree_task_button.setOnClickListener(onClickListener);
-
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         final Tasks task = tasks_list.get(position);
+
         holder.task_title.setText(task.getTask_tittle());
         holder.task_content.setText(task.getTask_content());
         holder.task_priority.setText(task.getTask_priority());
@@ -102,46 +104,12 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         holder.task_end_date.setText(task.getTask_end_date());
         holder.hidden_data.setText(task.getHidden_data());
 
-        String data = (String) holder.hidden_data.getText();
-        int task_type = 0;
+        String jsonData = (String) holder.hidden_data.getText();
 
-        //TODO MOVE A STATIC CLASS JSON
-        try {
-            JSONObject jObject = new JSONObject(data);
-            task_type = jObject.getInt("task_type");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        final TasksDecode taskDecode = DecodeJSONHelper.decodeTask(jsonData);
+        taskDecode.setTask_position(position);
 
-        //TODO MOVE TO A PRIVATE METOD
-        final Map<Long,Object> data_keys = new HashMap<>();
-
-        data_keys.put(1L,task_type);
-
-        //BUTTON CONTROLS
-        switch (task_type) {
-            case 4:
-                holder.decline_task_button.setVisibility(View.INVISIBLE);
-                holder.agree_task_button.setVisibility(View.INVISIBLE);
-                holder.finish_task_button.setVisibility(View.VISIBLE);
-                break;
-            case 5:
-                holder.decline_task_button.setVisibility(View.INVISIBLE);
-                holder.agree_task_button.setVisibility(View.VISIBLE);
-                break;
-            case 6:
-                holder.decline_task_button.setVisibility(View.INVISIBLE);
-                holder.agree_task_button.setVisibility(View.INVISIBLE);
-                holder.finish_task_button.setVisibility(View.INVISIBLE);
-                break;
-            case 7:
-                holder.decline_task_button.setVisibility(View.INVISIBLE);
-                holder.agree_task_button.setVisibility(View.INVISIBLE);
-                break;
-            default:
-
-                break;
-        }
+        buttonVisibilityControl(holder, taskDecode.getTask_type());
 
         holder.agree_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,28 +118,16 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
                 //TODO ABRIR UN NUEVO FRAGMETN PARA ACEPTAR LA TAREA CON UNA DESCRIPCION
                 //TODO COMO EJEMPLO ABRIR CUALQUIER FRAGMENT MENOS EL ACTUAL Y CERRAR EL ACTUAL
                 //TODO PASAR LOS DOS ON CLICK LISTENER A UN METODO IMPLEMENTADO, NO SALE POR QUE NO PUEDO OBTENER EL POSITION FUERA DE AQUI
-                Integer task_type = (Integer) data_keys.get(1L);
 
-                switch (task_type) {
-                    case 3:
-                        NewsTasksFragment.fragmentJump(v, task, position);
-                        break;
-                    case 4:
-                        ProgressTasksFragment.fragmentJump(v, task, position);
-                        break;
-                    case 5:
-                        PendingTasksFragment.fragmentJump(v,task,position);
-                        break;
-                    case 6:
-                        CloseTasksFragment.fragmentJump(v,task,position);
-                        break;
-                    case 7:
-                        RevisionTasksFragment.fragmentJump(v,task,position);
-                        break;
-                    default:
-                        Snackbar.make(v, "No action", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                        break;
+                fragmentJumper(v,task,taskDecode);
+            }
+        });
+
+        holder.finish_task_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                {
+                    fragmentJumper(v,task,taskDecode);
                 }
             }
         });
@@ -180,21 +136,72 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         holder.decline_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //TODO ACEPTAR LA TAREA; ENVIAR EL CAMBIO AL WEB SERVICE DE FRED
-                Snackbar.make(v, "Tarea pospuesta # " + position, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                remove(position);
-                notifyItemRemoved(position);
-                notifyDataSetChanged();
+                fragmentJumper(v,task,taskDecode);
             }
         });
     }
 
+    private void fragmentJumper(View v, Tasks task,TasksDecode _tasksDecode) {
+
+        switch (_tasksDecode.getTask_type()) {
+            case Constants.NEWS_TASK:
+                NewsTasksFragment.fragmentJump(v, task, _tasksDecode);
+                break;
+            case Constants.PENDING_TASK:
+                PendingTasksFragment.fragmentJump(v, task, _tasksDecode);
+                break;
+            case Constants.PROGRESS_TASK:
+                ProgressTasksFragment.fragmentJump(v,task,_tasksDecode);
+                break;
+            case Constants.CLOSE_TASK:
+                CloseTasksFragment.fragmentJump(v,task,_tasksDecode);
+                break;
+            case Constants.REVISION_TASK:
+                RevisionTasksFragment.fragmentJump(v,task,_tasksDecode);
+                break;
+            default:
+                Snackbar.make(v, "No action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                break;
+        }
+    }
+
+    private void buttonVisibilityControl(ViewHolder holder,int task_type) {
+        switch (task_type) {
+            case Constants.NEWS_TASK:
+                holder.decline_task_button.setVisibility(View.VISIBLE);
+                holder.finish_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.VISIBLE);
+                break;
+            case Constants.PROGRESS_TASK:
+                holder.decline_task_button.setVisibility(View.VISIBLE);
+                holder.finish_task_button.setVisibility(View.VISIBLE);
+                holder.agree_task_button.setVisibility(View.INVISIBLE);
+                break;
+            case Constants.PENDING_TASK:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.finish_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.VISIBLE);
+                break;
+            case Constants.REVISION_TASK:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.finish_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.INVISIBLE);
+                break;
+            case Constants.CLOSE_TASK:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.finish_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.INVISIBLE);
+                break;
+            default:
+                break;
+        }
+    }
 
 
     @Override
     public int getItemCount() {
         return tasks_list == null ? 0 : tasks_list.size();
     }
+
 }

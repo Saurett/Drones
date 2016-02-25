@@ -24,13 +24,13 @@ import texium.mx.drones.models.TasksTitle;
 public class PendingTasksFragment extends Fragment implements View.OnClickListener {
 
 
-    FragmentTaskListener activityListener;
+    static FragmentTaskListener activityListener;
     static List<Tasks> pendingTask;
     static List<TasksTitle> pendingTaskTitle;
 
     static {
         pendingTask = new ArrayList<>();
-        pendingTask.add(new Tasks("Patrulla de inspección de zonas verdes en Tierra Colorada.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{5}"));
+        pendingTask.add(new Tasks("Patrulla de inspección de zonas verdes en Tierra Colorada.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:5,id:1}"));
     }
 
     static {
@@ -40,7 +40,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
     RecyclerView tasks_list, tasks_list_tittle;
 
-    TaskListAdapter task_list_adapter;
+    static TaskListAdapter task_list_adapter;
     TaskListTitleAdapter task_list_title_adapter;
 
 
@@ -100,5 +100,9 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
             default:
                 break;
         }
+    }
+
+    public static void fragmentJump(View view,Tasks task, int position) {
+        activityListener.agreeTask2(view, task_list_adapter, task, position);
     }
 }

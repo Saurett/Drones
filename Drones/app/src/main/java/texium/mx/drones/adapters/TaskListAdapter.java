@@ -22,8 +22,11 @@ import java.util.Map;
 import texium.mx.drones.MainActivity;
 import texium.mx.drones.NavigationDrawerActivity;
 import texium.mx.drones.R;
+import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.NewsTasksFragment;
+import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
+import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.models.Tasks;
 
 /**
@@ -51,6 +54,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
 
         Button agree_task_button;
         Button decline_task_button;
+        Button finish_task_button;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -63,6 +67,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
             hidden_data = (TextView) itemView.findViewById(R.id.hidden_data);
             agree_task_button = (Button) itemView.findViewById(R.id.agree_task_button);
             decline_task_button = (Button) itemView.findViewById(R.id.decline_task_button);
+            finish_task_button = (Button) itemView.findViewById(R.id.finish_task_button);
         }
     }
 
@@ -83,8 +88,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task_list, parent, false);
         ViewHolder vh = new ViewHolder(view);
         vh.agree_task_button.setOnClickListener(onClickListener);
-        vh.agree_task_button.setVisibility(View.VISIBLE);
-        vh.decline_task_button.setVisibility(View.VISIBLE);
 
         return vh;
     }
@@ -100,18 +103,45 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         holder.hidden_data.setText(task.getHidden_data());
 
         String data = (String) holder.hidden_data.getText();
-        String cosa = "";
+        int task_type = 0;
 
+        //TODO MOVE A STATIC CLASS JSON
         try {
             JSONObject jObject = new JSONObject(data);
-            cosa = jObject.getString("task_type");
+            task_type = jObject.getInt("task_type");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        //TODO MOVE TO A PRIVATE METOD
         final Map<Long,Object> data_keys = new HashMap<>();
 
-        data_keys.put(1L, Integer.valueOf(cosa));
+        data_keys.put(1L,task_type);
+
+        //BUTTON CONTROLS
+        switch (task_type) {
+            case 4:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.INVISIBLE);
+                holder.finish_task_button.setVisibility(View.VISIBLE);
+                break;
+            case 5:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.VISIBLE);
+                break;
+            case 6:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.INVISIBLE);
+                holder.finish_task_button.setVisibility(View.INVISIBLE);
+                break;
+            case 7:
+                holder.decline_task_button.setVisibility(View.INVISIBLE);
+                holder.agree_task_button.setVisibility(View.INVISIBLE);
+                break;
+            default:
+
+                break;
+        }
 
         holder.agree_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,10 +159,20 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
                     case 4:
                         ProgressTasksFragment.fragmentJump(v, task, position);
                         break;
+                    case 5:
+                        PendingTasksFragment.fragmentJump(v,task,position);
+                        break;
+                    case 6:
+                        CloseTasksFragment.fragmentJump(v,task,position);
+                        break;
+                    case 7:
+                        RevisionTasksFragment.fragmentJump(v,task,position);
+                        break;
+                    default:
+                        Snackbar.make(v, "No action", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        break;
                 }
-
-
-
             }
         });
 

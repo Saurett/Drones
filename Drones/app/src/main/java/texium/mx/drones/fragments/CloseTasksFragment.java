@@ -23,14 +23,14 @@ import texium.mx.drones.models.TasksTitle;
 
 public class CloseTasksFragment extends Fragment implements View.OnClickListener{
 
-    FragmentTaskListener activityListener;
+    static FragmentTaskListener activityListener;
     static List<Tasks> closeTask;
     static List<TasksTitle> closeTaskTitle;
 
     static {
         closeTask = new ArrayList<>();
-        closeTask.add(new Tasks("Patrulla de inspección de zonas verdes en la polvora.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{6}"));
-        closeTask.add(new Tasks("Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","task_type:{6}"));
+        closeTask.add(new Tasks("Patrulla de inspección de zonas verdes en la polvora.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:6,id:1}"));
+        closeTask.add(new Tasks("Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:6,id:1}"));
     }
 
     static {
@@ -40,7 +40,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
 
     RecyclerView tasks_list, tasks_list_tittle;
 
-    TaskListAdapter task_list_adapter;
+    static TaskListAdapter task_list_adapter;
     TaskListTitleAdapter task_list_title_adapter;
 
 
@@ -99,5 +99,9 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
             default:
                 break;
         }
+    }
+
+    public static void fragmentJump(View view,Tasks task, int position) {
+        activityListener.agreeTask2(view, task_list_adapter, task, position);
     }
 }

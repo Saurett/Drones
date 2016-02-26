@@ -455,10 +455,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         clearTaskToken();
 
-        taskToken.put(1L, v);
-        taskToken.put(2L, taskListAdapter);
-        taskToken.put(3L, task);
-        taskToken.put(4L, tasksDecode);
+        taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_VIEW, v);
+        taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER, taskListAdapter);
+        taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, task);
+        taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, tasksDecode);
 
         return taskToken;
     }

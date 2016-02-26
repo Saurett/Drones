@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.fragments.CloseTasksFragment;
+import texium.mx.drones.fragments.FinishTasksFragment;
 import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
@@ -291,6 +292,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
         if (null != revision) {
             fragmentManager.beginTransaction().remove(revision).commit();
         }
+
+        Fragment finish = fragmentManager.findFragmentByTag("fragment_finish_taks");
+        if (null != finish) {
+            fragmentManager.beginTransaction().remove(finish).commit();
+        }
     }
 
     //TODO MOVER A MapsActivity
@@ -389,6 +395,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 taskListAdapter.remove(tasksDecode.getTask_position());
                 taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
                 taskListAdapter.notifyDataSetChanged();
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), "fragment_finish_taks");
+                fragmentTransaction.commit();
+
                 break;
             default:
                 break;

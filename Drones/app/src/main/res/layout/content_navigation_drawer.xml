@@ -25,6 +25,12 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"></FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/tasks_finish_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"></FrameLayout>
+
     <View
     android:layout_width="match_parent"
     android:layout_height="10dp"

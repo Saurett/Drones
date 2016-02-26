@@ -35,6 +35,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.fragments.CloseTasksFragment;
@@ -46,6 +48,7 @@ import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
+import texium.mx.drones.utils.Constants;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
@@ -72,6 +75,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
     private Intent cameraIntent;
+
+    //Token Control//
+    Map<Long,Object> taskToken = new HashMap<>();
 
 
     @Override
@@ -234,30 +240,42 @@ public class NavigationDrawerActivity extends AppCompatActivity
         if (id == R.id.nav_news_task) {
 
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new NewsTasksFragment(), "fragment_news_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new NewsTasksFragment(), Constants.FRAGMENT_NEWS_TAG);
             fragmentTransaction.commit();
+
+            taskToken.clear();
 
         } else if (id == R.id.nav_progress_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), "fragment_progress_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
             fragmentTransaction.commit();
+
+            taskToken.clear();
 
         } else if (id == R.id.nav_pending_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), "fragment_pending_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), Constants.FRAGMENT_PENDING_TAG);
             fragmentTransaction.commit();
+
+            taskToken.clear();
 
         } else if (id == R.id.nav_revision_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), "fragment_revision_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), Constants.FRAGMENT_REVISION_TAG);
             fragmentTransaction.commit();
+
+            taskToken.clear();
 
         } else if (id == R.id.nav_close_task) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), "fragment_close_taks");
+            fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), Constants.FRAGMENT_CLOSE_TAG);
             fragmentTransaction.commit();
 
+            taskToken.clear();
+
         } else if (id == R.id.nav_logout) {
+
+            taskToken.clear();
             finish();
         }
 
@@ -268,32 +286,32 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     public void removeAllFragment(FragmentManager fragmentManager) {
 
-        Fragment news = fragmentManager.findFragmentByTag("fragment_news_taks");
+        Fragment news = fragmentManager.findFragmentByTag(Constants.FRAGMENT_NEWS_TAG);
         if (null != news) {
             fragmentManager.beginTransaction().remove(news).commit();
         }
 
-        Fragment pending = fragmentManager.findFragmentByTag("fragment_pending_taks");
+        Fragment pending = fragmentManager.findFragmentByTag(Constants.FRAGMENT_PENDING_TAG);
         if (null != pending) {
             fragmentManager.beginTransaction().remove(pending).commit();
         }
 
-        Fragment close = fragmentManager.findFragmentByTag("fragment_close_taks");
+        Fragment close = fragmentManager.findFragmentByTag(Constants.FRAGMENT_CLOSE_TAG);
         if (null != close) {
             fragmentManager.beginTransaction().remove(close).commit();
         }
 
-        Fragment progress = fragmentManager.findFragmentByTag("fragment_progress_taks");
+        Fragment progress = fragmentManager.findFragmentByTag(Constants.FRAGMENT_PROGRESS_TAG);
         if (null != progress) {
             fragmentManager.beginTransaction().remove(progress).commit();
         }
 
-        Fragment revision = fragmentManager.findFragmentByTag("fragment_revision_taks");
+        Fragment revision = fragmentManager.findFragmentByTag(Constants.FRAGMENT_REVISION_TAG);
         if (null != revision) {
             fragmentManager.beginTransaction().remove(revision).commit();
         }
 
-        Fragment finish = fragmentManager.findFragmentByTag("fragment_finish_taks");
+        Fragment finish = fragmentManager.findFragmentByTag(Constants.FRAGMENT_FINISH_TAG);
         if (null != finish) {
             fragmentManager.beginTransaction().remove(finish).commit();
         }
@@ -356,20 +374,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public void closeActiveTaskFragment(View view) {
-
-        /*switch (view.getId()) {
-
-            case R.id.task_title_close_button:*/
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                removeAllFragment(fragmentManager);
-                /*break;
-            default:
-                break;
-        }*/
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        removeAllFragment(fragmentManager);
     }
 
     @Override
     public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         switch (v.getId()) {
             case R.id.agree_task_button:
@@ -389,20 +401,35 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 taskListAdapter.notifyDataSetChanged();
                 break;
             case R.id.finish_task_button:
-                Snackbar.make(v, "Tarea finalizada :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                setToken(v,taskListAdapter,task,tasksDecode);
+
+                closeActiveTaskFragment(v);
+
+
+                FragmentTransaction finishFragment = fragmentManager.beginTransaction();
+                finishFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
+                finishFragment.commit();
+
+                break;
+            case R.id.send_task_button:
+                closeActiveTaskFragment(v);
+
+                FragmentTransaction progressFragment = fragmentManager.beginTransaction();
+                progressFragment.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
+                progressFragment.commit();
 
                 taskListAdapter.remove(tasksDecode.getTask_position());
                 taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
                 taskListAdapter.notifyDataSetChanged();
 
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), "fragment_finish_taks");
-                fragmentTransaction.commit();
+                Snackbar.make(v,"Tarea Finalizada : " + task.getTask_tittle(), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
 
                 break;
             default:
+                Snackbar.make(v, "Acción no registrada " , Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
                 break;
         }
 
@@ -413,6 +440,30 @@ public class NavigationDrawerActivity extends AppCompatActivity
         //FragmentManager fragmentManager = getSupportFragmentManager();
         //removeAllFragment(fragmentManager);
     }
+
+    @Override
+    public void clearTaskToken() {
+        taskToken.clear();
+    }
+
+    @Override
+    public Map<Long,Object> getToken() {
+        return taskToken;
+    }
+
+    public Map<Long,Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
+
+        clearTaskToken();
+
+        taskToken.put(1L, v);
+        taskToken.put(2L, taskListAdapter);
+        taskToken.put(3L, task);
+        taskToken.put(4L, tasksDecode);
+
+        return taskToken;
+    }
+
+
 
     private void defineLocationManager(Context context) {
         this.ctx = context;

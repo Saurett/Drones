@@ -18,7 +18,7 @@
         android:id="@+id/task_title"
         android:layout_width="500dp"
         android:layout_height="wrap_content"
-        android:text="Enviar un dron a la tadeo para bombardearla por falta de pagos"
+        android:text="Titulo de la tarea"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/colorPrimaryWhite"

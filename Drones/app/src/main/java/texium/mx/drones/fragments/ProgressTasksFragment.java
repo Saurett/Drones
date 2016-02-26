@@ -30,9 +30,9 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
     static {
         progressTask = new ArrayList<>();
-        progressTask.add(new Tasks("Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
-        progressTask.add(new Tasks("Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Baja", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
-        progressTask.add(new Tasks("Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Alta", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
+        progressTask.add(new Tasks("0-Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cu.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
+        progressTask.add(new Tasks("1-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec Enviar Dron para reconocimiento aére.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cu.", "Baja", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
+        progressTask.add(new Tasks("2-Patrulla de inspección de zonas verdes en Churubusco.", "Anean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cu.", "Alta", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
     }
 
     static {

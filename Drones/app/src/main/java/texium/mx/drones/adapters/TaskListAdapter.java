@@ -78,6 +78,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         this.onClickListener = onClickListener;
     }
 
+    public Tasks getItemByPosition(int position) { return tasks_list.get(position);}
+
     public void addAll(List<Tasks> tasks_list) { this.tasks_list.addAll(tasks_list);}
 
     public void remove(int position) { this.tasks_list.remove(position);}

@@ -7,9 +7,18 @@ public class TasksDecode {
 
     private Integer task_position;
     private Integer task_type;
+    private String task_coment;
 
     public TasksDecode() {
 
+    }
+
+    public String getTask_coment() {
+        return task_coment;
+    }
+
+    public void setTask_coment(String task_coment) {
+        this.task_coment = task_coment;
     }
 
     public Integer getTask_type() {

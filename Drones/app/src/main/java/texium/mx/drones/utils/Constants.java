@@ -33,5 +33,48 @@ public final class Constants {
     public static final String FRAGMENT_CLOSE_TAG = "fragment_close_task";
     public static final String FRAGMENT_FINISH_TAG = "fragment_finish_task";
 
+    //WEB SERVICE ID //
+    public static final int WS_KEY_PUBLIC_TEST = 0;
+    public static final int WS_KEY_LOGIN_SERVICE = 1;
+    public static final int WS_KEY_TASK_SERVICE= 2;
+
+    //SOAP CONFIGURATION//
+    public static final String WEB_SERVICE_SOAP_ACTION = "192.168.12.10/LoginMovil";
+    public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
+    public static final String WEB_SERVICE_URL = "http://192.168.12.111/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+
+    //OPERERATION SOAP//
+    public static final String WEB_SERVICE_METHOD_NAME_LOGIN = "LoginMovil";
+
+    //WEB SERVICE PARAMS//
+    public static final String WEB_SERVICE_PARAM_LOGIN_USERNAME = "NombreUsuario";
+    public static final String WEB_SERVICE_PARAM_LOGIN_PASSWORD = "ContrasenaUsuario";
+
+    //Google Maps COORD//
+    public static final Double GOOGLE_MAPS_LATITUDE = 19.4265606;
+    public static final Double GOOGLE_MAPS_LONGITUDE = -99.0672223;
+    public static final float GOOGLE_MAPS_DEFAULT_CAMERA = 10;
+
+    //SOAP KEYS//
+    public static final String SOAP_OBJECT_KEY_LOGIN_ID = "idusuario";
+    public static final String SOAP_OBJECT_KEY_LOGIN_USERNAME = "nombreusuario";
+    public static final String SOAP_OBJECT_KEY_LOGIN_ID_ACTOR = "idactor";
+    public static final String SOAP_OBJECT_KEY_LOGIN_ACTORNAME = "nombreactor";
+    public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE = "idtipoactor";
+    public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME = "nombretipoactor";
+    public static final String SOAP_OBJECT_KEY_LOGIN_ID_TEAM = "idcuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_TEAMNAME = "nombrecuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION = "coordenadascuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_LATITUDE = "Latitud";
+    public static final String SOAP_OBJECT_KEY_LOGIN_LONGITUDE = "Longitud";
+    public static final String SOAP_OBJECT_KEY_LOGIN_LAST_CONEXION = "ultimaconexioncuadrilla";
+
+    //ACTIVY PARAMS//
+    public static final String ACTIVITY_EXTRA_PARAMS_LOGIN = "data";
+
+
+
+
+
 
 }

@@ -150,8 +150,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                     next_task_button.setEnabled(true);
                     next_task_button.setVisibility(View.VISIBLE);
 
-                    back_task_button.setEnabled(true);
-                    back_task_button.setVisibility(View.VISIBLE);
+                    //back_task_button.setEnabled(true);
+                    //back_task_button.setVisibility(View.VISIBLE);
 
                 }
 
@@ -180,8 +180,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 }
 
                 if ((_ACTUAL_POSITION > 0) && (_ACTUAL_POSITION < _ACTUAL_COUNT)) {
-                    next_task_button.setEnabled(true);
-                    next_task_button.setVisibility(View.VISIBLE);
+                    //next_task_button.setEnabled(true);
+                    //next_task_button.setVisibility(View.VISIBLE);
 
                     back_task_button.setEnabled(true);
                     back_task_button.setVisibility(View.VISIBLE);

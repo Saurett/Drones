@@ -48,6 +48,7 @@ import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
+import texium.mx.drones.models.Users;
 import texium.mx.drones.utils.Constants;
 
 
@@ -76,6 +77,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
     private Intent cameraIntent;
 
+    //Control de Sessiones//
+    private static Users SESSION_DATA;
+
     //Token Control//
     Map<Long,Object> taskToken = new HashMap<>();
 
@@ -84,6 +88,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
+
+        SESSION_DATA =  (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -132,8 +138,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         task_force_latitude = (TextView) headerLayout.findViewById(R.id.task_force_latitude);
         task_force_longitude = (TextView) headerLayout.findViewById(R.id.task_force_longitude);
 
-        task_force_name.setText("CUAMX-HISTORICO-C");
-        task_element_name.setText("Francisco Javier\nDíaz\nSaurett");
+        task_force_name.setText(SESSION_DATA.getTeamName());
+        task_element_name.setText(SESSION_DATA.getActorName().replace("-","\n"));
         task_force_location.setText("CIUDAD DE MÉXICO");
 
         getLocation();
@@ -321,11 +327,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng cdMx = new LatLng(19.4265606, -99.0672223);
+        LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
 
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 10));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
 
         //Seteamos el tipo de mapa
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -443,7 +449,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public void clearTaskToken() {
-        taskToken.clear();
+        taskToken = new HashMap<>();
     }
 
     @Override

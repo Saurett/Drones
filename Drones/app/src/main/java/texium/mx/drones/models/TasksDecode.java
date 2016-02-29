@@ -1,5 +1,7 @@
 package texium.mx.drones.models;
 
+import java.io.Serializable;
+
 /**
  * Created by texiumuser on 25/02/2016.
  */

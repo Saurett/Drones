@@ -36,7 +36,11 @@ public final class Constants {
     //WEB SERVICE ID //
     public static final int WS_KEY_PUBLIC_TEST = 0;
     public static final int WS_KEY_LOGIN_SERVICE = 1;
-    public static final int WS_KEY_TASK_SERVICE= 2;
+    public static final int WS_KEY_TASK_SERVICE_NEWS = 2;
+    public static final int WS_KEY_TASK_SERVICE_PROGRESS = 3;
+    public static final int WS_KEY_TASK_SERVICE_PENDING= 4;
+    public static final int WS_KEY_TASK_SERVICE_REVISION = 5;
+    public static final int WS_KEY_TASK_SERVICE_CLOSE = 6;
 
     //SOAP CONFIGURATION//
     public static final String WEB_SERVICE_SOAP_ACTION = "192.168.12.10/LoginMovil";

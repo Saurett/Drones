@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -522,5 +523,42 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
+
+        private Integer webServiceOperation;
+
+        private AsyncCallWS(Integer wsOperation) {
+            webServiceOperation = wsOperation;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            Boolean validOperation = false;
+
+            switch (webServiceOperation) {
+                default:
+
+                    break;
+            }
+
+            return validOperation;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if(success) {
+
+            } else {
+
+            }
+        }
     }
 }

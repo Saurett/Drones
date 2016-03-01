@@ -2,6 +2,7 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -105,5 +106,42 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
     public static void fragmentJump(View view,Tasks task,TasksDecode tasksDecode) {
         activityListener.taskActions(view, task_list_adapter, task, tasksDecode);
+    }
+
+    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
+
+        private Integer webServiceOperation;
+
+        private AsyncCallWS(Integer wsOperation) {
+            webServiceOperation = wsOperation;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            Boolean validOperation = false;
+
+            switch (webServiceOperation) {
+                default:
+
+                    break;
+            }
+
+            return validOperation;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if(success) {
+
+            } else {
+
+            }
+        }
     }
 }

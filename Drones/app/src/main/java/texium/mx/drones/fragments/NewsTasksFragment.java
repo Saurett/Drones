@@ -2,6 +2,8 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,10 +15,14 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import org.ksoap2.serialization.SoapObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import texium.mx.drones.NavigationDrawerActivity;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
@@ -24,9 +30,14 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
+import texium.mx.drones.models.Users;
+import texium.mx.drones.utils.Constants;
 
 
 public class NewsTasksFragment extends Fragment implements View.OnClickListener{
+
+    //Control de Sessiones//
+    private static Users SESSION_DATA;
 
     static FragmentTaskListener activityListener;
     static List<Tasks> newsTask;
@@ -92,10 +103,10 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
 
-        //TODO AQUI VA LO DE FRED
+        SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
-
-
+        AsyncCallWS webService = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_NEWS);
+        webService.execute();
     }
 
     @Override
@@ -121,6 +132,43 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
     public static void fragmentJump(View view,Tasks task,TasksDecode tasksDecode) {
         activityListener.taskActions(view, task_list_adapter, task,tasksDecode);
+    }
+
+    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
+
+        private Integer webServiceOperation;
+
+        private AsyncCallWS(Integer wsOperation) {
+            webServiceOperation = wsOperation;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            Boolean validOperation = false;
+
+            switch (webServiceOperation) {
+                default:
+
+                    break;
+            }
+
+            return validOperation;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if(success) {
+
+            } else {
+
+            }
+        }
     }
 
 

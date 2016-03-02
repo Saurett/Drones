@@ -35,6 +35,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +53,7 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -127,6 +131,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //Administrar Header dinamico//
         getTaskForceData(navigationView);
+
+        callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -170,16 +176,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     }
 
-    //fab action onClik
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
 
             case R.id.fab:
-                //TODO Enviar WEB SERVICES
-                Snackbar.make(v, "Mi ubicación ha sido enviada", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                onMapReady(mMap);
+
+                callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION);
+
                 break;
             case R.id.chat_fab:
                 Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
@@ -196,6 +200,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         .setAction("Action", null).show();
                 break;
         }
+    }
+
+    private void callWebServiceLocation(int type) {
+        TasksDecode tasksDecode = new TasksDecode();
+        tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
+        tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
+        tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
+        tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+
+        AsyncCallWS wsLocation = new AsyncCallWS(type,tasksDecode);
+        wsLocation.execute();
     }
 
     //Save media content
@@ -282,6 +297,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
 
+            callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
             taskToken.clear();
             finish();
         }
@@ -392,27 +408,34 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         switch (v.getId()) {
             case R.id.agree_task_button:
-                Snackbar.make(v, "Tarea aceptada :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
 
-                taskListAdapter.remove(tasksDecode.getTask_position());
-                taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
-                taskListAdapter.notifyDataSetChanged();
+                tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
+
+                AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                wsAgree.execute();
+
+
                 break;
             case R.id.decline_task_button:
+                /*
                 Snackbar.make(v, "Tarea pospuesta :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
                 taskListAdapter.remove(tasksDecode.getTask_position());
                 taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
-                taskListAdapter.notifyDataSetChanged();
+                taskListAdapter.notifyDataSetChanged();*/
+
+                tasksDecode.setTask_update_to(Constants.PENDING_TASK);
+
+                AsyncCallWS wsDecline = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                wsDecline.execute();
+
                 break;
             case R.id.finish_task_button:
 
                 setToken(v,taskListAdapter,task,tasksDecode);
 
                 closeActiveTaskFragment(v);
-
 
                 FragmentTransaction finishFragment = fragmentManager.beginTransaction();
                 finishFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
@@ -422,6 +445,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case R.id.send_task_button:
                 closeActiveTaskFragment(v);
 
+                /*
                 FragmentTransaction progressFragment = fragmentManager.beginTransaction();
                 progressFragment.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
                 progressFragment.commit();
@@ -431,7 +455,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 taskListAdapter.notifyDataSetChanged();
 
                 Snackbar.make(v,"Tarea Finalizada : " + task.getTask_tittle(), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+                    .setAction("Action", null).show();*/
+
+                tasksDecode.setTask_update_to(Constants.CLOSE_TASK);
+
+                AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                wsClose.execute();
 
                 break;
             default:
@@ -442,6 +471,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (taskListAdapter.getItemCount() == 0) {
             closeActiveTaskFragment(v);
+            Toast.makeText(this, "Lista de tareas vacia", Toast.LENGTH_SHORT).show();
         }
 
         //FragmentManager fragmentManager = getSupportFragmentManager();
@@ -527,10 +557,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
-        private Integer webServiceOperation;
+        private SoapPrimitive soapPrimitive;
 
-        private AsyncCallWS(Integer wsOperation) {
+        private Integer webServiceOperation;
+        private Tasks webServiceTask;
+        private TasksDecode webServiceTaskDecode;
+
+        private AsyncCallWS(Integer wsOperation, TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
+            webServiceTaskDecode = wsServiceTaskDecode;
+        }
+
+        private AsyncCallWS(Integer wsOperation,Tasks wsTask,TasksDecode wsServiceTaskDecode) {
+            webServiceOperation = wsOperation;
+            webServiceTask = wsTask;
+            webServiceTaskDecode = wsServiceTaskDecode;
         }
 
         @Override
@@ -543,6 +584,27 @@ public class NavigationDrawerActivity extends AppCompatActivity
             Boolean validOperation = false;
 
             switch (webServiceOperation) {
+                case Constants.WS_KEY_UPDATE_TASK:
+                    soapPrimitive = SoapServices.updateTask(webServiceTask.getTask_id()
+                            ,webServiceTaskDecode.getTask_comment()
+                            ,webServiceTaskDecode.getTask_update_to()
+                            ,webServiceTask.getTask_user_id());
+                    validOperation = (soapPrimitive != null ) ? true : false;
+
+                    break;
+                case Constants.WS_KEY_SEND_LOCATION:
+                    soapPrimitive = SoapServices.updateLocation(webServiceTaskDecode.getTask_team_id()
+                            , webServiceTaskDecode.getTask_latitude()
+                            , webServiceTaskDecode.getTask_longitude()
+                            , webServiceTaskDecode.getTask_user_id());
+                    validOperation = (soapPrimitive != null ) ? true : false;
+                case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+                    soapPrimitive = SoapServices.updateLocation(webServiceTaskDecode.getTask_team_id()
+                            ,webServiceTaskDecode.getTask_latitude()
+                            ,webServiceTaskDecode.getTask_longitude()
+                            ,webServiceTaskDecode.getTask_user_id());
+                    validOperation = (soapPrimitive != null ) ? true : false;
+                    break;
                 default:
 
                     break;
@@ -556,8 +618,50 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             if(success) {
 
-            } else {
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_UPDATE_TASK:
 
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        removeAllFragment(fragmentManager);
+
+                        switch (webServiceTask.getTask_status().intValue()) {
+
+                            case Constants.NEWS_TASK:
+
+                                FragmentTransaction ftNews = fragmentManager.beginTransaction();
+                                ftNews.add(R.id.tasks_fragment_container, new NewsTasksFragment(), Constants.FRAGMENT_NEWS_TAG);
+                                ftNews.commit();
+                                break;
+                            case Constants.PROGRESS_TASK:
+                                FragmentTransaction ftProgress = fragmentManager.beginTransaction();
+                                ftProgress.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
+                                ftProgress.commit();
+                                break;
+                            case Constants.PENDING_TASK:
+                                FragmentTransaction ftPending = fragmentManager.beginTransaction();
+                                ftPending.add(R.id.tasks_fragment_container, new PendingTasksFragment(), Constants.FRAGMENT_PENDING_TAG);
+                                ftPending.commit();
+                                break;
+                            case Constants.CLOSE_TASK:
+                                FragmentTransaction ftClose = fragmentManager.beginTransaction();
+                                ftClose.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
+                                ftClose.commit();
+                                break;
+                        }
+                        taskToken.clear();
+                        Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case Constants.WS_KEY_SEND_LOCATION:
+                        onMapReady(mMap);
+                        Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        //HIDDEN WEB SERVIDE
+                        break;
+                }
+            } else {
+                Toast.makeText(NavigationDrawerActivity.this,"No es posible realizar acción", Toast.LENGTH_LONG).show();
             }
         }
     }

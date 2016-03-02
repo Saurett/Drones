@@ -84,10 +84,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
 
     public void remove(int position) { this.tasks_list.remove(position);}
 
-    public void removeAll(List<Tasks> tasks_list) { this.tasks_list.removeAll(tasks_list);}
-
-    public void clearAll() { this.tasks_list.clear();}
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task_list, parent, false);
@@ -101,26 +97,20 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
 
         holder.task_title.setText(task.getTask_tittle());
         holder.task_content.setText(task.getTask_content());
-        holder.task_priority.setText(task.getTask_priority());
+        holder.task_priority.setText(Constants.MAP_STATUS_NAME.get(task.getTask_priority()));
         holder.task_begin_date.setText(task.getTask_begin_date());
         holder.task_end_date.setText(task.getTask_end_date());
-        holder.hidden_data.setText(task.getHidden_data());
 
-        String jsonData = (String) holder.hidden_data.getText();
+        final TasksDecode taskDecode = new TasksDecode();
 
-        final TasksDecode taskDecode = DecodeJSONHelper.decodeTask(jsonData);
+        taskDecode.setTask_status(task.getTask_status());
         taskDecode.setTask_position(position);
 
-        buttonVisibilityControl(holder, taskDecode.getTask_type());
+        buttonVisibilityControl(holder, taskDecode.getTask_status());
 
         holder.agree_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //TODO ABRIR UN NUEVO FRAGMETN PARA ACEPTAR LA TAREA CON UNA DESCRIPCION
-                //TODO COMO EJEMPLO ABRIR CUALQUIER FRAGMENT MENOS EL ACTUAL Y CERRAR EL ACTUAL
-                //TODO PASAR LOS DOS ON CLICK LISTENER A UN METODO IMPLEMENTADO, NO SALE POR QUE NO PUEDO OBTENER EL POSITION FUERA DE AQUI
-
                 fragmentJumper(v,task,taskDecode);
             }
         });
@@ -128,9 +118,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         holder.finish_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                {
                     fragmentJumper(v,task,taskDecode);
-                }
             }
         });
 
@@ -145,7 +133,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
 
     private void fragmentJumper(View v, Tasks task,TasksDecode _tasksDecode) {
 
-        switch (_tasksDecode.getTask_type()) {
+        switch (_tasksDecode.getTask_status()) {
             case Constants.NEWS_TASK:
                 NewsTasksFragment.fragmentJump(v, task, _tasksDecode);
                 break;

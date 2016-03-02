@@ -7,42 +7,96 @@ public class Tasks {
 
     private String task_tittle;
     private String task_content;
-    private String task_priority;
+    private Integer task_priority;
     private String task_begin_date;
     private String task_end_date;
-    private String hidden_data;
+    private Integer task_id;
+    private Double task_latitude;
+    private Double task_longitude;
+    private Integer task_status;
+    private Integer task_user_id;
 
-    public Tasks(String task_tittle,String task_content, String task_priority, String task_begin_date, String task_end_date, String hidden_data){
-        super();
-        this.task_tittle = task_tittle;
-        this.task_content = task_content;
-        this.task_priority = task_priority;
-        this.task_begin_date = task_begin_date;
-        this.task_end_date = task_end_date;
-        this.hidden_data = hidden_data;
+    public Tasks() {
+
     }
 
-    public String getTask_tittle() { return task_tittle;}
+    public String getTask_tittle() {
+        return task_tittle;
+    }
 
-    public void setTask_tittle(String task_tittle) { this.task_tittle = task_tittle; }
+    public void setTask_tittle(String task_tittle) {
+        this.task_tittle = task_tittle;
+    }
 
-    public String getTask_content() { return task_content;}
+    public String getTask_content() {
+        return task_content;
+    }
 
-    public void setTask_content(String task_content) { this.task_content = task_content; }
+    public void setTask_content(String task_content) {
+        this.task_content = task_content;
+    }
 
-    public String getTask_priority() { return task_priority;}
+    public Integer getTask_priority() {
+        return task_priority;
+    }
 
-    public void setTask_priority(String task_priority) { this.task_priority = task_priority; }
+    public void setTask_priority(Integer task_priority) {
+        this.task_priority = task_priority;
+    }
 
-    public String getTask_begin_date() { return task_begin_date;}
+    public String getTask_begin_date() {
+        return task_begin_date;
+    }
 
-    public void setTask_begin_date(String begin_date) { this.task_begin_date = begin_date; }
+    public void setTask_begin_date(String task_begin_date) {
+        this.task_begin_date = task_begin_date;
+    }
 
-    public String getTask_end_date() { return task_end_date;}
+    public String getTask_end_date() {
+        return task_end_date;
+    }
 
-    public void setTask_end_date(String task_end_date) { this.task_end_date = task_end_date; }
+    public void setTask_end_date(String task_end_date) {
+        this.task_end_date = task_end_date;
+    }
 
-    public String getHidden_data() { return hidden_data;}
+    public Integer getTask_id() {
+        return task_id;
+    }
 
-    public void setHidden_data(String hidden_data) { this.hidden_data = hidden_data;}
+    public void setTask_id(Integer task_id) {
+        this.task_id = task_id;
+    }
+
+    public Double getTask_latitude() {
+        return task_latitude;
+    }
+
+    public void setTask_latitude(Double task_latitude) {
+        this.task_latitude = task_latitude;
+    }
+
+    public Double getTask_longitude() {
+        return task_longitude;
+    }
+
+    public void setTask_longitude(Double task_longitude) {
+        this.task_longitude = task_longitude;
+    }
+
+    public Integer getTask_status() {
+        return task_status;
+    }
+
+    public void setTask_status(Integer task_status) {
+        this.task_status = task_status;
+    }
+
+    public Integer getTask_user_id() {
+        return task_user_id;
+    }
+
+    public void setTask_user_id(Integer task_user_id) {
+        this.task_user_id = task_user_id;
+    }
 }

@@ -121,7 +121,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 Tasks sendTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
                 TasksDecode sendDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
 
-                sendDecode.setTask_coment(ssb.toString());
+                sendDecode.setTask_comment(ssb.toString());
 
                 taskToken = new HashMap<>();
 
@@ -141,18 +141,20 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 _ACTUAL_POSITION--;
 
-                if (_ACTUAL_POSITION <= 0) {
-                    back_task_button.setEnabled(false);
-                    back_task_button.setVisibility(View.INVISIBLE);
-                }
-
-                if ((_ACTUAL_POSITION > 0) && (_ACTUAL_POSITION < _ACTUAL_COUNT)) {
+                if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
+                    next_task_button.setEnabled(false);
+                    next_task_button.setVisibility(View.INVISIBLE);
+                } else {
                     next_task_button.setEnabled(true);
                     next_task_button.setVisibility(View.VISIBLE);
+                }
 
-                    //back_task_button.setEnabled(true);
-                    //back_task_button.setVisibility(View.VISIBLE);
-
+                if (_ACTUAL_POSITION == 0) {
+                    back_task_button.setEnabled(false);
+                    back_task_button.setVisibility(View.INVISIBLE);
+                } else {
+                    back_task_button.setEnabled(true);
+                    back_task_button.setVisibility(View.VISIBLE);
                 }
 
                 Tasks actualBackTask = backAdapter.getItemByPosition(_ACTUAL_POSITION);
@@ -174,18 +176,21 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 _ACTUAL_POSITION++;
 
 
+
                 if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
                     next_task_button.setEnabled(false);
                     next_task_button.setVisibility(View.INVISIBLE);
+                } else {
+                    next_task_button.setEnabled(true);
+                    next_task_button.setVisibility(View.VISIBLE);
                 }
 
-                if ((_ACTUAL_POSITION > 0) && (_ACTUAL_POSITION < _ACTUAL_COUNT)) {
-                    //next_task_button.setEnabled(true);
-                    //next_task_button.setVisibility(View.VISIBLE);
-
+                if (_ACTUAL_POSITION == 0) {
+                    back_task_button.setEnabled(false);
+                    back_task_button.setVisibility(View.INVISIBLE);
+                } else {
                     back_task_button.setEnabled(true);
                     back_task_button.setVisibility(View.VISIBLE);
-
                 }
 
                 Tasks actualNextTask = nextAdapter.getItemByPosition(_ACTUAL_POSITION);

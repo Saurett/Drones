@@ -10,6 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import org.ksoap2.serialization.SoapObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +24,25 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
+import texium.mx.drones.models.Users;
+import texium.mx.drones.services.SoapServices;
+import texium.mx.drones.utils.Constants;
 
 
 public class PendingTasksFragment extends Fragment implements View.OnClickListener {
 
+    private SoapObject soapObject;
+    private static Users SESSION_DATA;
 
     static FragmentTaskListener activityListener;
     static List<Tasks> pendingTask;
     static List<TasksTitle> pendingTaskTitle;
 
+    /*
     static {
         pendingTask = new ArrayList<>();
         pendingTask.add(new Tasks("Patrulla de inspección de zonas verdes en Tierra Colorada.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:5,id:1}"));
-    }
+    }*/
 
     static {
         pendingTaskTitle = new ArrayList<>();
@@ -60,25 +69,17 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
         task_list_title_adapter.setOnClickListener(this);
 
-        task_list_adapter.addAll(pendingTask);
-        task_list_title_adapter.addAll(pendingTaskTitle);
-
-        tasks_list.setAdapter(task_list_adapter);
-        tasks_list_tittle.setAdapter(task_list_title_adapter);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        tasks_list.setLayoutManager(linearLayoutManager);
-
-        LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
-        tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
-
         return view;
     }
 
     @Override
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
-        //Aqui cargar la cosas de fred
+
+        SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
+
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_PENDING,Integer.valueOf(SESSION_DATA.getIdTeam().toString()),Constants.PENDING_TASK);
+        wsTaskList.execute();
 
     }
 
@@ -111,9 +112,13 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private Integer webServiceOperation;
+        private Integer idTeam;
+        private Integer idStatus;
 
-        private AsyncCallWS(Integer wsOperation) {
+        private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
+            idTeam = wsIdTeam;
+            idStatus = wsIdStatus;
         }
 
         @Override
@@ -126,8 +131,14 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
             Boolean validOperation = false;
 
             switch (webServiceOperation) {
-                default:
+                case Constants.WS_KEY_TASK_SERVICE_PENDING:
 
+                    soapObject = SoapServices.getServerTaskList(idTeam, idStatus);
+                    validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+
+                    break;
+                default:
+                    //TODO DEFAULT MESSAGE
                     break;
             }
 
@@ -139,8 +150,42 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
             if(success) {
 
-            } else {
+                pendingTask = new ArrayList<>();
+                for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                    Tasks t = new Tasks();
 
+                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+
+                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                    t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+
+                    pendingTask.add(t);
+                }
+
+                //TODO QUITAR DE LA ASYNCHO
+
+                task_list_adapter.addAll(pendingTask);
+                task_list_title_adapter.addAll(pendingTaskTitle);
+
+                tasks_list.setAdapter(task_list_adapter);
+                tasks_list_tittle.setAdapter(task_list_title_adapter);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                tasks_list.setLayoutManager(linearLayoutManager);
+
+                LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
+                tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+            } else {
+                Toast.makeText(getActivity(), "Lista de tareas vacia", Toast.LENGTH_LONG).show();
             }
         }
     }

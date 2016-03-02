@@ -7,49 +7,35 @@ import java.io.Serializable;
  */
 public class Users implements Serializable {
 
-    private Long idUser;
+    private Integer idUser;
     private String userName;
-    private Long idActor;
+    private Integer idActor;
     private String actorName;
-    private Long actorType;
+    private Integer actorType;
     private String actorTypeName;
-    private Long idTeam;
+    private Integer idTeam;
     private String teamName;
     private Double latitude;
     private Double longitude;
-    private String lastTeamConexion;
+    private String lastTeamConnection;
 
     public Users() {
 
     }
 
-    public Users(Long idTeam, Long idUser, String userName, Long idActor, String actorName, Long actorType, String actorTypeName, String teamName, Double latitude, Double longitude, String lastTeamConexion) {
-        this.idTeam = idTeam;
-        this.idUser = idUser;
-        this.userName = userName;
-        this.idActor = idActor;
+    public String getActorName() {
+        return actorName;
+    }
+
+    public void setActorName(String actorName) {
         this.actorName = actorName;
-        this.actorType = actorType;
-        this.actorTypeName = actorTypeName;
-        this.teamName = teamName;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.lastTeamConexion = lastTeamConexion;
     }
 
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Long getIdUser() {
+    public Integer getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(Long idUser) {
+    public void setIdUser(Integer idUser) {
         this.idUser = idUser;
     }
 
@@ -61,27 +47,35 @@ public class Users implements Serializable {
         this.userName = userName;
     }
 
-    public Long getIdActor() {
+    public Integer getIdActor() {
         return idActor;
     }
 
-    public void setIdActor(Long idActor) {
+    public void setIdActor(Integer idActor) {
         this.idActor = idActor;
     }
 
-    public String getActorName() {
-        return actorName;
+    public Integer getActorType() {
+        return actorType;
     }
 
-    public void setActorName(String actorName) {
-        this.actorName = actorName;
+    public void setActorType(Integer actorType) {
+        this.actorType = actorType;
     }
 
-    public Long getIdTeam() {
+    public String getActorTypeName() {
+        return actorTypeName;
+    }
+
+    public void setActorTypeName(String actorTypeName) {
+        this.actorTypeName = actorTypeName;
+    }
+
+    public Integer getIdTeam() {
         return idTeam;
     }
 
-    public void setIdTeam(Long idTeam) {
+    public void setIdTeam(Integer idTeam) {
         this.idTeam = idTeam;
     }
 
@@ -101,27 +95,19 @@ public class Users implements Serializable {
         this.latitude = latitude;
     }
 
-    public Long getActorType() {
-        return actorType;
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public void setActorType(Long actorType) {
-        this.actorType = actorType;
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
-    public String getActorTypeName() {
-        return actorTypeName;
+    public String getLastTeamConnection() {
+        return lastTeamConnection;
     }
 
-    public void setActorTypeName(String actorTypeName) {
-        this.actorTypeName = actorTypeName;
-    }
-
-    public String getLastTeamConexion() {
-        return lastTeamConexion;
-    }
-
-    public void setLastTeamConexion(String lastTeamConexion) {
-        this.lastTeamConexion = lastTeamConexion;
+    public void setLastTeamConnection(String lastTeamConnection) {
+        this.lastTeamConnection = lastTeamConnection;
     }
 }

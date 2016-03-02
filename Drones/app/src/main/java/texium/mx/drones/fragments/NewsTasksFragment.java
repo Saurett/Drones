@@ -17,7 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,31 +34,18 @@ import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
 public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
-    //Control de Sessiones//
+    private SoapObject soapObject;
     private static Users SESSION_DATA;
 
     static FragmentTaskListener activityListener;
     static List<Tasks> newsTask;
     static List<TasksTitle> newsTaskTitle;
-
-    static {
-        newsTask = new ArrayList<>();
-        newsTask.add(new Tasks("0-Patrulla de inspección de zonas verdes en la polvora.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("1-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("2-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("3-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("4-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("5-Patrulla de inspección de zonas verdes en Churubusco y Patrulla de inspección de zonas verdes en Churubusco v2.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("6-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("7-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("8-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Alta","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-        newsTask.add(new Tasks("9-Patrulla de inspección de zonas verdes en Churubusco.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:3,id:1}"));
-    }
 
     static {
         newsTaskTitle = new ArrayList<>();
@@ -84,18 +74,6 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
         task_list_title_adapter.setOnClickListener(this);
         task_list_adapter.setOnClickListener(this);
 
-        task_list_adapter.addAll(newsTask);
-        task_list_title_adapter.addAll(newsTaskTitle);
-
-        tasks_list.setAdapter(task_list_adapter);
-        tasks_list_tittle.setAdapter(task_list_title_adapter);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        tasks_list.setLayoutManager(linearLayoutManager);
-
-        LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
-        tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
-
         return view;
     }
 
@@ -105,8 +83,8 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
         SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
-        AsyncCallWS webService = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_NEWS);
-        webService.execute();
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_NEWS,Integer.valueOf(SESSION_DATA.getIdTeam().toString()),Constants.NEWS_TASK);
+        wsTaskList.execute();
     }
 
     @Override
@@ -137,9 +115,13 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private Integer webServiceOperation;
+        private Integer idTeam;
+        private Integer idStatus;
 
-        private AsyncCallWS(Integer wsOperation) {
+        private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
+            idTeam = wsIdTeam;
+            idStatus = wsIdStatus;
         }
 
         @Override
@@ -152,8 +134,14 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
             Boolean validOperation = false;
 
             switch (webServiceOperation) {
-                default:
+                case Constants.WS_KEY_TASK_SERVICE_NEWS:
 
+                    soapObject = SoapServices.getServerTaskList(idTeam, idStatus);
+                    validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+
+                    break;
+                default:
+                    //TODO DEFAULT MESSAGE
                     break;
             }
 
@@ -165,8 +153,42 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
             if(success) {
 
-            } else {
+                newsTask = new ArrayList<>();
+                for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                    Tasks t = new Tasks();
 
+                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+
+                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                    t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+
+                    newsTask.add(t);
+                }
+
+                //TODO QUITAR DE LA ASYNCHO
+
+                task_list_adapter.addAll(newsTask);
+                task_list_title_adapter.addAll(newsTaskTitle);
+
+                tasks_list.setAdapter(task_list_adapter);
+                tasks_list_tittle.setAdapter(task_list_title_adapter);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                tasks_list.setLayoutManager(linearLayoutManager);
+
+                LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
+                tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+            } else {
+                Toast.makeText(getActivity(),"Lista de tareas vacia", Toast.LENGTH_LONG).show();
             }
         }
     }

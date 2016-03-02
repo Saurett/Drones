@@ -13,6 +13,7 @@ import texium.mx.drones.utils.Constants;
  */
 public class DecodeJSONHelper {
 
+    @Deprecated
     public static TasksDecode decodeTask(String jsonData) {
         TasksDecode dataDecode = new TasksDecode();
 
@@ -20,7 +21,7 @@ public class DecodeJSONHelper {
 
             JSONObject jObject = new JSONObject(jsonData);
 
-            dataDecode.setTask_type(jObject.getInt(Constants.JSON_DATA_ACCESS_TASK_TYPE));
+
 
         } catch (JSONException e) {
             e.printStackTrace();

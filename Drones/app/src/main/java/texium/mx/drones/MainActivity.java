@@ -6,27 +6,26 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     String TAG = "Response";
-    SoapObject soapObject;
+    private SoapObject soapObject;
 
     EditText usernameLogin;
     EditText passwordLogin;
+
+    private SoapServices soapServices;
 
 
     @Override
@@ -69,9 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (!cancel) {
 
-            AsyncCallWS task = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE);
-            task.execute();
-
+            AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE,username,password);
+            wsLogin.execute();
         }
 
     }
@@ -100,9 +98,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean>  {
 
         private Integer webServiceOperation;
+        private String username;
+        private String password;
+        private String text;
 
         private AsyncCallWS(Integer wsOperation) {
             webServiceOperation = wsOperation;
+        }
+        private AsyncCallWS(Integer wsOperation,String wsUsername, String wsPassword) {
+            webServiceOperation = wsOperation;
+            username = wsUsername;
+            password = wsPassword;
+        }
+
+        private AsyncCallWS(Integer wsOperation,String wsText) {
+            webServiceOperation = wsOperation;
+            text = wsText;
         }
 
         @Override
@@ -112,18 +123,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            Boolean validOperation = false;
+            Boolean validOperation;
 
             switch (webServiceOperation) {
                 case Constants.WS_KEY_PUBLIC_TEST:
-                    calculate();
+                    soapServices.calculate(text);
                     validOperation = true;
                     break;
                 case Constants.WS_KEY_LOGIN_SERVICE:
-                    SoapObject soLogin = checkUser();
-                    Integer id = Integer.valueOf(soLogin.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
+                    soapObject = soapServices.checkUser(username,password);
+                    Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
-                    if(id > 0)  validOperation = true;
+                    validOperation = (id > 0) ?  true : false;
 
                     break;
                 default:
@@ -146,17 +157,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Users user = new Users();
 
-                user.setIdUser(Long.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
                 user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
-                user.setIdActor(Long.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
                 user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTORNAME).toString());
-                user.setActorType(Long.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
                 user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
-                user.setIdTeam(Long.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
+                user.setIdTeam(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
                 user.setTeamName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAMNAME).toString());
                 user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
                 user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
-                user.setLastTeamConexion(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONEXION).toString());
+                user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONEXION).toString());
 
                 intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
                 cleanAllLogin();
@@ -164,61 +175,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 Toast.makeText(MainActivity.this,getString(R.string.default_login_error), Toast.LENGTH_LONG).show();
             }
-        }
-    }
-
-    public SoapObject checkUser() {
-        try {
-            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION;
-            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_LOGIN;
-            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
-
-            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
-
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_LOGIN_USERNAME,usernameLogin.getText().toString());
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_LOGIN_PASSWORD, passwordLogin.getText().toString());
-
-            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            soapEnvelope.dotNet = true;
-            soapEnvelope.setOutputSoapObject(Request);
-
-            HttpTransportSE transport = new HttpTransportSE(URL);
-
-            transport.call(SOAP_ACTION, soapEnvelope);
-            soapObject = (SoapObject) soapEnvelope.getResponse();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return soapObject;
-    }
-
-    /**
-     * Test Public WebService in W3Schools
-     */
-    public void calculate() {
-        String SOAP_ACTION = "http://www.w3schools.com/xml/CelsiusToFahrenheit";
-        String METHOD_NAME = "CelsiusToFahrenheit";
-        String NAMESPACE = "http://www.w3schools.com/xml/";
-        String URL = "http://www.w3schools.com/xml/tempconvert.asmx";
-
-        try {
-            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
-            Request.addProperty("Celsius", usernameLogin.getText().toString());
-
-            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            soapEnvelope.dotNet = true;
-            soapEnvelope.setOutputSoapObject(Request);
-
-            HttpTransportSE transport = new HttpTransportSE(URL);
-
-            transport.call(SOAP_ACTION, soapEnvelope);
-            soapObject = (SoapObject) soapEnvelope.getResponse();
-
-        } catch (Exception ex) {
-            Log.e(TAG, "Error: " + ex.getMessage());
         }
     }
 }

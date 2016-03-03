@@ -1,14 +1,10 @@
 package texium.mx.drones.services;
 
-import android.util.Log;
-
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-
-import java.io.Serializable;
 
 import texium.mx.drones.utils.Constants;
 
@@ -49,7 +45,7 @@ public class SoapServices {
     public static SoapObject getServerTaskList(Integer idTeam, Integer idStatus) {
         SoapObject soapObject = new SoapObject();
         try {
-            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_TASKLIST;
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_TASK_LIST;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_TASK;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
             String URL = Constants.WEB_SERVICE_URL;

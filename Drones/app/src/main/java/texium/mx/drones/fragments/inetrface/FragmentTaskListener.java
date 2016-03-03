@@ -2,9 +2,12 @@ package texium.mx.drones.fragments.inetrface;
 
 import android.view.View;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 
@@ -21,4 +24,6 @@ public interface FragmentTaskListener {
 
     //TODO CrEATE A OWN CLASS
     Map<Long,Object> getToken();
+
+    Map<Integer,FilesManager> getTaskFiles();
 }

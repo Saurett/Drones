@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TASK MANAGER CD MX</string>
-    <string name="title_activity_main">SEDEMA - CD MX</string>
+    <string name="title_activity_main">OKOXALI</string>
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -11,7 +11,13 @@
     <string name="password_login_error">This password is invalid</string>
     <string name="username_login_error">This field is required</string>
     <string name="default_ws_operation">Web Service default is not Online</string>
-    <string name="default_login_error">The email address and password you entered do not match.</string>
+    <string name="default_login_error">El email y la contraseña no coinciden.</string>
+    <string name="no_user_team_login_error">El usuario no tiene cuadrilla asignada.</string>
+
+    <string name="task_priority_name_low">Baja</string>
+    <string name="task_priority_name_mid">Media</string>
+    <string name="task_priority_name_high">Alta</string>
+    <string name="task_priority_name_express">Urgente</string>
 
 
 </resources>

@@ -1,12 +1,14 @@
 package texium.mx.drones;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,11 +37,13 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
@@ -50,6 +54,7 @@ import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
@@ -60,33 +65,36 @@ import texium.mx.drones.utils.Constants;
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, FragmentTaskListener, LocationListener {
 
-    //Activación Google Maps//
+    //Google Maps manager//
     private GoogleMap mMap;
 
-    //Botones Principales//
+    //Principal Buttons//
     private FloatingActionButton fab, chat_fab,camera_fab,video_fab;
 
-    //Header Dinamico//
+    //Dynamic Header//
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
 
-
-    //Administración del GPS//
+    //GPS Manager//
     private static final String provider = LocationManager.GPS_PROVIDER; //Recomendado GPS
     private LocationManager locationManagerGPS;
     private Location locationGPS;
     private Context ctx;
     private boolean providerEnabled;
 
-    //Administración  de la Camara//
+    //Camera manager//
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
+    private static final int GALLERY_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private static final int GALLERY_VIDEO_ACTIVITY_REQUEST_CODE = 200;
     private Intent cameraIntent;
 
-    //Control de Sessiones//
+    //Sessions control//
     private static Users SESSION_DATA;
 
-    //Token Control//
-    Map<Long,Object> taskToken = new HashMap<>();
+    //Collections Controls//
+    public Map<Long,Object> taskToken = new HashMap<>();
+    public static Map<Integer,FilesManager> TASK_FILE = new HashMap<>();
+    public static Integer ACTUAL_POSITION;
 
 
     @Override
@@ -99,15 +107,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setTitle(""); //Quita el titulo del activity
+        setTitle(""); //Set activity tittle
 
-        //Botones flotantes principales//
+        //Principal floatingButtons//
         fab = (FloatingActionButton) findViewById(R.id.fab);
         chat_fab = (FloatingActionButton) findViewById(R.id.chat_fab);
         camera_fab = (FloatingActionButton) findViewById(R.id.camera_fab);
         video_fab = (FloatingActionButton) findViewById(R.id.video_fab);
 
-        //Listeres de los botones//
+        //Button listeners//
         fab.setOnClickListener(this);
         chat_fab.setOnClickListener(this);
         camera_fab.setOnClickListener(this);
@@ -122,17 +130,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Activación del Google Maps//
+        //Google Maps fragment//
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //Administar ubicación por GPS//
+        //GPS manager location//
         defineLocationManager(this);
 
-        //Administrar Header dinamico//
+        //Header dynamic manager//
         getTaskForceData(navigationView);
-
-        callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -172,6 +178,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             task_force_latitude.setText(BigDecimal.valueOf(dx).longValue() + "° " + BigDecimal.valueOf(mx).longValue() + "' " + BigDecimal.valueOf(sx).longValue() + "'' N");
             task_force_longitude.setText(BigDecimal.valueOf(dy).longValue() + "° " + BigDecimal.valueOf(my).longValue() + "' " + BigDecimal.valueOf(sy).longValue() + "'' O");
+
+            callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
+        } else {
+            taskToken.clear();
+            finish();
+
         }
 
     }
@@ -181,9 +193,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         switch (v.getId()) {
 
             case R.id.fab:
-
                 callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION);
-
                 break;
             case R.id.chat_fab:
                 Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
@@ -224,30 +234,73 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                // Image captured and saved to fileUri specified in the Intent
-                Toast.makeText(this, "Image saved to:\n" +
-                        data.getData(), Toast.LENGTH_LONG).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                // User cancelled the image capture
-            } else {
-                // Image capture failed, advise user
-            }
-        }
 
-        if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                // Video captured and saved to fileUri specified in the Intent
-                Toast.makeText(this, "Video saved to:\n" +
-                        data.getData(), Toast.LENGTH_LONG).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                // User cancelled the video capture
-            } else {
-                // Video capture failed, advise user
-            }
+        switch (requestCode) {
+            case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
+                if (requestCode == GALLERY_IMAGE_ACTIVITY_REQUEST_CODE) {
+                    if (resultCode == RESULT_OK) {
+
+                        List<File> files = new ArrayList<>();
+                        List<File> selectFiles = new ArrayList<>();
+
+                        ClipData clipData = data.getClipData();
+                        clipData.getItemCount();
+
+                        for (int i = 0; i < clipData.getItemCount(); i++) {
+                            Uri path = clipData.getItemAt(i).getUri();
+                            File file = new File(path.getPath());
+                            selectFiles.add(file);
+                        }
+
+                        FilesManager taskFiles = new FilesManager();
+
+                        if (TASK_FILE.containsKey(ACTUAL_POSITION)) {
+
+                            taskFiles = TASK_FILE.get(ACTUAL_POSITION);
+                            files = taskFiles.getFilesPicture();
+                        }
+
+                        files.addAll(selectFiles);
+                        taskFiles.setFilesPicture(files);
+                        TASK_FILE.put(ACTUAL_POSITION,taskFiles);
+
+                        TextView number_photos = (TextView) findViewById(R.id.number_photos);
+                        number_photos.setText(String.valueOf(files.size()));
+
+                    } else if (resultCode == RESULT_CANCELED) {
+                        // User cancelled the image capture
+                    } else {
+                        // Image capture failed, advise user
+                    }
+                }
+                break;
+            case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // Image captured and saved to fileUri specified in the Intent
+                    Toast.makeText(this, "Imagen guardada en:\n" +
+                            data.getData(), Toast.LENGTH_LONG).show();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the image capture
+                } else {
+                    // Image capture failed, advise user
+                }
+                break;
+            case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // Video captured and saved to fileUri specified in the Intent
+                    Toast.makeText(this, "Video guardado en:\n" +
+                            data.getData(), Toast.LENGTH_LONG).show();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the video capture
+                } else {
+                    // Video capture failed, advise user
+                }
+                break;
         }
     }
+
+
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -340,7 +393,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
-    //TODO MOVER A MapsActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -353,12 +405,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
         //Seteamos el tipo de mapa
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
            return;
         }
         mMap.setMyLocationEnabled(true);
-
-
     }
 
     @Override
@@ -407,25 +458,37 @@ public class NavigationDrawerActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         switch (v.getId()) {
+            case R.id.picture_task_button:
+
+                Intent imgGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                imgGalleryIntent.setType("image/*");
+                imgGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(imgGalleryIntent.createChooser(imgGalleryIntent, "Selecciona app de Imagen"), GALLERY_IMAGE_ACTIVITY_REQUEST_CODE);
+
+                ACTUAL_POSITION = tasksDecode.getTask_position();
+
+                break;
+            case R.id.video_task_button:
+
+                Intent videoGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                videoGalleryIntent.setType("video/*");
+                videoGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(videoGalleryIntent.createChooser(videoGalleryIntent, "Selecciona app de video"), GALLERY_VIDEO_ACTIVITY_REQUEST_CODE);
+
+                break;
             case R.id.agree_task_button:
 
                 tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
+                tasksDecode.setTask_comment("Tarea aceptada");
 
                 AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
                 wsAgree.execute();
 
-
                 break;
             case R.id.decline_task_button:
-                /*
-                Snackbar.make(v, "Tarea pospuesta :" + task.getTask_tittle(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                taskListAdapter.remove(tasksDecode.getTask_position());
-                taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
-                taskListAdapter.notifyDataSetChanged();*/
 
                 tasksDecode.setTask_update_to(Constants.PENDING_TASK);
+                tasksDecode.setTask_comment("Tarea pospuesta");
 
                 AsyncCallWS wsDecline = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
                 wsDecline.execute();
@@ -443,19 +506,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 break;
             case R.id.send_task_button:
+
                 closeActiveTaskFragment(v);
-
-                /*
-                FragmentTransaction progressFragment = fragmentManager.beginTransaction();
-                progressFragment.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
-                progressFragment.commit();
-
-                taskListAdapter.remove(tasksDecode.getTask_position());
-                taskListAdapter.notifyItemRemoved(tasksDecode.getTask_position());
-                taskListAdapter.notifyDataSetChanged();
-
-                Snackbar.make(v,"Tarea Finalizada : " + task.getTask_tittle(), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();*/
 
                 tasksDecode.setTask_update_to(Constants.CLOSE_TASK);
 
@@ -473,19 +525,22 @@ public class NavigationDrawerActivity extends AppCompatActivity
             closeActiveTaskFragment(v);
             Toast.makeText(this, "Lista de tareas vacia", Toast.LENGTH_SHORT).show();
         }
-
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //removeAllFragment(fragmentManager);
     }
 
     @Override
     public void clearTaskToken() {
         taskToken = new HashMap<>();
+        TASK_FILE.clear();
     }
 
     @Override
     public Map<Long,Object> getToken() {
         return taskToken;
+    }
+
+    @Override
+    public Map<Integer,FilesManager> getTaskFiles() {
+        return TASK_FILE;
     }
 
     public Map<Long,Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
@@ -499,8 +554,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         return taskToken;
     }
-
-
 
     private void defineLocationManager(Context context) {
         this.ctx = context;
@@ -531,30 +584,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
             } else {
                 locationGPS = locationManagerGPS.getLastKnownLocation(provider);
             }
+        } else {
+            Toast.makeText(NavigationDrawerActivity.this, "Activa tu gps", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        getLocation();
+    public void onLocationChanged(Location location) { getLocation(); }
+    @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
+    @Override public void onProviderEnabled(String provider) {}
+    @Override public void onProviderDisabled(String provider) {}
 
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
+    //WEB SERVICE CLASS CALL//
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private SoapPrimitive soapPrimitive;
@@ -586,23 +627,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
             switch (webServiceOperation) {
                 case Constants.WS_KEY_UPDATE_TASK:
                     soapPrimitive = SoapServices.updateTask(webServiceTask.getTask_id()
-                            ,webServiceTaskDecode.getTask_comment()
-                            ,webServiceTaskDecode.getTask_update_to()
-                            ,webServiceTask.getTask_user_id());
+                            , webServiceTaskDecode.getTask_comment()
+                            , webServiceTaskDecode.getTask_update_to()
+                            , webServiceTask.getTask_user_id());
                     validOperation = (soapPrimitive != null ) ? true : false;
 
                     break;
-                case Constants.WS_KEY_SEND_LOCATION:
+                case Constants.WS_KEY_SEND_LOCATION: case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
                     soapPrimitive = SoapServices.updateLocation(webServiceTaskDecode.getTask_team_id()
                             , webServiceTaskDecode.getTask_latitude()
                             , webServiceTaskDecode.getTask_longitude()
                             , webServiceTaskDecode.getTask_user_id());
-                    validOperation = (soapPrimitive != null ) ? true : false;
-                case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
-                    soapPrimitive = SoapServices.updateLocation(webServiceTaskDecode.getTask_team_id()
-                            ,webServiceTaskDecode.getTask_latitude()
-                            ,webServiceTaskDecode.getTask_longitude()
-                            ,webServiceTaskDecode.getTask_user_id());
                     validOperation = (soapPrimitive != null ) ? true : false;
                     break;
                 default:

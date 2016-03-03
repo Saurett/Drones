@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TASK MANAGER CD MX</string>
-    <string name="title_activity_main">SEDEMA - CD MX</string>
+    <string name="title_activity_main">OKOXALI</string>
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -12,6 +12,12 @@
     <string name="username_login_error">This field is required</string>
     <string name="default_ws_operation">Web Service default is not Online</string>
     <string name="default_login_error">The email address and password you entered do not match.</string>
+    <string name="no_user_team_login_error">The user is not assigned a team.</string>
+
+    <string name="task_priority_name_low">Low</string>
+    <string name="task_priority_name_mid">Medium</string>
+    <string name="task_priority_name_high">High</string>
+    <string name="task_priority_name_express">Express</string>
 
 
 </resources>

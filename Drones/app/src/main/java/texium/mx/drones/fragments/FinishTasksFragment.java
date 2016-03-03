@@ -2,7 +2,9 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
@@ -11,12 +13,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.utils.Constants;
@@ -26,13 +32,15 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
     static FragmentTaskListener activityListener;
 
-    private Button send_task_button,close_window_button,next_task_button,back_task_button;
-    private TextView title_task_window, content_task_window,comment_task_window;
+    private Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
+    private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
 
     static Map<Long,Object> taskToken = new HashMap<>();
 
     static private int _ACTUAL_POSITION;
     static private int _ACTUAL_COUNT;
+
+    static Map<Integer,FilesManager> TASK_FILES = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,15 +52,21 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         send_task_button = (Button) view.findViewById(R.id.send_task_button);
         next_task_button = (Button) view.findViewById(R.id.next_task_button);
         back_task_button = (Button) view.findViewById(R.id.back_task_button);
+        picture_task_button = (Button) view.findViewById(R.id.picture_task_button);
+        video_task_button = (Button) view.findViewById(R.id.video_task_button);
 
         title_task_window = (TextView) view.findViewById(R.id.title_task_window);
         content_task_window = (TextView) view.findViewById(R.id.content_task_window);
         comment_task_window = (TextView) view.findViewById(R.id.comment_task_window);
+        number_photos = (TextView) view.findViewById(R.id.number_photos);
+        number_videos = (TextView) view.findViewById(R.id.number_videos);
+
 
         back_task_button.setOnClickListener(this);
         send_task_button.setOnClickListener(this);
         close_window_button.setOnClickListener(this);
         next_task_button.setOnClickListener(this);
+        picture_task_button.setOnClickListener(this);
 
 
         View tokenView = (View) taskToken.get(1L);
@@ -82,6 +96,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             back_task_button.setVisibility(View.INVISIBLE);
         }
 
+        number_photos.setText(String.valueOf(TASK_FILES.size()));
+
         return view;
     }
 
@@ -97,7 +113,12 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
             _ACTUAL_POSITION = taskDecode.getTask_position();
             _ACTUAL_COUNT = backAdapter.getItemCount() - 1;
+
+
         }
+
+        TASK_FILES = activityListener.getTaskFiles();
+
     }
 
     @Override
@@ -113,6 +134,24 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.picture_task_button:
+
+                TaskListAdapter pictureAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
+                Tasks pictureTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
+                TasksDecode pictureDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
+
+                activityListener.taskActions(v, pictureAdapter, pictureTask, pictureDecode);
+
+                break;
+            case R.id.video_task_button:
+
+                TaskListAdapter videoAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
+                Tasks videoTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
+                TasksDecode videoDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
+
+                activityListener.taskActions(v, videoAdapter, videoTask, videoDecode);
+
+                break;
             case R.id.send_task_button:
 
                 SpannableStringBuilder ssb = (SpannableStringBuilder) comment_task_window.getText();
@@ -162,11 +201,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualBackTask.getTask_tittle());
                 content_task_window.setText(actualBackTask.getTask_content());
-                comment_task_window.setText(new String());
+                setCountPicture();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualBackTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,backDecode);
-
                 break;
             case R.id.next_task_button:
 
@@ -198,7 +236,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualNextTask.getTask_tittle());
                 content_task_window.setText(actualNextTask.getTask_content());
-                comment_task_window.setText(new String());
+                setCountPicture();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualNextTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,nextDecode);
@@ -206,5 +244,17 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             default:
                 break;
         }
+    }
+
+    private void setCountPicture() {
+
+        number_photos.setText(Constants.NUMBER_ZERO);
+        number_videos.setText(Constants.NUMBER_ZERO);
+
+        if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
+            FilesManager filesManager = TASK_FILES.get(_ACTUAL_POSITION);
+            number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
+        }
+
     }
 }

@@ -117,13 +117,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
+        protected void onCancelled(Boolean aBoolean) {
+            super.onCancelled(aBoolean);
+        }
+
+        @Override
         protected void onPreExecute() {
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            Boolean validOperation;
+            Boolean validOperation = false;
 
             switch (webServiceOperation) {
                 case Constants.WS_KEY_PUBLIC_TEST:
@@ -135,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
                     validOperation = (id > 0) ?  true : false;
-
                     break;
                 default:
                     Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();
@@ -150,29 +154,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(final Boolean success) {
 
             if(success) {
-                //Oficial Login To Navigation Drawer//
-                Intent intentNavigationDrawer = new Intent(MainActivity.this,NavigationDrawerActivity.class);
 
-                SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+                if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
+                    //Official Login To Navigation Drawer//
+                    Intent intentNavigationDrawer = new Intent(MainActivity.this,NavigationDrawerActivity.class);
 
-                Users user = new Users();
+                    if(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()) == 0) {
+                        Toast.makeText(MainActivity.this,getString(R.string.no_user_team_login_error), Toast.LENGTH_LONG).show();
+                        return;
+                    }
 
-                user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
-                user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
-                user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
-                user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTORNAME).toString());
-                user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
-                user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
-                user.setIdTeam(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
-                user.setTeamName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAMNAME).toString());
-                user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
-                user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
-                user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONEXION).toString());
+                    SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
 
-                intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
-                cleanAllLogin();
-                startActivity(intentNavigationDrawer);
+                    Users user = new Users();
+
+                    user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                    user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
+                    user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                    user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
+                    user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                    user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
+                    user.setIdTeam(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
+                    user.setTeamName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_NAME).toString());
+                    user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
+                    user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+                    user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+
+                    usernameLogin.clearFocus();
+                    passwordLogin.clearFocus();
+
+                    intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
+                    cleanAllLogin();
+                    startActivity(intentNavigationDrawer);
+                } else {
+                    Toast.makeText(MainActivity.this, "TEST DE WEB", Toast.LENGTH_LONG).show();
+                }
+
             } else {
+
                 Toast.makeText(MainActivity.this,getString(R.string.default_login_error), Toast.LENGTH_LONG).show();
             }
         }

@@ -79,6 +79,7 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_TASK_LIST = "192.168.12.10/ListadoTareas";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_TASK = "192.168.12.10/ActualizarTarea";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_LOCATION = "192.168.12.10/SincronizarCoordenadas";
+    public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_URL = "http://192.168.12.111/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     //public static final String WEB_SERVICE_URL = "http://192.168.1.98/ServicioWeb/Servicio_Android.asmx";
@@ -89,6 +90,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_TASK = "ListadoTareas";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_TASK = "ActualizarTarea";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_LOCATION = "SincronizarCoordenadas";
+    public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//

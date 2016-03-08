@@ -1,11 +1,18 @@
 package texium.mx.drones.services;
 
+import android.util.Base64;
+
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.File;
+import java.util.List;
+
+import texium.mx.drones.helpers.DecodeJSONHelper;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -100,20 +107,28 @@ public class SoapServices {
         return soapObject;
     }
 
-    public static SoapPrimitive updateTask(Integer task, String comment,Integer status,Integer user) {
+    public static SoapPrimitive updateTask(Integer task, String comment,Integer status,Integer user,List<String> encodedImage) {
         SoapPrimitive soapPrimitive = null;
         try {
-            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_TASK;
-            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_TASK;
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SEND_FILE;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SEND_FILE;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
             String URL = Constants.WEB_SERVICE_URL;
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            SoapObject soapFiles = new SoapObject(NAMESPACE, "Archivo");
+
+            for (String encode: encodedImage) {
+                soapFiles.addProperty("string",encode);
+            }
+
+            Request.addSoapObject(soapFiles);
+
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;

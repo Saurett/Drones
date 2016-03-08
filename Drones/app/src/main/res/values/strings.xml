@@ -8,11 +8,16 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_maps">Map</string>
+
     <string name="password_login_error">This password is invalid</string>
     <string name="username_login_error">This field is required</string>
     <string name="default_ws_operation">Web Service default is not Online</string>
     <string name="default_login_error">The email address and password you entered do not match.</string>
     <string name="no_user_team_login_error">The user is not assigned a team.</string>
+    <string name="default_gps_error">GPS is offline</string>
+
+    <string name="default_file_single_selection">Single-selection: Tap on any file.</string>
+    <string name="default_file_multiple_selection">Multi-selection: Tap and Hold on the first file,tap for more, tap on OPEN to finish.</string>
 
     <string name="task_priority_name_low">Low</string>
     <string name="task_priority_name_mid">Medium</string>

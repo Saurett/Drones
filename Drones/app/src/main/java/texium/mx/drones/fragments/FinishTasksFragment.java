@@ -2,22 +2,43 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.CursorLoader;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Movie;
+import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
+import android.util.Base64;
+import android.util.Base64OutputStream;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.games.video.Video;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.zip.Deflater;
 
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
@@ -67,7 +88,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         close_window_button.setOnClickListener(this);
         next_task_button.setOnClickListener(this);
         picture_task_button.setOnClickListener(this);
-
+        video_task_button.setOnClickListener(this);
 
         View tokenView = (View) taskToken.get(1L);
         TaskListAdapter tokenAdapter = (TaskListAdapter) taskToken.get(2L);
@@ -96,7 +117,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             back_task_button.setVisibility(View.INVISIBLE);
         }
 
-        number_photos.setText(String.valueOf(TASK_FILES.size()));
+        setCountFiles();
 
         return view;
     }
@@ -153,6 +174,9 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 break;
             case R.id.send_task_button:
+                FilesManager sendFile;
+
+                List<File> objects = new ArrayList<>();
 
                 SpannableStringBuilder ssb = (SpannableStringBuilder) comment_task_window.getText();
 
@@ -161,6 +185,69 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 TasksDecode sendDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
 
                 sendDecode.setTask_comment(ssb.toString());
+
+                if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
+                    sendFile = TASK_FILES.get(_ACTUAL_POSITION);
+
+                    //objects.addAll(sendFile.getFilesPicture());
+                    //objects.addAll(sendFile.getFilesVideo());
+
+                    //File file = sendFile.getFilesPicture().get(0);
+                    List<Uri> uriFilesPicture = sendFile.getFilesPicture();
+                    List<Uri> uriFileVideo = sendFile.getFilesVideo();
+
+                    List<String> stringsPicture = new ArrayList<>();
+                    List<String> stringsVideo = new ArrayList<>();
+
+                    for (Uri uri :uriFilesPicture) {
+                        Uri uriActual = uri;
+                        String imageEncoded = "";
+                        try {
+                            InputStream is = getActivity().getContentResolver().openInputStream(uri);
+                            Bitmap img = BitmapFactory.decodeStream(is);
+                            ByteArrayOutputStream convert = new ByteArrayOutputStream();
+                            img.compress(Bitmap.CompressFormat.JPEG, 50, convert);
+                            byte[] b = convert.toByteArray();
+                            imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+
+                        }
+
+                        stringsVideo.add(imageEncoded);
+                    }
+
+                    for (Uri uri : uriFileVideo) {
+
+                        String videoEncoded = "";
+
+                        try {
+                            InputStream is = getActivity().getContentResolver().openInputStream(uri);
+
+                            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+                            // this is storage overwritten on each iteration with bytes
+                            int bufferSize = 4096;
+                            byte[] buffer = new byte[bufferSize];
+
+                            // we need to know how may bytes were read to write them to the byteBuffer
+                            int len = 0;
+                            while ((len = is.read(buffer)) != -1) {
+                                byteBuffer.write(buffer, 0, len);
+                            }
+                                                        // and then we can return your byte array.
+                            videoEncoded = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        stringsVideo.add(videoEncoded);
+                    }
+
+                    //sendDecode.setSendFiles(stringsVideo);
+                    sendDecode.setSendFiles(stringsVideo);
+                }
 
                 taskToken = new HashMap<>();
 
@@ -201,7 +288,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualBackTask.getTask_tittle());
                 content_task_window.setText(actualBackTask.getTask_content());
-                setCountPicture();
+                setCountFiles();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualBackTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,backDecode);
@@ -236,7 +323,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualNextTask.getTask_tittle());
                 content_task_window.setText(actualNextTask.getTask_content());
-                setCountPicture();
+                setCountFiles();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualNextTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,nextDecode);
@@ -246,7 +333,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void setCountPicture() {
+    private void setCountFiles() {
 
         number_photos.setText(Constants.NUMBER_ZERO);
         number_videos.setText(Constants.NUMBER_ZERO);
@@ -254,6 +341,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
             FilesManager filesManager = TASK_FILES.get(_ACTUAL_POSITION);
             number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
+            number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
         }
 
     }

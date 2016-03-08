@@ -1,6 +1,10 @@
 package texium.mx.drones.models;
 
+import android.util.Base64;
+
+import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by texiumuser on 25/02/2016.
@@ -15,6 +19,7 @@ public class TasksDecode {
     private Integer task_user_id;
     private Integer task_update_to;
     private Integer task_team_id;
+    private List<String> sendFiles;
 
     public TasksDecode() {
 
@@ -82,5 +87,22 @@ public class TasksDecode {
 
     public void setTask_team_id(Integer task_team_id) {
         this.task_team_id = task_team_id;
+    }
+
+    /*
+    public List<byte[]> getSendFiles() {
+        return sendFiles;
+    }
+
+    public void setSendFiles(List<byte[]> sendFiles) {
+        this.sendFiles = sendFiles;
+    }*/
+
+    public List<String> getSendFiles() {
+        return sendFiles;
+    }
+
+    public void setSendFiles(List<String> sendFiles) {
+        this.sendFiles = sendFiles;
     }
 }

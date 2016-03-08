@@ -6,13 +6,18 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="password_login_error">This password is invalid</string>
-    <string name="username_login_error">This field is required</string>
-    <string name="default_ws_operation">Web Service default is not Online</string>
+    <string name="action_settings">Configuraciones</string>
+    <string name="title_activity_maps">Mapas</string>
+
+    <string name="password_login_error">Contraseña invalida</string>
+    <string name="username_login_error">El campo es requerido</string>
+    <string name="default_ws_operation">El webservice no esta disponible.</string>
     <string name="default_login_error">El email y la contraseña no coinciden.</string>
     <string name="no_user_team_login_error">El usuario no tiene cuadrilla asignada.</string>
+    <string name="default_gps_error">Habilite su GPS</string>
+
+    <string name="default_file_single_selection">Selección única: Toque cualquier archivo.</string>
+    <string name="default_file_multiple_selection">Selección multiple: Toque y mantenga presionado el archivo,toque para añadir mas, para terminar toque abrir .</string>
 
     <string name="task_priority_name_low">Baja</string>
     <string name="task_priority_name_mid">Media</string>

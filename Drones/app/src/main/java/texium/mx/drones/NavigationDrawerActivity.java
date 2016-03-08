@@ -1,10 +1,15 @@
 package texium.mx.drones;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,7 +29,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,7 +46,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.ksoap2.serialization.SoapPrimitive;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,6 +107,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     public static Map<Integer,FilesManager> TASK_FILE = new HashMap<>();
     public static Integer ACTUAL_POSITION;
 
+    NotificationManager nm;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +152,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //Header dynamic manager//
         getTaskForceData(navigationView);
+
+        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -181,6 +197,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
         } else {
+            Toast.makeText(this, "Ubicación no disponible, active su GPS", Toast.LENGTH_LONG).show();
             taskToken.clear();
             finish();
 
@@ -232,6 +249,90 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
+
+    @Override
+    public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        switch (v.getId()) {
+            case R.id.picture_task_button:
+                Intent imgGalleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));
+                imgGalleryIntent.setType("image/*");
+                imgGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(imgGalleryIntent, GALLERY_IMAGE_ACTIVITY_REQUEST_CODE);
+
+                Toast.makeText(this, getString(R.string.default_file_single_selection)+"\n"
+                        + getString(R.string.default_file_multiple_selection)
+                        ,Toast.LENGTH_LONG).show();
+
+                ACTUAL_POSITION = tasksDecode.getTask_position();
+
+                break;
+            case R.id.video_task_button:
+                Intent videoGalleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));
+                videoGalleryIntent.setType("video/*");
+                videoGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(videoGalleryIntent, GALLERY_VIDEO_ACTIVITY_REQUEST_CODE);
+
+                Toast.makeText(this, getString(R.string.default_file_single_selection)+"\n"
+                        + getString(R.string.default_file_multiple_selection)
+                        ,Toast.LENGTH_LONG).show();
+
+                ACTUAL_POSITION = tasksDecode.getTask_position();
+
+                break;
+            case R.id.agree_task_button:
+
+                tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
+                tasksDecode.setTask_comment("Tarea aceptada");
+
+                AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                wsAgree.execute();
+
+                break;
+            case R.id.decline_task_button:
+
+                tasksDecode.setTask_update_to(Constants.PENDING_TASK);
+                tasksDecode.setTask_comment("Tarea pospuesta");
+
+                AsyncCallWS wsDecline = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                wsDecline.execute();
+
+                break;
+            case R.id.finish_task_button:
+
+                setToken(v,taskListAdapter,task,tasksDecode);
+
+                closeActiveTaskFragment(v);
+
+                FragmentTransaction finishFragment = fragmentManager.beginTransaction();
+                finishFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
+                finishFragment.commit();
+
+                break;
+            case R.id.send_task_button:
+
+                closeActiveTaskFragment(v);
+
+                tasksDecode.setTask_update_to(Constants.CLOSE_TASK);
+
+                AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                wsClose.execute();
+
+                break;
+            default:
+                Snackbar.make(v, "Acción no registrada " , Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                break;
+        }
+
+        if (taskListAdapter.getItemCount() == 0) {
+            closeActiveTaskFragment(v);
+            Toast.makeText(this, "Lista de tareas vacia", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -240,32 +341,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 if (requestCode == GALLERY_IMAGE_ACTIVITY_REQUEST_CODE) {
                     if (resultCode == RESULT_OK) {
 
-                        List<File> files = new ArrayList<>();
-                        List<File> selectFiles = new ArrayList<>();
-
-                        ClipData clipData = data.getClipData();
-                        clipData.getItemCount();
-
-                        for (int i = 0; i < clipData.getItemCount(); i++) {
-                            Uri path = clipData.getItemAt(i).getUri();
-                            File file = new File(path.getPath());
-                            selectFiles.add(file);
+                        if (data.getClipData() != null) {
+                            //select multiple file picture
+                            selectMultipleFile(data.getClipData(),requestCode);
+                        } else if (data.getData() != null) {
+                            //select unique file picture
+                            selectUniqueFile(data.getData(), requestCode);
                         }
-
-                        FilesManager taskFiles = new FilesManager();
-
-                        if (TASK_FILE.containsKey(ACTUAL_POSITION)) {
-
-                            taskFiles = TASK_FILE.get(ACTUAL_POSITION);
-                            files = taskFiles.getFilesPicture();
-                        }
-
-                        files.addAll(selectFiles);
-                        taskFiles.setFilesPicture(files);
-                        TASK_FILE.put(ACTUAL_POSITION,taskFiles);
-
-                        TextView number_photos = (TextView) findViewById(R.id.number_photos);
-                        number_photos.setText(String.valueOf(files.size()));
 
                     } else if (resultCode == RESULT_CANCELED) {
                         // User cancelled the image capture
@@ -274,11 +356,26 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     }
                 }
                 break;
+            case GALLERY_VIDEO_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    if (data.getClipData() != null) {
+                        //select multiple file picture
+                        selectMultipleFile(data.getClipData(), requestCode);
+                    } else if (data.getData() != null) {
+                        //select unique file picture
+                        selectUniqueFile(data.getData(), requestCode);
+                    }
+
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the image capture
+                } else {
+                    // Image capture failed, advise user
+                }
+                break;
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Image captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this, "Imagen guardada en:\n" +
-                            data.getData(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Imagen guardada", Toast.LENGTH_LONG).show();
                 } else if (resultCode == RESULT_CANCELED) {
                     // User cancelled the image capture
                 } else {
@@ -288,8 +385,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Video captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this, "Video guardado en:\n" +
-                            data.getData(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Video guardado", Toast.LENGTH_LONG).show();
                 } else if (resultCode == RESULT_CANCELED) {
                     // User cancelled the video capture
                 } else {
@@ -299,6 +395,75 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
+    public void selectMultipleFile(ClipData data, int requestCode) {
+        List<Uri> files = new ArrayList<>();
+        List<Uri> selectFiles = new ArrayList<>();
+
+        ClipData clipData = data;
+
+        for (int i = 0; i < clipData.getItemCount(); i++) {
+            Uri path = clipData.getItemAt(i).getUri();
+            //File file = new File(path.getPath());
+            selectFiles.add(path);
+        }
+
+        FilesManager taskFiles = new FilesManager();
+
+        if (TASK_FILE.containsKey(ACTUAL_POSITION)) {
+
+            taskFiles = TASK_FILE.get(ACTUAL_POSITION);
+            files = (requestCode == GALLERY_VIDEO_ACTIVITY_REQUEST_CODE) ? taskFiles.getFilesVideo() : taskFiles.getFilesPicture();
+        }
+
+        files.addAll(selectFiles);
+
+        switch (requestCode) {
+            case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
+                taskFiles.setFilesPicture(files);
+                TextView number_photos = (TextView) findViewById(R.id.number_photos);
+                number_photos.setText(String.valueOf(files.size()));
+                break;
+            case GALLERY_VIDEO_ACTIVITY_REQUEST_CODE:
+                taskFiles.setFilesVideo(files);
+                TextView number_videos = (TextView) findViewById(R.id.number_videos);
+                number_videos.setText(String.valueOf(files.size()));
+                break;
+        }
+
+        TASK_FILE.put(ACTUAL_POSITION, taskFiles);
+
+    }
+
+    public void selectUniqueFile(Uri data, int requestCode) {
+        List<Uri> files = new ArrayList<>();
+        FilesManager taskFiles = new FilesManager();
+
+        Uri path = data;
+        //File file = new File(path.getPath());
+
+        if (TASK_FILE.containsKey(ACTUAL_POSITION)) {
+
+            taskFiles = TASK_FILE.get(ACTUAL_POSITION);
+            files = (requestCode == GALLERY_VIDEO_ACTIVITY_REQUEST_CODE) ? taskFiles.getFilesVideo() : taskFiles.getFilesPicture();
+        }
+
+        files.add(path);
+
+        switch (requestCode) {
+            case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
+                taskFiles.setFilesPicture(files);
+                TextView number_photos = (TextView) findViewById(R.id.number_photos);
+                number_photos.setText(String.valueOf(files.size()));
+                break;
+            case GALLERY_VIDEO_ACTIVITY_REQUEST_CODE:
+                taskFiles.setFilesVideo(files);
+                TextView number_videos = (TextView) findViewById(R.id.number_videos);
+                number_videos.setText(String.valueOf(files.size()));
+                break;
+        }
+
+        TASK_FILE.put(ACTUAL_POSITION, taskFiles);
+    }
 
 
 
@@ -453,81 +618,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        switch (v.getId()) {
-            case R.id.picture_task_button:
-
-                Intent imgGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                imgGalleryIntent.setType("image/*");
-                imgGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(imgGalleryIntent.createChooser(imgGalleryIntent, "Selecciona app de Imagen"), GALLERY_IMAGE_ACTIVITY_REQUEST_CODE);
-
-                ACTUAL_POSITION = tasksDecode.getTask_position();
-
-                break;
-            case R.id.video_task_button:
-
-                Intent videoGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                videoGalleryIntent.setType("video/*");
-                videoGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(videoGalleryIntent.createChooser(videoGalleryIntent, "Selecciona app de video"), GALLERY_VIDEO_ACTIVITY_REQUEST_CODE);
-
-                break;
-            case R.id.agree_task_button:
-
-                tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
-                tasksDecode.setTask_comment("Tarea aceptada");
-
-                AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
-                wsAgree.execute();
-
-                break;
-            case R.id.decline_task_button:
-
-                tasksDecode.setTask_update_to(Constants.PENDING_TASK);
-                tasksDecode.setTask_comment("Tarea pospuesta");
-
-                AsyncCallWS wsDecline = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
-                wsDecline.execute();
-
-                break;
-            case R.id.finish_task_button:
-
-                setToken(v,taskListAdapter,task,tasksDecode);
-
-                closeActiveTaskFragment(v);
-
-                FragmentTransaction finishFragment = fragmentManager.beginTransaction();
-                finishFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
-                finishFragment.commit();
-
-                break;
-            case R.id.send_task_button:
-
-                closeActiveTaskFragment(v);
-
-                tasksDecode.setTask_update_to(Constants.CLOSE_TASK);
-
-                AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
-                wsClose.execute();
-
-                break;
-            default:
-                Snackbar.make(v, "Acción no registrada " , Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                break;
-        }
-
-        if (taskListAdapter.getItemCount() == 0) {
-            closeActiveTaskFragment(v);
-            Toast.makeText(this, "Lista de tareas vacia", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
     public void clearTaskToken() {
         taskToken = new HashMap<>();
         TASK_FILE.clear();
@@ -585,7 +675,22 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 locationGPS = locationManagerGPS.getLastKnownLocation(provider);
             }
         } else {
-            Toast.makeText(NavigationDrawerActivity.this, "Activa tu gps", Toast.LENGTH_SHORT).show();
+            Toast.makeText(NavigationDrawerActivity.this, "AQUI VA EL MENSAGE DE LA BARRA", Toast.LENGTH_SHORT).show();
+
+            /*
+            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0,new Intent(),0);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+            builder.setSmallIcon(R.drawable.angel);
+            builder.setContentIntent(pendingIntent);
+            builder.setAutoCancel(true);
+            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.angel));
+            builder.setContentTitle("Notificación");
+            builder.setContentText("GPS apagado");
+            builder.setSubText("Encianda su GPS para obtener su ubicación");
+
+            nm.notify(1,builder.build());
+            */
         }
     }
 
@@ -629,7 +734,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     soapPrimitive = SoapServices.updateTask(webServiceTask.getTask_id()
                             , webServiceTaskDecode.getTask_comment()
                             , webServiceTaskDecode.getTask_update_to()
-                            , webServiceTask.getTask_user_id());
+                            , webServiceTask.getTask_user_id(),webServiceTaskDecode.getSendFiles());
                     validOperation = (soapPrimitive != null ) ? true : false;
 
                     break;

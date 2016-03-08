@@ -1,5 +1,7 @@
 package texium.mx.drones.models;
 
+import android.net.Uri;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,32 +11,27 @@ import java.util.List;
  */
 public class FilesManager {
 
-    private List<File> filesPicture;
-    private List<File> filesVideo;
+    private List<Uri> filesPicture;
+    private List<Uri> filesVideo;
 
     public FilesManager() {
         filesPicture = new ArrayList<>();
         filesVideo = new ArrayList<>();
     }
 
-    public FilesManager(List<File> filesPicture, List<File> filesVideo) {
-        this.filesPicture = filesPicture;
-        this.filesVideo = filesVideo;
-    }
-
-    public List<File> getFilesPicture() {
+    public List<Uri> getFilesPicture() {
         return filesPicture;
     }
 
-    public void setFilesPicture(List<File> filesPicture) {
+    public void setFilesPicture(List<Uri> filesPicture) {
         this.filesPicture = filesPicture;
     }
 
-    public List<File> getFilesVideo() {
+    public List<Uri> getFilesVideo() {
         return filesVideo;
     }
 
-    public void setFilesVideo(List<File> filesVideo) {
+    public void setFilesVideo(List<Uri> filesVideo) {
         this.filesVideo = filesVideo;
     }
 }

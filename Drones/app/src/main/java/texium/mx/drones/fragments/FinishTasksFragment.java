@@ -176,8 +176,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             case R.id.send_task_button:
                 FilesManager sendFile;
 
-                List<File> objects = new ArrayList<>();
-
                 SpannableStringBuilder ssb = (SpannableStringBuilder) comment_task_window.getText();
 
                 TaskListAdapter sendAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
@@ -189,15 +187,12 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
                     sendFile = TASK_FILES.get(_ACTUAL_POSITION);
 
-                    //objects.addAll(sendFile.getFilesPicture());
-                    //objects.addAll(sendFile.getFilesVideo());
 
-                    //File file = sendFile.getFilesPicture().get(0);
                     List<Uri> uriFilesPicture = sendFile.getFilesPicture();
-                    List<Uri> uriFileVideo = sendFile.getFilesVideo();
+                    //List<Uri> uriFileVideo = sendFile.getFilesVideo();
 
                     List<String> stringsPicture = new ArrayList<>();
-                    List<String> stringsVideo = new ArrayList<>();
+                    //List<String> stringsVideo = new ArrayList<>();
 
                     for (Uri uri :uriFilesPicture) {
                         Uri uriActual = uri;
@@ -215,9 +210,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                         }
 
-                        stringsVideo.add(imageEncoded);
+                        stringsPicture.add(imageEncoded);
                     }
 
+                    /*
                     for (Uri uri : uriFileVideo) {
 
                         String videoEncoded = "";
@@ -243,10 +239,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                         }
 
                         stringsVideo.add(videoEncoded);
-                    }
+                    }*/
 
+                    sendDecode.setSendFiles(stringsPicture);
                     //sendDecode.setSendFiles(stringsVideo);
-                    sendDecode.setSendFiles(stringsVideo);
                 }
 
                 taskToken = new HashMap<>();

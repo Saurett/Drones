@@ -1,6 +1,7 @@
 package texium.mx.drones.services;
 
 import android.util.Base64;
+import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -44,6 +45,7 @@ public class SoapServices {
 
         } catch (Exception ex) {
             ex.printStackTrace();
+            Log.e("Soap Exception", ex.getMessage());
         }
 
         return soapObject;
@@ -73,6 +75,7 @@ public class SoapServices {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
         }
 
         return soapObject;
@@ -102,12 +105,53 @@ public class SoapServices {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
         }
 
         return soapObject;
     }
 
-    public static SoapPrimitive updateTask(Integer task, String comment,Integer status,Integer user,List<String> encodedImage) {
+    public static SoapPrimitive updateTask(Integer task, String comment,Integer status,Integer user,List<String> encodedFile) {
+        SoapPrimitive soapPrimitive = null;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_TASK;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_TASK;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = Constants.WEB_SERVICE_URL;
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+
+            SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
+
+            for (String encode: encodedFile) {
+                soapFiles.addProperty(Constants.WEB_SERVICE_PARAM_OBJECT_STRING,encode);
+            }
+
+            Request.addSoapObject(soapFiles);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapPrimitive sendTask(Integer task, String comment,Integer status,Integer user,List<String> encodedImage) {
         SoapPrimitive soapPrimitive = null;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SEND_FILE;
@@ -117,14 +161,14 @@ public class SoapServices {
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
             //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
             //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
-            SoapObject soapFiles = new SoapObject(NAMESPACE, "Archivo");
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
 
             for (String encode: encodedImage) {
-                soapFiles.addProperty("string",encode);
+                soapFiles.addProperty(Constants.WEB_SERVICE_PARAM_OBJECT_STRING,encode);
             }
 
             Request.addSoapObject(soapFiles);
@@ -141,6 +185,45 @@ public class SoapServices {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapPrimitive sendFile(Integer task, Integer user, List<String> encodedImage) {
+        SoapPrimitive soapPrimitive = null;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SEND_FILE;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SEND_FILE;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = Constants.WEB_SERVICE_URL;
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
+
+            for (String encode: encodedImage) {
+                soapFiles.addProperty(Constants.WEB_SERVICE_PARAM_OBJECT_STRING,encode);
+            }
+
+            Request.addSoapObject(soapFiles);
+
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
         }
 
         return soapPrimitive;
@@ -172,6 +255,7 @@ public class SoapServices {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
         }
 
         return soapPrimitive;

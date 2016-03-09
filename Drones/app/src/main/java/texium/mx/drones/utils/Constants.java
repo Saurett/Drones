@@ -51,11 +51,13 @@ public final class Constants {
     public static final int WS_KEY_TASK_SERVICE_PROGRESS = 3;
     public static final int WS_KEY_TASK_SERVICE_PENDING= 4;
     public static final int WS_KEY_UPDATE_TASK = 5;
-    public static final int WS_KEY_SEND_LOCATION = 6;
-    public static final int WS_KEY_SEND_LOCATION_HIDDEN = 7;
-    @Deprecated public static final int WS_KEY_FIND_TASK = 8;
-    @Deprecated public static final int WS_KEY_TASK_SERVICE_REVISION = 9; //ONLI WEB
-    public static final int WS_KEY_TASK_SERVICE_CLOSE = 10;
+    public static final int WS_KEY_UPDATE_TASK_WITH_PICTURE = 6;
+    public static final int WS_KEY_UPDATE_TASK_FILE = 8;
+    public static final int WS_KEY_SEND_LOCATION = 9;
+    public static final int WS_KEY_SEND_LOCATION_HIDDEN = 10;
+    @Deprecated public static final int WS_KEY_FIND_TASK = 11;
+    @Deprecated public static final int WS_KEY_TASK_SERVICE_REVISION = 12; //ONLI WEB
+    public static final int WS_KEY_TASK_SERVICE_CLOSE = 13;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -103,6 +105,8 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_TASK_ID_USER = "IDUsuario";
     public static final String WEB_SERVICE_PARAM_TASK_LATITUDE = "Latitud";
     public static final String WEB_SERVICE_PARAM_TASK_LONGITUDE = "Longitud";
+    public static final String WEB_SERVICE_PARAM_TASK_FILE = "Archivo";
+    public static final String WEB_SERVICE_PARAM_OBJECT_STRING = "string";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//

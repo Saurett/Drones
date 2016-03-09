@@ -4,6 +4,7 @@ import android.util.Base64;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class TasksDecode {
     private List<String> sendFiles;
 
     public TasksDecode() {
-
+        sendFiles = new ArrayList<>();
     }
 
     public Integer getTask_update_to() {

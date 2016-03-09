@@ -1,8 +1,11 @@
 package texium.mx.drones;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText usernameLogin;
     EditText passwordLogin;
 
+    private View mLoginFormView,mProgressView;
     private SoapServices soapServices;
 
 
@@ -32,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
 
         Button loginButton = (Button) findViewById(R.id.login_button);
         Button cleanButton = (Button) findViewById(R.id.clean_button);
@@ -95,6 +102,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void showProgress(final boolean show) {
+
+        // The ViewPropertyAnimator APIs are not available, so simply show
+        // and hide the relevant UI components.
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+    }
+
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean>  {
 
         private Integer webServiceOperation;
@@ -117,12 +132,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected void onCancelled(Boolean aBoolean) {
-            super.onCancelled(aBoolean);
-        }
-
-        @Override
         protected void onPreExecute() {
+            showProgress(true);
         }
 
         @Override
@@ -152,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(final Boolean success) {
-
+            showProgress(false);
             if(success) {
 
                 if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
@@ -191,9 +202,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             } else {
-
                 Toast.makeText(MainActivity.this,getString(R.string.default_login_error), Toast.LENGTH_LONG).show();
             }
+        }
+
+        @Override
+        protected void onCancelled() {
+            showProgress(false);
+            super.onCancelled();
         }
     }
 }

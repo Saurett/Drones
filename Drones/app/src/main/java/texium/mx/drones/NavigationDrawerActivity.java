@@ -32,6 +32,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -318,6 +319,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 tasksDecode.setTask_update_to(Constants.CLOSE_TASK);
 
                 AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                //AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK_FILE,task,tasksDecode);
                 wsClose.execute();
 
                 break;
@@ -734,9 +736,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     soapPrimitive = SoapServices.updateTask(webServiceTask.getTask_id()
                             , webServiceTaskDecode.getTask_comment()
                             , webServiceTaskDecode.getTask_update_to()
-                            , webServiceTask.getTask_user_id(),webServiceTaskDecode.getSendFiles());
+                            , webServiceTask.getTask_user_id()
+                            ,webServiceTaskDecode.getSendFiles());
                     validOperation = (soapPrimitive != null ) ? true : false;
-
+                    break;
+                case Constants.WS_KEY_UPDATE_TASK_FILE:
+                    soapPrimitive = SoapServices.sendFile(webServiceTask.getTask_id()
+                            , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendFiles());
+                    validOperation = (soapPrimitive != null ) ? true : false;
                     break;
                 case Constants.WS_KEY_SEND_LOCATION: case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
                     soapPrimitive = SoapServices.updateLocation(webServiceTaskDecode.getTask_team_id()
@@ -758,10 +765,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             if(success) {
 
-                switch (webServiceOperation) {
-                    case Constants.WS_KEY_UPDATE_TASK:
+                FragmentManager fragmentManager = getSupportFragmentManager();
 
-                        FragmentManager fragmentManager = getSupportFragmentManager();
+                switch (webServiceOperation) {
+
+                    case Constants.WS_KEY_UPDATE_TASK:
                         removeAllFragment(fragmentManager);
 
                         switch (webServiceTask.getTask_status().intValue()) {
@@ -796,10 +804,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         onMapReady(mMap);
                         Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
-                    default:
-                        //HIDDEN WEB SERVIDE
+                    case Constants.WS_KEY_UPDATE_TASK_FILE:
+
+                        removeAllFragment(fragmentManager);
+
+                        FragmentTransaction ftProgress = fragmentManager.beginTransaction();
+                        ftProgress.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
+                        ftProgress.commit();
+
+                        taskToken.clear();
+
+                        Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                 }
+                Log.d("SOAP RESPONSE",soapPrimitive.toString());
             } else {
                 Toast.makeText(NavigationDrawerActivity.this,"No es posible realizar acción", Toast.LENGTH_LONG).show();
             }

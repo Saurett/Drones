@@ -2,43 +2,25 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Movie;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
 import android.util.Base64;
-import android.util.Base64OutputStream;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.games.video.Video;
-
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.zip.Deflater;
 
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
@@ -67,7 +49,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_finish_tasks,container,false);
+        View view = inflater.inflate(R.layout.fragment_finish_tasks, container, false);
 
         close_window_button = (Button) view.findViewById(R.id.close_window_button);
         send_task_button = (Button) view.findViewById(R.id.send_task_button);
@@ -178,15 +160,16 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 SpannableStringBuilder ssb = (SpannableStringBuilder) comment_task_window.getText();
 
+                View tokenView = (View) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_VIEW);
                 TaskListAdapter sendAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
                 Tasks sendTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
                 TasksDecode sendDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
 
                 sendDecode.setTask_comment(ssb.toString());
+                sendDecode.setOrigen_button(tokenView.getId());
 
                 if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
                     sendFile = TASK_FILES.get(_ACTUAL_POSITION);
-
 
                     List<Uri> uriFilesPicture = sendFile.getFilesPicture();
                     //List<Uri> uriFileVideo = sendFile.getFilesVideo();
@@ -195,7 +178,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                     //List<String> stringsVideo = new ArrayList<>();
 
                     for (Uri uri :uriFilesPicture) {
-                        Uri uriActual = uri;
                         String imageEncoded = "";
                         try {
                             InputStream is = getActivity().getContentResolver().openInputStream(uri);
@@ -246,7 +228,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 }
 
                 taskToken = new HashMap<>();
-
                 activityListener.taskActions(v, sendAdapter, sendTask, sendDecode);
                 break;
             case R.id.close_window_button:

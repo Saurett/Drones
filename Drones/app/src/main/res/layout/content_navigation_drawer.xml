@@ -19,6 +19,16 @@
         android:layout_height="match_parent"
         android:name="com.google.android.gms.maps.MapFragment"/>
 
+    <ProgressBar
+        android:id="@+id/compress_files_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:scrollbarSize="700dp"
+        android:visibility="gone"
+        />
+
     <FrameLayout
         android:id="@+id/tasks_fragment_container"
         android:layout_width="match_parent"

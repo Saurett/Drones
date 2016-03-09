@@ -20,6 +20,7 @@ public class TasksDecode {
     private Integer task_user_id;
     private Integer task_update_to;
     private Integer task_team_id;
+    private Integer origen_button;
     private List<String> sendFiles;
 
     public TasksDecode() {
@@ -90,14 +91,13 @@ public class TasksDecode {
         this.task_team_id = task_team_id;
     }
 
-    /*
-    public List<byte[]> getSendFiles() {
-        return sendFiles;
+    public Integer getOrigen_button() {
+        return origen_button;
     }
 
-    public void setSendFiles(List<byte[]> sendFiles) {
-        this.sendFiles = sendFiles;
-    }*/
+    public void setOrigen_button(Integer origen_button) {
+        this.origen_button = origen_button;
+    }
 
     public List<String> getSendFiles() {
         return sendFiles;

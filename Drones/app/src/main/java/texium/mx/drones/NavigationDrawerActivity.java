@@ -294,11 +294,22 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
             case R.id.decline_task_button:
 
+                setToken(v,taskListAdapter,task,tasksDecode);
+
+                /*
                 tasksDecode.setTask_update_to(Constants.PENDING_TASK);
                 tasksDecode.setTask_comment("Tarea pospuesta");
 
                 AsyncCallWS wsDecline = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
-                wsDecline.execute();
+                wsDecline.execute();*/
+
+                setToken(v,taskListAdapter,task,tasksDecode);
+
+                closeActiveTaskFragment(v);
+
+                FragmentTransaction declineFragment = fragmentManager.beginTransaction();
+                declineFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
+                declineFragment.commit();
 
                 break;
             case R.id.finish_task_button:
@@ -316,10 +327,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 closeActiveTaskFragment(v);
 
-                tasksDecode.setTask_update_to(Constants.CLOSE_TASK);
+                tasksDecode.setTask_update_to((tasksDecode.getOrigen_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
 
                 AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
-                //AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK_FILE,task,tasksDecode);
                 wsClose.execute();
 
                 break;

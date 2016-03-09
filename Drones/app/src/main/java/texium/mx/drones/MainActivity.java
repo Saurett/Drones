@@ -1,11 +1,8 @@
 package texium.mx.drones;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -22,15 +19,9 @@ import texium.mx.drones.utils.Constants;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    String TAG = "Response";
     private SoapObject soapObject;
-
-    EditText usernameLogin;
-    EditText passwordLogin;
-
+    private EditText usernameLogin, passwordLogin;
     private View mLoginFormView,mProgressView;
-    private SoapServices soapServices;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Login action
     private void attemptLogin() {
-
 
         boolean cancel = false;
 
@@ -143,11 +133,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             switch (webServiceOperation) {
                 case Constants.WS_KEY_PUBLIC_TEST:
-                    soapServices.calculate(text);
+                    SoapServices.calculate(text);
                     validOperation = true;
                     break;
                 case Constants.WS_KEY_LOGIN_SERVICE:
-                    soapObject = soapServices.checkUser(username,password);
+                    soapObject = SoapServices.checkUser(username,password);
                     Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
                     validOperation = (id > 0) ?  true : false;

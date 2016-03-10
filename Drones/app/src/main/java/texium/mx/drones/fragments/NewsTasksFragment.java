@@ -118,10 +118,13 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
         private Integer idTeam;
         private Integer idStatus;
 
+        private String textError;
+
         private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
+            textError = new String();
         }
 
         @Override
@@ -133,16 +136,18 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
             Boolean validOperation = false;
 
-            switch (webServiceOperation) {
-                case Constants.WS_KEY_TASK_SERVICE_NEWS:
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_TASK_SERVICE_NEWS:
 
-                    soapObject = SoapServices.getServerTaskList(idTeam, idStatus);
-                    validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
+                        validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
 
-                    break;
-                default:
-                    //TODO DEFAULT MESSAGE
-                    break;
+                        break;
+                }
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
             }
 
             return validOperation;
@@ -174,8 +179,6 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                     newsTask.add(t);
                 }
 
-                //TODO QUITAR DE LA ASYNCHO
-
                 task_list_adapter.addAll(newsTask);
                 task_list_title_adapter.addAll(newsTaskTitle);
 
@@ -188,7 +191,8 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                 LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                 tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
             } else {
-                Toast.makeText(getActivity(),"Lista de tareas vacia", Toast.LENGTH_LONG).show();
+                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -38,14 +38,6 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
     static List<Tasks> progressTask;
     static List<TasksTitle> progressTaskTitle;
 
-    /*
-    static {
-        progressTask = new ArrayList<>();
-        progressTask.add(new Tasks("0-Patrulla de inspección de zonas verdes en Churubusco.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cu.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
-        progressTask.add(new Tasks("1-Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec Enviar Dron para reconocimiento aére.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cu.", "Baja", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
-        progressTask.add(new Tasks("2-Patrulla de inspección de zonas verdes en Churubusco.", "Anean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cu.", "Alta", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:4,id:1}"));
-    }*/
-
     static {
         progressTaskTitle = new ArrayList<>();
         progressTaskTitle.add(new TasksTitle("TAREAS EN PROGRESO", "CUADRILLA"));
@@ -116,10 +108,13 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         private Integer idTeam;
         private Integer idStatus;
 
+        private String textError;
+
         private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
+            textError = new String();
         }
 
         @Override
@@ -131,17 +126,19 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
             Boolean validOperation = false;
 
-            switch (webServiceOperation) {
-                case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
+           try{
+               switch (webServiceOperation) {
+                   case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
 
-                    soapObject = SoapServices.getServerTaskList(idTeam,idStatus);
-                    validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                       soapObject = SoapServices.getServerTaskList(getContext(),idTeam,idStatus);
+                       validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
 
-                    break;
-                default:
-                    //TODO DEFAULT MESSAGE
-                    break;
-            }
+                       break;
+               }
+           } catch (Exception e) {
+               textError = e.getMessage();
+               validOperation = false;
+           }
 
             return validOperation;
         }
@@ -171,9 +168,6 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
                     progressTask.add(t);
                 }
-
-                //TODO QUITAR DE LA ASYNCHO
-
                 task_list_adapter.addAll(progressTask);
                 task_list_title_adapter.addAll(progressTaskTitle);
 
@@ -186,7 +180,8 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                 LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                 tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
             } else {
-                Toast.makeText(getActivity(), "Lista de tareas vacia", Toast.LENGTH_LONG).show();
+                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
         }
     }

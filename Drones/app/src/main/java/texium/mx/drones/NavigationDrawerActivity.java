@@ -1,15 +1,11 @@
 package texium.mx.drones;
 
 import android.Manifest;
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -29,10 +26,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,11 +41,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.ksoap2.serialization.SoapPrimitive;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,6 +145,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         getTaskForceData(navigationView);
 
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        try {
+            File filename = new File(Environment.getExternalStorageDirectory()+"/navitagionDrawer.log");
+            filename.createNewFile();
+            String cmd = "logcat -d -f"+filename.getAbsolutePath();
+            Runtime.getRuntime().exec(cmd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -686,23 +685,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             } else {
                 locationGPS = locationManagerGPS.getLastKnownLocation(provider);
             }
-        } else {
-            Toast.makeText(NavigationDrawerActivity.this, "AQUI VA EL MENSAGE DE LA BARRA", Toast.LENGTH_SHORT).show();
-
-            /*
-            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0,new Intent(),0);
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-            builder.setSmallIcon(R.drawable.angel);
-            builder.setContentIntent(pendingIntent);
-            builder.setAutoCancel(true);
-            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.angel));
-            builder.setContentTitle("Notificación");
-            builder.setContentText("GPS apagado");
-            builder.setSubText("Encianda su GPS para obtener su ubicación");
-
-            nm.notify(1,builder.build());
-            */
         }
     }
 
@@ -721,15 +703,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
         private Tasks webServiceTask;
         private TasksDecode webServiceTaskDecode;
 
+        private String textError;
+
         private AsyncCallWS(Integer wsOperation, TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceTaskDecode = wsServiceTaskDecode;
+            textError = new String();
         }
 
         private AsyncCallWS(Integer wsOperation,Tasks wsTask,TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceTask = wsTask;
             webServiceTaskDecode = wsServiceTaskDecode;
+            textError = new String();
         }
 
         @Override
@@ -741,30 +727,35 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             Boolean validOperation = false;
 
-            switch (webServiceOperation) {
-                case Constants.WS_KEY_UPDATE_TASK:
-                    soapPrimitive = SoapServices.updateTask(webServiceTask.getTask_id()
-                            , webServiceTaskDecode.getTask_comment()
-                            , webServiceTaskDecode.getTask_update_to()
-                            , webServiceTask.getTask_user_id()
-                            ,webServiceTaskDecode.getSendFiles());
-                    validOperation = (soapPrimitive != null ) ? true : false;
-                    break;
-                case Constants.WS_KEY_UPDATE_TASK_FILE:
-                    soapPrimitive = SoapServices.sendFile(webServiceTask.getTask_id()
-                            , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendFiles());
-                    validOperation = (soapPrimitive != null ) ? true : false;
-                    break;
-                case Constants.WS_KEY_SEND_LOCATION: case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
-                    soapPrimitive = SoapServices.updateLocation(webServiceTaskDecode.getTask_team_id()
-                            , webServiceTaskDecode.getTask_latitude()
-                            , webServiceTaskDecode.getTask_longitude()
-                            , webServiceTaskDecode.getTask_user_id());
-                    validOperation = (soapPrimitive != null ) ? true : false;
-                    break;
-                default:
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_UPDATE_TASK:
+                        soapPrimitive = SoapServices.updateTask(getApplicationContext(),webServiceTask.getTask_id()
+                                , webServiceTaskDecode.getTask_comment()
+                                , webServiceTaskDecode.getTask_update_to()
+                                , webServiceTask.getTask_user_id()
+                                ,webServiceTaskDecode.getSendFiles());
+                        validOperation = (soapPrimitive != null ) ? true : false;
+                        break;
+                    case Constants.WS_KEY_UPDATE_TASK_FILE:
+                        soapPrimitive = SoapServices.sendFile(getApplicationContext(),webServiceTask.getTask_id()
+                                , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendFiles());
+                        validOperation = (soapPrimitive != null ) ? true : false;
+                        break;
+                    case Constants.WS_KEY_SEND_LOCATION: case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+                        soapPrimitive = SoapServices.updateLocation(getApplicationContext(),webServiceTaskDecode.getTask_team_id()
+                                , webServiceTaskDecode.getTask_latitude()
+                                , webServiceTaskDecode.getTask_longitude()
+                                , webServiceTaskDecode.getTask_user_id());
+                        validOperation = (soapPrimitive != null ) ? true : false;
+                        break;
+                    default:
 
-                    break;
+                        break;
+                }
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
             }
 
             return validOperation;
@@ -807,8 +798,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 break;
                         }
                         taskToken.clear();
-                        Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
                         onMapReady(mMap);
@@ -823,13 +813,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         ftProgress.commit();
 
                         taskToken.clear();
-
                         Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                 }
-                Log.d("SOAP RESPONSE",soapPrimitive.toString());
             } else {
-                Toast.makeText(NavigationDrawerActivity.this,"No es posible realizar acción", Toast.LENGTH_LONG).show();
+                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -4,6 +4,7 @@ package texium.mx.drones;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -12,6 +13,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.ConnectException;
 
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.SoapServices;
@@ -39,6 +44,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loginButton.setOnClickListener(this);
         cleanButton.setOnClickListener(this);
+
+        try {
+            File filename = new File(Environment.getExternalStorageDirectory()+"/mylog.log");
+            filename.createNewFile();
+            String cmd = "logcat -d -f"+filename.getAbsolutePath();
+            Runtime.getRuntime().exec(cmd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -93,9 +107,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showProgress(final boolean show) {
-
-        // The ViewPropertyAnimator APIs are not available, so simply show
-        // and hide the relevant UI components.
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
@@ -106,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private String username;
         private String password;
         private String text;
+        private String textError;
 
         private AsyncCallWS(Integer wsOperation) {
             webServiceOperation = wsOperation;
@@ -114,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             webServiceOperation = wsOperation;
             username = wsUsername;
             password = wsPassword;
+            textError = "";
         }
 
         private AsyncCallWS(Integer wsOperation,String wsText) {
@@ -131,22 +144,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Boolean validOperation = false;
 
-            switch (webServiceOperation) {
-                case Constants.WS_KEY_PUBLIC_TEST:
-                    SoapServices.calculate(text);
-                    validOperation = true;
-                    break;
-                case Constants.WS_KEY_LOGIN_SERVICE:
-                    soapObject = SoapServices.checkUser(username,password);
-                    Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
+           try{
+               switch (webServiceOperation) {
+                   case Constants.WS_KEY_PUBLIC_TEST:
+                       SoapServices.calculate(text);
+                       validOperation = true;
+                       break;
+                   case Constants.WS_KEY_LOGIN_SERVICE:
+                       soapObject = SoapServices.checkUser(getApplicationContext(),username,password);
+                       Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
-                    validOperation = (id > 0) ?  true : false;
-                    break;
-                default:
-                    Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();
-                    validOperation = false;
-                    break;
-            }
+                       validOperation = (id > 0) ?  true : false;
+                       break;
+                   default:
+                       Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();
+                       validOperation = false;
+                       break;
+               }
+           } catch (Exception e) {
+               textError = e.getMessage();
+               validOperation = false;
+           }
 
             return validOperation;
         }
@@ -157,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(success) {
 
                 if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
-                    //Official Login To Navigation Drawer//
                     Intent intentNavigationDrawer = new Intent(MainActivity.this,NavigationDrawerActivity.class);
 
                     if(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()) == 0) {
@@ -192,7 +209,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             } else {
-                Toast.makeText(MainActivity.this,getString(R.string.default_login_error), Toast.LENGTH_LONG).show();
+                String tempTextMsg = (textError.isEmpty() ? getString(R.string.default_login_error) : textError);
+                Toast.makeText(MainActivity.this,tempTextMsg, Toast.LENGTH_LONG).show();
             }
         }
 

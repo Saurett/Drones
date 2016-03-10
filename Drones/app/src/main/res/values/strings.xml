@@ -11,11 +11,14 @@
 
     <string name="password_login_error">This password is invalid</string>
     <string name="username_login_error">This field is required</string>
-    <string name="default_ws_operation">Web Service default is not Online</string>
+    <string name="default_ws_operation">Web Service default is not Online.</string>
     <string name="default_login_error">The email address and password you entered do not match.</string>
     <string name="no_user_team_login_error">The user is not assigned a team.</string>
-    <string name="default_gps_error">GPS is offline</string>
+    <string name="default_gps_error">GPS is offline.</string>
+    <string name="default_connect_error">A failure in the server connection has been detected.</string>
+    <string name="default_exception_error">Unexpected error.</string>
 
+    <string name="default_soap_error">Unexpected soap error.</string>
     <string name="default_file_single_selection">Single-selection: Tap on any file.</string>
     <string name="default_file_multiple_selection">Multi-selection: Tap and Hold on the first file,tap for more, tap on OPEN to finish.</string>
 
@@ -24,5 +27,6 @@
     <string name="task_priority_name_high">High</string>
     <string name="task_priority_name_express">Express</string>
 
+    <string name="default_empty_task_list">Empty task list</string>
 
 </resources>

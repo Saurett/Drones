@@ -1,19 +1,19 @@
 package texium.mx.drones.services;
 
-import android.util.Base64;
+import android.content.Context;
 import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import java.io.File;
+import java.net.ConnectException;
 import java.util.List;
 
-import texium.mx.drones.helpers.DecodeJSONHelper;
+import texium.mx.drones.R;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -51,8 +51,8 @@ public class SoapServices {
         return soapObject;
     }
 
-    public static SoapObject getServerTaskList(Integer idTeam, Integer idStatus) {
-        SoapObject soapObject = new SoapObject();
+    public static SoapObject getServerTaskList(Context context,Integer idTeam, Integer idStatus) throws Exception {
+        SoapObject soapObject;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_TASK_LIST;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_TASK;
@@ -73,16 +73,24 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapObject = (SoapObject) soapEnvelope.getResponse();
 
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
         }
 
         return soapObject;
     }
 
-    public static SoapObject checkUser(String username, String password) {
-        SoapObject soapObject = new SoapObject();
+    public static SoapObject checkUser(Context context,String username, String password) throws Exception {
+        SoapObject soapObject;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_LOGIN;
@@ -103,16 +111,24 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapObject = (SoapObject) soapEnvelope.getResponse();
 
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
         }
 
         return soapObject;
     }
 
-    public static SoapPrimitive updateTask(Integer task, String comment,Integer status,Integer user,List<String> encodedFile) {
-        SoapPrimitive soapPrimitive = null;
+    public static SoapPrimitive updateTask(Context context,Integer task, String comment,Integer status,Integer user,List<String> encodedFile) throws Exception {
+        SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_TASK;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_TASK;
@@ -143,56 +159,24 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
 
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
         }
 
         return soapPrimitive;
     }
 
-    public static SoapPrimitive sendTask(Integer task, String comment,Integer status,Integer user,List<String> encodedImage) {
-        SoapPrimitive soapPrimitive = null;
-        try {
-            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SEND_FILE;
-            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SEND_FILE;
-            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
-
-            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
-
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
-            SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
-
-            for (String encode: encodedImage) {
-                soapFiles.addProperty(Constants.WEB_SERVICE_PARAM_OBJECT_STRING,encode);
-            }
-
-            Request.addSoapObject(soapFiles);
-
-
-            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            soapEnvelope.dotNet = true;
-            soapEnvelope.setOutputSoapObject(Request);
-
-            HttpTransportSE transport = new HttpTransportSE(URL);
-
-            transport.call(SOAP_ACTION, soapEnvelope);
-            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-        }
-
-        return soapPrimitive;
-    }
-
-    public static SoapPrimitive sendFile(Integer task, Integer user, List<String> encodedImage) {
-        SoapPrimitive soapPrimitive = null;
+    public static SoapPrimitive sendFile(Context context,Integer task, Integer user, List<String> encodedImage) throws Exception {
+        SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SEND_FILE;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SEND_FILE;
@@ -221,16 +205,24 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
 
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
         }
 
         return soapPrimitive;
     }
 
-    public static SoapPrimitive updateLocation(Integer team, String latitude, String longitude,Integer user) {
-        SoapPrimitive soapPrimitive = null;
+    public static SoapPrimitive updateLocation(Context context,Integer team, String latitude, String longitude,Integer user) throws Exception {
+        SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_LOCATION;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_LOCATION;
@@ -253,9 +245,17 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
 
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
         }
 
         return soapPrimitive;

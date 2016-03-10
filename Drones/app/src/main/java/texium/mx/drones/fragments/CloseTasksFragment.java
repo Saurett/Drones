@@ -39,13 +39,6 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
     static List<Tasks> closeTask;
     static List<TasksTitle> closeTaskTitle;
 
-    /*
-    static {
-        closeTask = new ArrayList<>();
-        closeTask.add(new Tasks("Patrulla de inspección de zonas verdes en la polvora.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Media","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:6,id:1}"));
-        closeTask.add(new Tasks("Enviar Dron para reconocimiento aéreo del Bosque de Chapultepec.","Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.","Baja","12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:6,id:1}"));
-    }*/
-
     static {
         closeTaskTitle = new ArrayList<>();
         closeTaskTitle.add(new TasksTitle("TAREAS CERRADAS","CUADRILLA"));
@@ -116,10 +109,13 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
         private Integer idTeam;
         private Integer idStatus;
 
+        private String textError;
+
         private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
+            textError = new String();
         }
 
         @Override
@@ -131,16 +127,17 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
 
             Boolean validOperation = false;
 
-            switch (webServiceOperation) {
-                case Constants.WS_KEY_TASK_SERVICE_CLOSE:
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_TASK_SERVICE_CLOSE:
 
-                    soapObject = SoapServices.getServerTaskList(idTeam, idStatus);
-                    validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
-
-                    break;
-                default:
-                    //TODO DEFAULT MESSAGE
-                    break;
+                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
+                        validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                        break;
+                }
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
             }
 
             return validOperation;
@@ -172,8 +169,6 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                     closeTask.add(t);
                 }
 
-                //TODO QUITAR DE LA ASYNCHO
-
                 task_list_adapter.addAll(closeTask);
                 task_list_title_adapter.addAll(closeTaskTitle);
 
@@ -186,7 +181,8 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                 LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                 tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
             } else {
-                Toast.makeText(getActivity(), "Lista de tareas vacia", Toast.LENGTH_LONG).show();
+                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
         }
     }

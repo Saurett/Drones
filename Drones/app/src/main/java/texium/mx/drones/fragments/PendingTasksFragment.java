@@ -38,12 +38,6 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
     static List<Tasks> pendingTask;
     static List<TasksTitle> pendingTaskTitle;
 
-    /*
-    static {
-        pendingTask = new ArrayList<>();
-        pendingTask.add(new Tasks("Patrulla de inspección de zonas verdes en Tierra Colorada.", "Aenean interdum quis antes et consectetut.Donec faucibus luctus tempor.Sed suscipit a irci non cursus.", "Media", "12/Ene/2016 10:00 hrs", "13/Ene/2016 12:00 hrs","{task_type:5,id:1}"));
-    }*/
-
     static {
         pendingTaskTitle = new ArrayList<>();
         pendingTaskTitle.add(new TasksTitle("TAREAS PENDIENTES", "CUADRILLA"));
@@ -115,10 +109,13 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
         private Integer idTeam;
         private Integer idStatus;
 
+        private String textError;
+
         private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
+            textError = new String();
         }
 
         @Override
@@ -130,16 +127,18 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
             Boolean validOperation = false;
 
-            switch (webServiceOperation) {
-                case Constants.WS_KEY_TASK_SERVICE_PENDING:
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_TASK_SERVICE_PENDING:
 
-                    soapObject = SoapServices.getServerTaskList(idTeam, idStatus);
-                    validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
+                        validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
 
-                    break;
-                default:
-                    //TODO DEFAULT MESSAGE
-                    break;
+                        break;
+                }
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
             }
 
             return validOperation;
@@ -171,8 +170,6 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                     pendingTask.add(t);
                 }
 
-                //TODO QUITAR DE LA ASYNCHO
-
                 task_list_adapter.addAll(pendingTask);
                 task_list_title_adapter.addAll(pendingTaskTitle);
 
@@ -185,7 +182,8 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                 LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                 tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
             } else {
-                Toast.makeText(getActivity(), "Lista de tareas vacia", Toast.LENGTH_LONG).show();
+                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
         }
     }

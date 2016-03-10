@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -37,6 +38,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
     private Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
     private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
+    private ImageView task_window_icon;
 
     static Map<Long,Object> taskToken = new HashMap<>();
 
@@ -64,6 +66,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         number_photos = (TextView) view.findViewById(R.id.number_photos);
         number_videos = (TextView) view.findViewById(R.id.number_videos);
 
+        task_window_icon = (ImageView) view.findViewById(R.id.task_window_icon);
+
 
         back_task_button.setOnClickListener(this);
         send_task_button.setOnClickListener(this);
@@ -79,6 +83,11 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
         title_task_window.setText(tokenTask.getTask_tittle());
         content_task_window.setText(tokenTask.getTask_content());
+
+        int actualIcon = (tokenTaskDecode.getOrigin_button() == R.id.finish_task_button)
+                ? R.drawable.icon_progress : R.drawable.icon_pending;
+
+        task_window_icon.setBackground(getResources().getDrawable(actualIcon));
 
         if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
             next_task_button.setEnabled(false);
@@ -166,7 +175,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 TasksDecode sendDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
 
                 sendDecode.setTask_comment(ssb.toString());
-                sendDecode.setOrigen_button(tokenView.getId());
+                sendDecode.setOrigin_button(tokenView.getId());
 
                 if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
                     sendFile = TASK_FILES.get(_ACTUAL_POSITION);

@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -41,7 +40,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.ksoap2.serialization.SoapPrimitive;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +75,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
 
     //GPS Manager//
-    private static final String provider = LocationManager.GPS_PROVIDER; //Recomendado GPS
+    private static final String provider = LocationManager.GPS_PROVIDER; //GPS Provider
     private LocationManager locationManagerGPS;
     private Location locationGPS;
     private Context ctx;
@@ -146,15 +144,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        try {
-            File filename = new File(Environment.getExternalStorageDirectory()+"/navitagionDrawer.log");
-            filename.createNewFile();
-            String cmd = "logcat -d -f"+filename.getAbsolutePath();
-            Runtime.getRuntime().exec(cmd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -197,7 +186,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
         } else {
-            Toast.makeText(this, "Ubicación no disponible, active su GPS", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getString(R.string.default_gps_error), Toast.LENGTH_LONG).show();
             taskToken.clear();
             finish();
 
@@ -285,7 +274,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case R.id.agree_task_button:
 
                 tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
-                tasksDecode.setTask_comment("Tarea aceptada");
+                tasksDecode.setTask_comment(getString(R.string.default_task_agree_msg));
+                tasksDecode.setOrigin_button(v.getId());
 
                 AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
                 wsAgree.execute();
@@ -293,16 +283,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
             case R.id.decline_task_button:
 
-                setToken(v,taskListAdapter,task,tasksDecode);
-
-                /*
-                tasksDecode.setTask_update_to(Constants.PENDING_TASK);
-                tasksDecode.setTask_comment("Tarea pospuesta");
-
-                AsyncCallWS wsDecline = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
-                wsDecline.execute();*/
-
-                setToken(v,taskListAdapter,task,tasksDecode);
+                tasksDecode.setOrigin_button(v.getId());
+                setToken(v, taskListAdapter, task, tasksDecode);
 
                 closeActiveTaskFragment(v);
 
@@ -313,6 +295,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
             case R.id.finish_task_button:
 
+                tasksDecode.setOrigin_button(v.getId());
                 setToken(v,taskListAdapter,task,tasksDecode);
 
                 closeActiveTaskFragment(v);
@@ -323,14 +306,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 break;
             case R.id.send_task_button:
-
                 closeActiveTaskFragment(v);
 
-                tasksDecode.setTask_update_to((tasksDecode.getOrigen_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
+                tasksDecode.setTask_update_to((tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
 
                 AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
                 wsClose.execute();
-
                 break;
             default:
                 Snackbar.make(v, "Acción no registrada " , Snackbar.LENGTH_LONG)
@@ -340,7 +321,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (taskListAdapter.getItemCount() == 0) {
             closeActiveTaskFragment(v);
-            Toast.makeText(this, "Lista de tareas vacia", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,getString(R.string.default_empty_task_list), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -386,7 +367,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Image captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this, "Imagen guardada", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,getString(R.string.default_save_img_msg), Toast.LENGTH_LONG).show();
                 } else if (resultCode == RESULT_CANCELED) {
                     // User cancelled the image capture
                 } else {
@@ -396,7 +377,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Video captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this, "Video guardado", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,getString(R.string.default_save_video_msg), Toast.LENGTH_LONG).show();
                 } else if (resultCode == RESULT_CANCELED) {
                     // User cancelled the video capture
                 } else {

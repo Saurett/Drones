@@ -4,7 +4,6 @@ package texium.mx.drones;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -13,10 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.ConnectException;
 
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.SoapServices;
@@ -44,16 +39,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loginButton.setOnClickListener(this);
         cleanButton.setOnClickListener(this);
-
-        try {
-            File filename = new File(Environment.getExternalStorageDirectory()+"/mylog.log");
-            filename.createNewFile();
-            String cmd = "logcat -d -f"+filename.getAbsolutePath();
-            Runtime.getRuntime().exec(cmd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     //Login action
@@ -205,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cleanAllLogin();
                     startActivity(intentNavigationDrawer);
                 } else {
-                    Toast.makeText(MainActivity.this, "TEST DE WEB", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "TEST", Toast.LENGTH_LONG).show();
                 }
 
             } else {

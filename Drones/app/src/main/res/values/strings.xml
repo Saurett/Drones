@@ -28,5 +28,9 @@
     <string name="task_priority_name_express">Express</string>
 
     <string name="default_empty_task_list">Empty task list</string>
+    <string name="default_task_agree_msg">Task agree</string>
+    <string name="default_save_img_msg">Save image</string>
+    <string name="default_save_video_msg">Save video</string>
+
 
 </resources>

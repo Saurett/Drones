@@ -14,7 +14,7 @@
     <string name="default_ws_operation">El webservice no esta disponible.</string>
     <string name="default_login_error">El email y la contraseña no coinciden.</string>
     <string name="no_user_team_login_error">El usuario no tiene cuadrilla asignada.</string>
-    <string name="default_gps_error">Habilite su GPS</string>
+    <string name="default_gps_error">Ubicación no disponible, active su GPS</string>
     <string name="default_connect_error">No se puede establecer una conexión con el servidor</string>
     <string name="default_exception_error">Error inesperado.</string>
     <string name="default_soap_error">El servidor no reconoció el valor del encabezado.</string>
@@ -28,6 +28,9 @@
     <string name="task_priority_name_express">Urgente</string>
 
     <string name="default_empty_task_list">Lista de tareas vacia</string>
+    <string name="default_task_agree_msg">Tarea aceptada</string>
+    <string name="default_save_img_msg">Imagen guardada correctamente.</string>
+    <string name="default_save_video_msg">Video guardado correctamente.</string>
 
 
 </resources>

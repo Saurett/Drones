@@ -2,6 +2,7 @@ package texium.mx.drones;
 
 import android.Manifest;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -96,7 +97,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     public static Map<Integer,FilesManager> TASK_FILE = new HashMap<>();
     public static Integer ACTUAL_POSITION;
 
-    NotificationManager nm;
+    private ProgressDialog pDialog;
 
 
     @Override
@@ -141,9 +142,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //Header dynamic manager//
         getTaskForceData(navigationView);
-
-        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -701,6 +699,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         @Override
         protected void onPreExecute() {
+            switch (webServiceOperation) {
+                case Constants.WS_KEY_UPDATE_TASK: case Constants.WS_KEY_UPDATE_TASK_FILE:
+
+
+                    if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                        pDialog = new ProgressDialog(NavigationDrawerActivity.this);
+                        pDialog.setMessage(getString(R.string.default_update_task));
+                        pDialog.setIndeterminate(false);
+                        pDialog.setCancelable(false);
+                        pDialog.show();
+                    }
+            }
         }
 
         @Override
@@ -752,7 +763,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 switch (webServiceOperation) {
 
                     case Constants.WS_KEY_UPDATE_TASK:
+
                         removeAllFragment(fragmentManager);
+
+                        if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
+                                || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                            pDialog.dismiss();
+                        }
 
                         switch (webServiceTask.getTask_status().intValue()) {
 
@@ -786,6 +803,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
+                        pDialog.dismiss();
 
                         removeAllFragment(fragmentManager);
 
@@ -798,6 +816,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                 }
             } else {
+
+                if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
+                        || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                    pDialog.dismiss();
+                }
+
                 String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                 Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
             }

@@ -1,20 +1,30 @@
 package texium.mx.drones.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableStringBuilder;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.gcm.Task;
+
+import org.ksoap2.serialization.SoapPrimitive;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -29,6 +39,8 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
+import texium.mx.drones.services.FileServices;
+import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -36,7 +48,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
     static FragmentTaskListener activityListener;
 
-    private Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
+    private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
     private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
     private ImageView task_window_icon;
 
@@ -46,6 +58,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     static private int _ACTUAL_COUNT;
 
     static Map<Integer,FilesManager> TASK_FILES = new HashMap<>();
+
+    private ProgressDialog pDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -130,7 +144,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         }
 
         TASK_FILES = activityListener.getTaskFiles();
-
     }
 
     @Override
@@ -165,7 +178,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 break;
             case R.id.send_task_button:
-                FilesManager sendFile;
 
                 SpannableStringBuilder ssb = (SpannableStringBuilder) comment_task_window.getText();
 
@@ -177,67 +189,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 sendDecode.setTask_comment(ssb.toString());
                 sendDecode.setOrigin_button(tokenView.getId());
 
-                if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
-                    sendFile = TASK_FILES.get(_ACTUAL_POSITION);
+                AsyncSendTask wsSendTask = new AsyncSendTask(Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE
+                        ,v,sendAdapter,sendTask,sendDecode);
+                wsSendTask.execute();
 
-                    List<Uri> uriFilesPicture = sendFile.getFilesPicture();
-                    //List<Uri> uriFileVideo = sendFile.getFilesVideo();
-
-                    List<String> stringsPicture = new ArrayList<>();
-                    //List<String> stringsVideo = new ArrayList<>();
-
-                    for (Uri uri :uriFilesPicture) {
-                        String imageEncoded = "";
-                        try {
-                            InputStream is = getActivity().getContentResolver().openInputStream(uri);
-                            Bitmap img = BitmapFactory.decodeStream(is);
-                            ByteArrayOutputStream convert = new ByteArrayOutputStream();
-                            img.compress(Bitmap.CompressFormat.JPEG, 50, convert);
-                            byte[] b = convert.toByteArray();
-                            imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-
-                        }
-
-                        stringsPicture.add(imageEncoded);
-                    }
-
-                    /*
-                    for (Uri uri : uriFileVideo) {
-
-                        String videoEncoded = "";
-
-                        try {
-                            InputStream is = getActivity().getContentResolver().openInputStream(uri);
-
-                            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-                            // this is storage overwritten on each iteration with bytes
-                            int bufferSize = 4096;
-                            byte[] buffer = new byte[bufferSize];
-
-                            // we need to know how may bytes were read to write them to the byteBuffer
-                            int len = 0;
-                            while ((len = is.read(buffer)) != -1) {
-                                byteBuffer.write(buffer, 0, len);
-                            }
-                                                        // and then we can return your byte array.
-                            videoEncoded = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        stringsVideo.add(videoEncoded);
-                    }*/
-
-                    sendDecode.setSendFiles(stringsPicture);
-                    //sendDecode.setSendFiles(stringsVideo);
-                }
-
-                taskToken = new HashMap<>();
-                activityListener.taskActions(v, sendAdapter, sendTask, sendDecode);
                 break;
             case R.id.close_window_button:
 
@@ -286,8 +241,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 _ACTUAL_POSITION++;
 
-
-
                 if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
                     next_task_button.setEnabled(false);
                     next_task_button.setVisibility(View.INVISIBLE);
@@ -329,6 +282,111 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
             number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
         }
-
     }
+
+    private void clearActualFiles() {
+        if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
+
+            FilesManager filesManager = TASK_FILES.get(_ACTUAL_POSITION);
+            filesManager.setFilesPicture(new ArrayList<Uri>());
+            filesManager.setFilesVideo(new ArrayList<Uri>());
+            TASK_FILES.put(_ACTUAL_POSITION, filesManager);
+
+            number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
+            number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
+        }
+    }
+
+    private TasksDecode attachFiles(TasksDecode tasksDecode) throws Exception {
+        try {
+            FilesManager sendFile;
+
+            if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
+                sendFile = TASK_FILES.get(_ACTUAL_POSITION);
+
+                List<Uri> uriFilesPicture = sendFile.getFilesPicture();
+                List<Uri> uriFileVideo = sendFile.getFilesVideo();
+
+                tasksDecode.setSendFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
+                //tasksDecode.setSendFiles(FileServices.attachVideo(getActivity(), uriFileVideo));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("File Exception:",e.getMessage());
+            throw  new Exception(e.getMessage());
+        }
+
+        return tasksDecode;
+    }
+
+    private class AsyncSendTask extends AsyncTask<Void, Void, Boolean> {
+
+        private SoapPrimitive soapPrimitive;
+
+        private Integer webServiceOperation;
+        private View webServiceView;
+        private TaskListAdapter webServiceAdapter;
+        private Tasks webServiceTask;
+        private TasksDecode webServiceTaskDecode;
+
+        private String textError;
+
+        private AsyncSendTask(Integer wsOperation,View wsView,TaskListAdapter wsAdapter,Tasks wsTask
+                ,TasksDecode wsServiceTaskDecode) {
+            webServiceOperation = wsOperation;
+            webServiceView = wsView;
+            webServiceAdapter = wsAdapter;
+            webServiceTask = wsTask;
+            webServiceTaskDecode = wsServiceTaskDecode;
+            textError = new String();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            pDialog = new ProgressDialog(getContext());
+            pDialog.setMessage(getString(R.string.default_attaching_img));
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            Boolean validOperation = false;
+
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE:
+                        webServiceTaskDecode = attachFiles(webServiceTaskDecode);
+                        validOperation = (webServiceTaskDecode != null) ? true : false;
+                        break;
+                }
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
+            }
+
+            return validOperation;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            pDialog.dismiss();
+            if(success) {
+
+                taskToken = new HashMap<>();
+                activityListener.taskActions(webServiceView, webServiceAdapter
+                        , webServiceTask, webServiceTaskDecode);
+
+            } else {
+                String tempText = (textError.isEmpty() ? "Se excedio el limite de imagenes" : textError);
+                Toast.makeText(getContext(), tempText, Toast.LENGTH_LONG).show();
+
+               clearActualFiles();
+            }
+        }
+    }
+
 }

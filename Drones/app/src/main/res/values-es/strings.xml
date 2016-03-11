@@ -18,6 +18,9 @@
     <string name="default_connect_error">No se puede establecer una conexión con el servidor</string>
     <string name="default_exception_error">Error inesperado.</string>
     <string name="default_soap_error">El servidor no reconoció el valor del encabezado.</string>
+    <string name="default_http_exception_error">HTTP solicitud fallida.</string>
+    <string name="default_attaching_img_error">"Error intentando comprimir imagenes"</string>
+    <string name="default_attaching_video_error">"Error intentando comprimir videos"</string>
 
     <string name="default_file_single_selection">Selección única: Toque cualquier archivo.</string>
     <string name="default_file_multiple_selection">Selección multiple: Toque y mantenga presionado el archivo,toque para añadir mas, para terminar toque abrir .</string>
@@ -32,5 +35,7 @@
     <string name="default_save_img_msg">Imagen guardada correctamente.</string>
     <string name="default_save_video_msg">Video guardado correctamente.</string>
 
+    <string name="default_attaching_img">Comprimiendo imágenes. Por favor espere…</string>
+    <string name="default_update_task">Actualizando tarea. Por favor espere…</string>
 
 </resources>

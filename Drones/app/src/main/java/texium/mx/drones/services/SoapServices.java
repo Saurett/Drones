@@ -8,10 +8,12 @@ import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpResponseException;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.net.ConnectException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import texium.mx.drones.R;
 import texium.mx.drones.utils.Constants;
@@ -77,9 +79,14 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
-        } catch (SoapFault e){
-            Log.e("Soap Fault",e.getMessage());
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
             throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
@@ -115,9 +122,14 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
-        } catch (SoapFault e){
-            Log.e("Soap Fault",e.getMessage());
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
             throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
@@ -163,9 +175,14 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
-        } catch (SoapFault e){
-            Log.e("Soap Fault",e.getMessage());
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
             throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
@@ -209,9 +226,14 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
-        } catch (SoapFault e){
-            Log.e("Soap Fault",e.getMessage());
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
             throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
@@ -249,9 +271,14 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
-        } catch (SoapFault e){
-            Log.e("Soap Fault",e.getMessage());
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
             throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new Exception(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());

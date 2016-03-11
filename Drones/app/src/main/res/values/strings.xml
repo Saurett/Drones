@@ -17,6 +17,9 @@
     <string name="default_gps_error">GPS is offline.</string>
     <string name="default_connect_error">A failure in the server connection has been detected.</string>
     <string name="default_exception_error">Unexpected error.</string>
+    <string name="default_http_exception_error">HTTP request failed</string>
+    <string name="default_attaching_img_error">"Attaching picture request failed"</string>
+    <string name="default_attaching_video_error">"Attaching video request failed"</string>
 
     <string name="default_soap_error">Unexpected soap error.</string>
     <string name="default_file_single_selection">Single-selection: Tap on any file.</string>
@@ -31,6 +34,9 @@
     <string name="default_task_agree_msg">Task agree</string>
     <string name="default_save_img_msg">Save image</string>
     <string name="default_save_video_msg">Save video</string>
+
+    <string name="default_attaching_img">Attaching images. Please wait…</string>
+    <string name="default_update_task">Update task. Please wait…</string>
 
 
 </resources>

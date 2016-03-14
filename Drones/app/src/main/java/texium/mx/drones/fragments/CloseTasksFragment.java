@@ -146,9 +146,10 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
         @Override
         protected void onPostExecute(final Boolean success) {
 
+            closeTask = new ArrayList<>();
+
             if(success) {
 
-                closeTask = new ArrayList<>();
                 for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
                     Tasks t = new Tasks();
 
@@ -184,6 +185,8 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                 String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                 Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
+
+            activityListener.addTasksListMarkers(closeTask);
         }
     }
 }

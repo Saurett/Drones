@@ -146,9 +146,11 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         @Override
         protected void onPostExecute(final Boolean success) {
 
+            progressTask = new ArrayList<>();
+
             if(success) {
 
-                progressTask = new ArrayList<>();
+
                 for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
                     Tasks t = new Tasks();
 
@@ -183,6 +185,8 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                 String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                 Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
+
+            activityListener.addTasksListMarkers(progressTask);
         }
     }
 }

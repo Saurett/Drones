@@ -27,6 +27,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +38,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.ksoap2.serialization.SoapPrimitive;
 
@@ -564,9 +568,42 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
            return;
         }
-        mMap.setMyLocationEnabled(true);
+
+       mMap.setMyLocationEnabled(true);
     }
 
+    @Override
+    public void addTasksListMarkers(List<Tasks> tasksList) {
+        if (mMap != null) {
+
+            mMap.clear();
+
+            Double LATITUDE = 19.4265606;
+            Double LONGITUDE = -99.0672223;
+
+            for (Tasks actualTask :
+                    tasksList) {
+
+                //LatLng taskLatLng = new LatLng(actualTask.getTask_latitude(), actualTask.getTask_longitude());
+                LatLng taskLatLng = new LatLng(LATITUDE, LONGITUDE);
+
+                //Log.d("GOOGLE MAPS MARKER", "Latitude : " + actualTask.getTask_latitude().toString() + " Longitude : " + actualTask.getTask_latitude());
+
+                MarkerOptions mo = new MarkerOptions();
+                mo.position(taskLatLng);
+                mo.title(actualTask.getTask_tittle());
+                mo.snippet(Constants.MAP_STATUS_NAME.get(actualTask.getTask_priority()));
+                mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
+
+                mMap.addMarker(mo);
+
+                LATITUDE += new Double(0.1000000);
+                LONGITUDE -= new Double(0.1000000);
+            }
+
+        }
+    }
+    
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -622,6 +659,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     public Map<Integer,FilesManager> getTaskFiles() {
         return TASK_FILE;
     }
+
+    
 
     public Map<Long,Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
 

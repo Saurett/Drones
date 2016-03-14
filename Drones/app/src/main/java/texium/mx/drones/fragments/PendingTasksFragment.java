@@ -147,9 +147,9 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
         @Override
         protected void onPostExecute(final Boolean success) {
 
+            pendingTask = new ArrayList<>();
             if(success) {
 
-                pendingTask = new ArrayList<>();
                 for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
                     Tasks t = new Tasks();
 
@@ -181,10 +181,14 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
                 LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                 tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+
             } else {
                 String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                 Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
+
+            activityListener.addTasksListMarkers(pendingTask);
+
         }
     }
 }

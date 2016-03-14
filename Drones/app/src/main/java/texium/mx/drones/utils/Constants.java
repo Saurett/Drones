@@ -1,5 +1,7 @@
 package texium.mx.drones.utils;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -164,6 +166,15 @@ public final class Constants {
         MAP_STATUS_NAME.put(TASK_PRIORITY_MID_ID,TASK_PRIORITY_MID_STR);
         MAP_STATUS_NAME.put(TASK_PRIORITY_TOP_ID,TASK_PRIORITY_TOP_STR);
         MAP_STATUS_NAME.put(TASK_PRIORITY_EXPRESS_ID,TASK_PRIORITY_EXPRESS_STR);
+    }
+
+    public static Map<Integer,Float> MAP_STATUS_COLOR;
+    static {
+        MAP_STATUS_COLOR = new HashMap<>();
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_LOW_ID,BitmapDescriptorFactory.HUE_CYAN);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_MID_ID,BitmapDescriptorFactory.HUE_YELLOW);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_TOP_ID,BitmapDescriptorFactory.HUE_ORANGE);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_EXPRESS_ID,BitmapDescriptorFactory.HUE_RED);
     }
 
     //endregion ACCESS TO MAP PRIORITY//

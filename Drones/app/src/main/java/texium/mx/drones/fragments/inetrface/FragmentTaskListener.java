@@ -22,8 +22,9 @@ public interface FragmentTaskListener {
 
     void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task, TasksDecode tasksDecode);
 
-    //TODO CrEATE A OWN CLASS
     Map<Long,Object> getToken();
 
     Map<Integer,FilesManager> getTaskFiles();
+
+    void addTasksListMarkers(List<Tasks> tasksList);
 }

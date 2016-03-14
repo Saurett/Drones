@@ -156,9 +156,10 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
         @Override
         protected void onPostExecute(final Boolean success) {
 
+            newsTask = new ArrayList<>();
             if(success) {
 
-                newsTask = new ArrayList<>();
+
                 for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
                     Tasks t = new Tasks();
 
@@ -194,6 +195,8 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                 String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                 Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
             }
+
+            activityListener.addTasksListMarkers(newsTask);
         }
     }
 

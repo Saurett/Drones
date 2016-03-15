@@ -55,8 +55,8 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
         View view = inflater.inflate(R.layout.fragment_progress_tasks,container,false);
 
-        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.progress_taks_list_title);
-        tasks_list = (RecyclerView) view.findViewById(R.id.progress_taks_list);
+        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.progress_task_list_title);
+        tasks_list = (RecyclerView) view.findViewById(R.id.progress_task_list);
 
         task_list_adapter = new TaskListAdapter();
         task_list_title_adapter = new TaskListTitleAdapter();
@@ -114,7 +114,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
-            textError = new String();
+            textError = "";
         }
 
         @Override
@@ -131,7 +131,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                    case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
 
                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam,idStatus);
-                       validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                       validOperation = (soapObject.getPropertyCount() > 0);
 
                        break;
                }

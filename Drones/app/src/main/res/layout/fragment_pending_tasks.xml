@@ -9,12 +9,12 @@
        android:layout_height="wrap_content"
        android:orientation="vertical">
        <android.support.v7.widget.RecyclerView
-           android:id="@+id/pending_taks_list_title"
+           android:id="@+id/pending_task_list_title"
            android:layout_width="500dp"
            android:layout_height="90dp">
        </android.support.v7.widget.RecyclerView>
        <android.support.v7.widget.RecyclerView
-           android:id="@+id/pending_taks_list"
+           android:id="@+id/pending_task_list"
            android:layout_width="500dp"
            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
    </LinearLayout>

@@ -56,8 +56,8 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
 
         final View view = inflater.inflate(R.layout.fragment_close_tasks,container,false);
 
-        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.close_taks_list_title);
-        tasks_list = (RecyclerView) view.findViewById(R.id.close_taks_list);
+        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.close_task_list_title);
+        tasks_list = (RecyclerView) view.findViewById(R.id.close_task_list);
 
         task_list_adapter = new TaskListAdapter();
         task_list_title_adapter = new TaskListTitleAdapter();
@@ -115,7 +115,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
-            textError = new String();
+            textError = "";
         }
 
         @Override
@@ -132,7 +132,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                     case Constants.WS_KEY_TASK_SERVICE_CLOSE:
 
                         soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
-                        validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                        validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                 }
             } catch (Exception e) {

@@ -64,8 +64,8 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
 
         View view = inflater.inflate(R.layout.fragment_revision_tasks,container,false);
 
-        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.revision_taks_list_title);
-        tasks_list = (RecyclerView) view.findViewById(R.id.revision_taks_list);
+        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.revision_task_list_title);
+        tasks_list = (RecyclerView) view.findViewById(R.id.revision_task_list);
 
         task_list_adapter = new TaskListAdapter();
         task_list_title_adapter = new TaskListTitleAdapter();
@@ -137,7 +137,7 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
                    case Constants.WS_KEY_TASK_SERVICE_REVISION:
 
                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
-                       validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                       validOperation = (soapObject.getPropertyCount() > 0);
 
                        break;
                }
@@ -175,7 +175,6 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
                     revisionTask.add(t);
                 }
 
-                //TODO QUITAR DE LA ASYNCHO
 
                 task_list_adapter.addAll(revisionTask);
                 task_list_title_adapter.addAll(revisionTaskTitle);
@@ -189,7 +188,6 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
                 LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                 tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
             } else {
-                //TODO FALSE OPERATION
             }
         }
     }

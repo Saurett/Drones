@@ -2,7 +2,6 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,21 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import texium.mx.drones.NavigationDrawerActivity;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
@@ -64,8 +55,8 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
         final View view = inflater.inflate(R.layout.fragment_news_tasks, container, false);
 
-        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.news_taks_list_title);
-        tasks_list = (RecyclerView) view.findViewById(R.id.news_taks_list);
+        tasks_list_tittle = (RecyclerView) view.findViewById(R.id.news_task_list_title);
+        tasks_list = (RecyclerView) view.findViewById(R.id.news_task_list);
 
 
         task_list_adapter = new TaskListAdapter();
@@ -124,7 +115,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
-            textError = new String();
+            textError = "";
         }
 
         @Override
@@ -141,7 +132,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                     case Constants.WS_KEY_TASK_SERVICE_NEWS:
 
                         soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
-                        validOperation = (soapObject.getPropertyCount() > 0) ? true : false;
+                        validOperation = (soapObject.getPropertyCount() > 0);
 
                         break;
                 }

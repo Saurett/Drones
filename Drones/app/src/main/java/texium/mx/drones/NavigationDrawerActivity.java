@@ -1,7 +1,7 @@
 package texium.mx.drones;
 
 import android.Manifest;
-import android.app.NotificationManager;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -27,7 +27,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +39,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.ksoap2.serialization.SoapPrimitive;
@@ -91,7 +89,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
     private static final int GALLERY_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int GALLERY_VIDEO_ACTIVITY_REQUEST_CODE = 200;
-    private Intent cameraIntent;
+    private static Intent cameraIntent;
 
     //Sessions control//
     private static Users SESSION_DATA;
@@ -241,6 +239,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
 
@@ -332,22 +331,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         switch (requestCode) {
             case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
-                if (requestCode == GALLERY_IMAGE_ACTIVITY_REQUEST_CODE) {
-                    if (resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
 
-                        if (data.getClipData() != null) {
-                            //select multiple file picture
-                            selectMultipleFile(data.getClipData(),requestCode);
-                        } else if (data.getData() != null) {
-                            //select unique file picture
-                            selectUniqueFile(data.getData(), requestCode);
-                        }
-
-                    } else if (resultCode == RESULT_CANCELED) {
-                        // User cancelled the image capture
-                    } else {
-                        // Image capture failed, advise user
+                    if (data.getClipData() != null) {
+                        //select multiple file picture
+                        selectMultipleFile(data.getClipData(),requestCode);
+                    } else if (data.getData() != null) {
+                        //select unique file picture
+                        selectUniqueFile(data.getData(), requestCode);
                     }
+
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the image capture
+                } else {
+                    // Image capture failed, advise user
                 }
                 break;
             case GALLERY_VIDEO_ACTIVITY_REQUEST_CODE:
@@ -380,10 +377,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 if (resultCode == RESULT_OK) {
                     // Video captured and saved to fileUri specified in the Intent
                     Toast.makeText(this,getString(R.string.default_save_video_msg), Toast.LENGTH_LONG).show();
-                } else if (resultCode == RESULT_CANCELED) {
-                    // User cancelled the video capture
-                } else {
+                } else if (resultCode != RESULT_CANCELED) {
                     // Video capture failed, advise user
+                } else {
+                    // User cancelled the video capture
                 }
                 break;
         }
@@ -393,11 +390,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         List<Uri> files = new ArrayList<>();
         List<Uri> selectFiles = new ArrayList<>();
 
-        ClipData clipData = data;
-
-        for (int i = 0; i < clipData.getItemCount(); i++) {
-            Uri path = clipData.getItemAt(i).getUri();
-            //File file = new File(path.getPath());
+        for (int i = 0; i < data.getItemCount(); i++) {
+            Uri path = data.getItemAt(i).getUri();
             selectFiles.add(path);
         }
 
@@ -432,16 +426,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
         List<Uri> files = new ArrayList<>();
         FilesManager taskFiles = new FilesManager();
 
-        Uri path = data;
-        //File file = new File(path.getPath());
-
         if (TASK_FILE.containsKey(ACTUAL_POSITION)) {
 
             taskFiles = TASK_FILE.get(ACTUAL_POSITION);
             files = (requestCode == GALLERY_VIDEO_ACTIVITY_REQUEST_CODE) ? taskFiles.getFilesVideo() : taskFiles.getFilesPicture();
         }
 
-        files.add(path);
+        files.add(data);
 
         switch (requestCode) {
             case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
@@ -587,8 +578,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 //LatLng taskLatLng = new LatLng(actualTask.getTask_latitude(), actualTask.getTask_longitude());
                 LatLng taskLatLng = new LatLng(LATITUDE, LONGITUDE);
 
-                //Log.d("GOOGLE MAPS MARKER", "Latitude : " + actualTask.getTask_latitude().toString() + " Longitude : " + actualTask.getTask_latitude());
-
                 MarkerOptions mo = new MarkerOptions();
                 mo.position(taskLatLng);
                 mo.title(actualTask.getTask_tittle());
@@ -597,8 +586,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 mMap.addMarker(mo);
 
-                LATITUDE += new Double(0.1000000);
-                LONGITUDE -= new Double(0.1000000);
+                LATITUDE += 0.1000000;
+                LONGITUDE -= 0.1000000;
             }
 
         }
@@ -726,14 +715,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         private AsyncCallWS(Integer wsOperation, TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceTaskDecode = wsServiceTaskDecode;
-            textError = new String();
+            textError = "";
         }
 
         private AsyncCallWS(Integer wsOperation,Tasks wsTask,TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceTask = wsTask;
             webServiceTaskDecode = wsServiceTaskDecode;
-            textError = new String();
+            textError = "";
         }
 
         @Override
@@ -766,19 +755,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getTask_update_to()
                                 , webServiceTask.getTask_user_id()
                                 ,webServiceTaskDecode.getSendFiles());
-                        validOperation = (soapPrimitive != null ) ? true : false;
+                        validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
                         soapPrimitive = SoapServices.sendFile(getApplicationContext(),webServiceTask.getTask_id()
                                 , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendFiles());
-                        validOperation = (soapPrimitive != null ) ? true : false;
+                        validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_SEND_LOCATION: case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
                         soapPrimitive = SoapServices.updateLocation(getApplicationContext(),webServiceTaskDecode.getTask_team_id()
                                 , webServiceTaskDecode.getTask_latitude()
                                 , webServiceTaskDecode.getTask_longitude()
                                 , webServiceTaskDecode.getTask_user_id());
-                        validOperation = (soapPrimitive != null ) ? true : false;
+                        validOperation = (soapPrimitive != null);
                         break;
                     default:
 
@@ -810,7 +799,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             pDialog.dismiss();
                         }
 
-                        switch (webServiceTask.getTask_status().intValue()) {
+                        switch (webServiceTask.getTask_status()) {
 
                             case Constants.NEWS_TASK:
 

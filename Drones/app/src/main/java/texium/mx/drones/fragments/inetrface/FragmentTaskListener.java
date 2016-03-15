@@ -2,7 +2,6 @@ package texium.mx.drones.fragments.inetrface;
 
 import android.view.View;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 

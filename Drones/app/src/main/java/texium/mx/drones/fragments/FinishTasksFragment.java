@@ -3,16 +3,11 @@ package texium.mx.drones.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableStringBuilder;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.gcm.Task;
-
 import org.ksoap2.serialization.SoapPrimitive;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +31,6 @@ import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.services.FileServices;
-import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -338,7 +328,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             webServiceAdapter = wsAdapter;
             webServiceTask = wsTask;
             webServiceTaskDecode = wsServiceTaskDecode;
-            textError = new String();
+            textError = "";
         }
 
         @Override
@@ -359,7 +349,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE:
                         webServiceTaskDecode = attachFiles(webServiceTaskDecode);
-                        validOperation = (webServiceTaskDecode != null) ? true : false;
+                        validOperation = (webServiceTaskDecode != null);
                         break;
                 }
             } catch (Exception e) {

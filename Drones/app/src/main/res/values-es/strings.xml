@@ -3,6 +3,19 @@
     <string name="title_activity_main">OKOXALI</string>
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
 
+    <string name="app_bar_navigation_name">SISTEMA DE MONITOREO DE RESERVAS NATURALES DEL DISTRITO FEDERAL</string>
+
+    <string name="task_validity_label">VIGENCIA</string>
+    <string name="task_priority_label">PRIORIDAD</string>
+    <string name="task_begin_date_label">Inicio:</string>
+    <string name="task_end_date_label">Termina:</string>
+    <string name="decline_task_label">  POSPONER  </string>
+    <string name="finish_task_label">  FINALIZAR  </string>
+    <string name="agree_task_label">  ACEPTAR  </string>
+    <string name="picture_task_label"> Fotos</string>
+    <string name="video_task_label">   Videos</string>
+    <string name="send_task_label">ENVIAR</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -37,5 +50,7 @@
 
     <string name="default_attaching_img">Comprimiendo imágenes. Por favor espere…</string>
     <string name="default_update_task">Actualizando tarea. Por favor espere…</string>
+
+
 
 </resources>

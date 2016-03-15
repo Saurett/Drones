@@ -1,9 +1,6 @@
 package texium.mx.drones.adapters;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,23 +8,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import texium.mx.drones.MainActivity;
-import texium.mx.drones.NavigationDrawerActivity;
 import texium.mx.drones.R;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
-import texium.mx.drones.helpers.DecodeJSONHelper;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.utils.Constants;
@@ -87,8 +76,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task_list, parent, false);
-        ViewHolder vh = new ViewHolder(view);
-        return vh;
+        return new ViewHolder(view);
     }
 
     @Override

@@ -2,6 +2,18 @@
     <string name="app_name">TASK MANAGER CD MX</string>
     <string name="title_activity_main">OKOXALI</string>
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
+    <string name="app_bar_navigation_name">MONITORING SYSTEM NATURAL RESERVES THE FEDERAL DISTRICT</string>
+
+    <string name="task_validity_label">VALIDITY</string>
+    <string name="task_priority_label">PRIORITY</string>
+    <string name="task_begin_date_label">Begin Date:</string>
+    <string name="task_end_date_label">End Date:</string>
+    <string name="decline_task_label">  DECLINE  </string>
+    <string name="finish_task_label">  FINISH  </string>
+    <string name="agree_task_label">  AGREE  </string>
+    <string name="picture_task_label">Picture</string>
+    <string name="video_task_label">   Videos</string>
+    <string name="send_task_label">SEND</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -37,6 +49,7 @@
 
     <string name="default_attaching_img">Attaching images. Please wait…</string>
     <string name="default_update_task">Update task. Please wait…</string>
+
 
 
 </resources>

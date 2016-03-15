@@ -1,9 +1,5 @@
 package texium.mx.drones.models;
 
-import android.util.Base64;
-
-import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 

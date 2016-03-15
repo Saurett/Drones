@@ -101,22 +101,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private Integer webServiceOperation;
         private String username;
         private String password;
-        private String text;
         private String textError;
 
-        private AsyncCallWS(Integer wsOperation) {
-            webServiceOperation = wsOperation;
-        }
+
         private AsyncCallWS(Integer wsOperation,String wsUsername, String wsPassword) {
             webServiceOperation = wsOperation;
             username = wsUsername;
             password = wsPassword;
             textError = "";
-        }
-
-        private AsyncCallWS(Integer wsOperation,String wsText) {
-            webServiceOperation = wsOperation;
-            text = wsText;
         }
 
         @Override
@@ -127,19 +119,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            Boolean validOperation = false;
+            Boolean validOperation;
 
            try{
                switch (webServiceOperation) {
                    case Constants.WS_KEY_PUBLIC_TEST:
-                       SoapServices.calculate(text);
+                       SoapServices.calculate(username);
                        validOperation = true;
                        break;
                    case Constants.WS_KEY_LOGIN_SERVICE:
                        soapObject = SoapServices.checkUser(getApplicationContext(),username,password);
                        Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
-                       validOperation = (id > 0) ?  true : false;
+                       validOperation = (id > 0);
                        break;
                    default:
                        Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();

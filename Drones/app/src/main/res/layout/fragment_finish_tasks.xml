@@ -50,7 +50,7 @@
                   android:layout_height="wrap_content"
                   android:textSize="15sp"
                   android:textColor="@color/colorPrimaryWhite"
-                  android:text="descripcion de la tarea"
+                  android:text="content task"
 
                   />
               <EditText
@@ -85,12 +85,13 @@
                              android:layout_height="wrap_content"
                              android:text="0"
                              android:textStyle="bold"
+                             android:layout_marginRight="2dp"
                              android:textColor="@color/colorAccent"
                              />
                          <TextView
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"
-                             android:text=" Fotos"
+                             android:text="@string/picture_task_label"
                              android:textColor="@color/colorAccent"
                              />
                      </LinearLayout>
@@ -119,12 +120,13 @@
                              android:layout_height="wrap_content"
                              android:text="0"
                              android:textStyle="bold"
+                             android:layout_marginRight="2dp"
                              android:textColor="@color/colorAccent"
                              />
                          <TextView
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"
-                             android:text=" Videos"
+                             android:text="@string/video_task_label"
                              android:textColor="@color/colorAccent"
                              />
                      </LinearLayout>
@@ -148,7 +150,7 @@
                          android:layout_height="60dp"
                          android:textSize="50sp"
                          android:textColor="@color/colorPrimaryWhite"
-                         android:background="@drawable/anterior"
+                         android:background="@drawable/back"
                          android:backgroundTint="@color/colorAccent"
                          android:layout_gravity="center"
                          />
@@ -158,7 +160,7 @@
                          android:layout_height="60dp"
                          android:textSize="50sp"
                          android:textColor="@color/colorPrimaryWhite"
-                         android:background="@drawable/siguiente"
+                         android:background="@drawable/next"
                          android:backgroundTint="@color/colorAccent"
                          android:layout_gravity="center"
                          android:layout_marginLeft="30dp"
@@ -167,7 +169,7 @@
                          android:id="@+id/send_task_button"
                          android:layout_width="60dp"
                          android:layout_height="60dp"
-                         android:text="Enviar"
+                         android:text="@string/send_task_label"
                          android:textColor="@color/colorPrimaryWhite"
                          android:background="@color/colorAccent"
                          android:layout_gravity="center"

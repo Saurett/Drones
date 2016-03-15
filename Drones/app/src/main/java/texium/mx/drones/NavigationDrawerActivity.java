@@ -551,9 +551,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
-
-        //Seteamos el tipo de mapa
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -569,25 +567,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             mMap.clear();
 
-            Double LATITUDE = 19.4265606;
-            Double LONGITUDE = -99.0672223;
-
             for (Tasks actualTask :
                     tasksList) {
 
-                //LatLng taskLatLng = new LatLng(actualTask.getTask_latitude(), actualTask.getTask_longitude());
-                LatLng taskLatLng = new LatLng(LATITUDE, LONGITUDE);
+                LatLng taskLatLng = new LatLng(actualTask.getTask_latitude(), actualTask.getTask_longitude());
 
                 MarkerOptions mo = new MarkerOptions();
                 mo.position(taskLatLng);
                 mo.title(actualTask.getTask_tittle());
                 mo.snippet(Constants.MAP_STATUS_NAME.get(actualTask.getTask_priority()));
-                mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
+                //mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
+                mo.icon(BitmapDescriptorFactory.fromResource(Constants.MAP_STATUS_ICON.get(actualTask.getTask_priority())));
 
                 mMap.addMarker(mo);
-
-                LATITUDE += 0.1000000;
-                LONGITUDE -= 0.1000000;
             }
 
         }

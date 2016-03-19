@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
@@ -168,6 +170,18 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                     t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
 
                     pendingTask.add(t);
+
+                    try {
+                        Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
+
+                        if (tempTask.getTask_id() == null) {
+                            BDTasksManagerQuery.addTasks(getContext(),t);
+                        } else if (tempTask.getTask_status() != t.getTask_status()) pendingTask.remove(t);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e("PendingTasksException: ", "Unknown error");
+                    }
                 }
 
                 task_list_adapter.addAll(pendingTask);

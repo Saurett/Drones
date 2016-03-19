@@ -5,6 +5,7 @@ package texium.mx.drones.models;
  */
 public class Tasks {
 
+    private Integer task_cve;
     private String task_tittle;
     private String task_content;
     private Integer task_priority;
@@ -18,6 +19,14 @@ public class Tasks {
 
     public Tasks() {
 
+    }
+
+    public Integer getTask_cve() {
+        return task_cve;
+    }
+
+    public void setTask_cve(Integer task_cve) {
+        this.task_cve = task_cve;
     }
 
     public String getTask_tittle() {

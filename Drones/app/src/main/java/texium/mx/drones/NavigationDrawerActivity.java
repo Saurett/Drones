@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -41,15 +43,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
 import java.math.BigDecimal;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.databases.BDTasksManager;
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.FinishTasksFragment;
 import texium.mx.drones.fragments.NewsTasksFragment;
@@ -144,6 +150,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //Header dynamic manager//
         getTaskForceData(navigationView);
+
+        TasksDecode tasksDecode = new TasksDecode();
+        tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
+        tasksDecode.setTask_status(Constants.ALL_TASK);
+
+        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_ALL,tasksDecode);
+        wsAllTask.execute();
+        //TODO EJECUTAR EL WS PARA OBTENER TODAS LAS TAREAS//
+            //TODO SI LA CONEXION FALLA MOSTRAR LAS TAREAS DE LA BASE DE DATOS
+        //TODO SI EXISTEN TAREAS REGISTRARLAS EN LA BASE DE DATOS
+            //TODO REGISTRAR EN LA BASE DE DATOS SOLO LAS TAREAS QUE NO EXISTAN
+
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -189,7 +207,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             Toast.makeText(this,getString(R.string.default_gps_error), Toast.LENGTH_LONG).show();
             taskToken.clear();
             finish();
-
         }
 
     }
@@ -697,6 +714,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private SoapPrimitive soapPrimitive;
+        private SoapObject soapObject;
 
         private Integer webServiceOperation;
         private Tasks webServiceTask;
@@ -761,10 +779,24 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getTask_user_id());
                         validOperation = (soapPrimitive != null);
                         break;
+                    case Constants.WS_KEY_TASK_SERVICE_ALL:
+                        soapObject = SoapServices.getServerTaskList(getApplicationContext(),webServiceTaskDecode.getTask_team_id()
+                                ,webServiceTaskDecode.getTask_status());
+                        validOperation = (soapObject.getPropertyCount() > 0);
+                        break;
                     default:
 
                         break;
                 }
+            } catch (ConnectException e) {
+
+                if (webServiceOperation == Constants.WS_KEY_TASK_SERVICE_ALL) {
+
+                    //TODO LLAMAR A BASE DE DATOS PARA TRAER LISTA DE TAREAS
+                        //TODO SI TRAE DATOS CONTINUAR CON LA OPERACIÓN
+                        //validOperation = true;
+                }
+
             } catch (Exception e) {
                 textError = e.getMessage();
                 validOperation = false;
@@ -833,6 +865,35 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         taskToken.clear();
                         Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
+                        break;
+                    case Constants.WS_KEY_TASK_SERVICE_ALL:
+
+                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                            Tasks t = new Tasks();
+
+                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                            SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+
+                            t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                            t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                            t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                            t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                            t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                            t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                            t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                            t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                            t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                            t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+
+                            try {
+                                Tasks tempTask = BDTasksManagerQuery.getTaskById(getApplicationContext(), t);
+
+                                if (tempTask.getTask_id() == null) BDTasksManagerQuery.addTasks(getApplicationContext(),t);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                         break;
                 }
             } else {

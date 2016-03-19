@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class Users implements Serializable {
 
+    private Integer cve_user;
     private Integer idUser;
     private String userName;
     private Integer idActor;
@@ -21,6 +22,15 @@ public class Users implements Serializable {
 
     public Users() {
 
+    }
+
+
+    public Integer getCve_user() {
+        return cve_user;
+    }
+
+    public void setCve_user(Integer cve_user) {
+        this.cve_user = cve_user;
     }
 
     public String getActorName() {

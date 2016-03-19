@@ -2,11 +2,13 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,8 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
+import texium.mx.drones.databases.BDTasksManager;
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
@@ -169,7 +173,20 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                     t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
 
                     progressTask.add(t);
+
+                    try {
+                        Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(),t);
+
+                        if (tempTask.getTask_id() == null) {
+                            BDTasksManagerQuery.addTasks(getContext(),t);
+                        } else if (tempTask.getTask_status() != t.getTask_status()) progressTask.remove(t);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e("ProgressTasksException: ", "Unknown error");
+                    }
                 }
+
                 task_list_adapter.addAll(progressTask);
                 task_list_title_adapter.addAll(progressTaskTitle);
 

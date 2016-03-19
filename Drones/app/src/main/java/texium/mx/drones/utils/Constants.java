@@ -19,6 +19,7 @@ public final class Constants {
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
+    public static final int ALL_TASK = 0;
     public static final int ACTIVE = 1;
     public static final int INACTIVE = 2;
     public static final int NEWS_TASK = 3;
@@ -60,15 +61,16 @@ public final class Constants {
     public static final int WS_KEY_SEND_LOCATION = 9;
     public static final int WS_KEY_SEND_LOCATION_HIDDEN = 10;
     @Deprecated public static final int WS_KEY_FIND_TASK = 11;
-    @Deprecated public static final int WS_KEY_TASK_SERVICE_REVISION = 12; //ONLI WEB
+    @Deprecated public static final int WS_KEY_TASK_SERVICE_REVISION = 12; //ONLY WEB
     public static final int WS_KEY_TASK_SERVICE_CLOSE = 13;
+    public static final int WS_KEY_TASK_SERVICE_ALL = 14;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
     /**
      * NEVER CHANGE IP SERVICE_NAMESPACE
      *
-     * TEXIUM NANAGER
+     * TEXIUM MANAGER
      * *********************************
      *
      * WEB_SERVICE_URL = "http://192.168.12.111/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";

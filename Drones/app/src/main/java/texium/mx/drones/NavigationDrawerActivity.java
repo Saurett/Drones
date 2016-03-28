@@ -4,11 +4,9 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -54,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.FinishTasksFragment;
@@ -155,12 +152,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
         tasksDecode.setTask_status(Constants.ALL_TASK);
 
-        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_ALL,tasksDecode);
+        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_TASKS,tasksDecode);
         wsAllTask.execute();
-        //TODO EJECUTAR EL WS PARA OBTENER TODAS LAS TAREAS//
-            //TODO SI LA CONEXION FALLA MOSTRAR LAS TAREAS DE LA BASE DE DATOS
+        //TODO EJECUTAR EL WS PARA OBTENER TODAS LAS TAREAS// //DONE//
+        //TODO SI LA CONEXION FALLA MOSTRAR LAS TAREAS DE LA BASE DE DATOS
         //TODO SI EXISTEN TAREAS REGISTRARLAS EN LA BASE DE DATOS
-            //TODO REGISTRAR EN LA BASE DE DATOS SOLO LAS TAREAS QUE NO EXISTAN
+        //TODO REGISTRAR EN LA BASE DE DATOS SOLO LAS TAREAS QUE NO EXISTAN
 
     }
 
@@ -572,10 +569,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-           return;
+            return;
         }
 
-       mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -601,7 +598,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         }
     }
-    
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -658,7 +655,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         return TASK_FILE;
     }
 
-    
+
 
     public Map<Long,Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
 
@@ -779,9 +776,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getTask_user_id());
                         validOperation = (soapPrimitive != null);
                         break;
-                    case Constants.WS_KEY_TASK_SERVICE_ALL:
-                        soapObject = SoapServices.getServerTaskList(getApplicationContext(),webServiceTaskDecode.getTask_team_id()
-                                ,webServiceTaskDecode.getTask_status());
+                    case Constants.WS_KEY_ALL_TASKS:
+                        soapObject = SoapServices.getServerAllTasks(getApplicationContext(), webServiceTaskDecode.getTask_team_id()
+                                , webServiceTaskDecode.getTask_status());
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                     default:
@@ -790,11 +787,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 }
             } catch (ConnectException e) {
 
-                if (webServiceOperation == Constants.WS_KEY_TASK_SERVICE_ALL) {
+                if (webServiceOperation == Constants.WS_KEY_ALL_TASKS) {
 
                     //TODO LLAMAR A BASE DE DATOS PARA TRAER LISTA DE TAREAS
-                        //TODO SI TRAE DATOS CONTINUAR CON LA OPERACIÓN
-                        //validOperation = true;
+                    //TODO SI TRAE DATOS CONTINUAR CON LA OPERACIÓN
+                    //validOperation = true;
                 }
 
             } catch (Exception e) {
@@ -866,7 +863,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         taskToken.clear();
                         Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
-                    case Constants.WS_KEY_TASK_SERVICE_ALL:
+                    case Constants.WS_KEY_ALL_TASKS:
 
                         for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
                             Tasks t = new Tasks();
@@ -888,7 +885,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             try {
                                 Tasks tempTask = BDTasksManagerQuery.getTaskById(getApplicationContext(), t);
 
-                                if (tempTask.getTask_id() == null) BDTasksManagerQuery.addTasks(getApplicationContext(),t);
+                                if (tempTask.getTask_id() == null) BDTasksManagerQuery.addTask(getApplicationContext(), t);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -898,9 +895,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 }
             } else {
 
-                if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
-                        || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
-                    pDialog.dismiss();
+                if (webServiceTaskDecode != null) {
+                    if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                        pDialog.dismiss();
+                    }
                 }
 
                 String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);

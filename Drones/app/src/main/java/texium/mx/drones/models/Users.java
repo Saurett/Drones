@@ -10,6 +10,7 @@ public class Users implements Serializable {
     private Integer cve_user;
     private Integer idUser;
     private String userName;
+    private String password;
     private Integer idActor;
     private String actorName;
     private Integer actorType;
@@ -55,6 +56,14 @@ public class Users implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Integer getIdActor() {

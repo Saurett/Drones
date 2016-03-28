@@ -133,7 +133,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_PENDING:
 
-                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
+                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         break;
@@ -175,7 +175,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                         Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
                         if (tempTask.getTask_id() == null) {
-                            BDTasksManagerQuery.addTasks(getContext(),t);
+                            BDTasksManagerQuery.addTask(getContext(), t);
                         } else if (tempTask.getTask_status() != t.getTask_status()) pendingTask.remove(t);
 
                     } catch (Exception e) {

@@ -2,7 +2,6 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,7 +21,6 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
@@ -135,7 +133,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_CLOSE:
 
-                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
+                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                 }
@@ -178,7 +176,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                         Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
                         if (tempTask.getTask_id() == null) {
-                            BDTasksManagerQuery.addTasks(getContext(),t);
+                            BDTasksManagerQuery.addTask(getContext(), t);
                         } else if (tempTask.getTask_status() != t.getTask_status()) closeTask.remove(t);
 
                     } catch (Exception e) {

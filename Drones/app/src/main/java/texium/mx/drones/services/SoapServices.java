@@ -12,8 +12,8 @@ import org.ksoap2.transport.HttpResponseException;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import texium.mx.drones.R;
 import texium.mx.drones.utils.Constants;
@@ -53,11 +53,11 @@ public class SoapServices {
         return soapObject;
     }
 
-    public static SoapObject getServerTaskList(Context context,Integer idTeam, Integer idStatus) throws Exception {
+    public static SoapObject getServerAllTasks(Context context, Integer idTeam, Integer idStatus) throws Exception {
         SoapObject soapObject;
         try {
-            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_TASK_LIST;
-            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_TASK;
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_TASKS;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ALL_TASKS;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
             String URL = Constants.WEB_SERVICE_URL;
 
@@ -79,6 +79,10 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -122,6 +126,57 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (java.net.SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
+            throw  new java.net.SocketTimeoutException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
+        }
+
+        return soapObject;
+    }
+
+    public static SoapObject getServerAllUsers(Context context) throws Exception {
+        SoapObject soapObject;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_USERS;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ALL_USERS;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = Constants.WEB_SERVICE_URL;
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_LOGIN_USERNAME, username);
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_LOGIN_PASSWORD, password);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapObject = (SoapObject) soapEnvelope.getResponse();
+
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -175,6 +230,10 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -226,6 +285,10 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -271,6 +334,10 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
             throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());

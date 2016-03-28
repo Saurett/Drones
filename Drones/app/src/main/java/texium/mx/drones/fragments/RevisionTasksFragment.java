@@ -132,19 +132,19 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
 
             Boolean validOperation = false;
 
-           try{
-               switch (webServiceOperation) {
-                   case Constants.WS_KEY_TASK_SERVICE_REVISION:
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_TASK_SERVICE_REVISION:
 
-                       soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
-                       validOperation = (soapObject.getPropertyCount() > 0);
+                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
+                        validOperation = (soapObject.getPropertyCount() > 0);
 
-                       break;
-               }
-           } catch (Exception e) {
-               e.getMessage();
-               validOperation = false;
-           }
+                        break;
+                }
+            } catch (Exception e) {
+                e.getMessage();
+                validOperation = false;
+            }
 
             return validOperation;
         }

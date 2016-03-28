@@ -2,7 +2,6 @@ package texium.mx.drones.fragments;
 
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,7 +21,6 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
@@ -130,19 +128,19 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
             Boolean validOperation = false;
 
-           try{
-               switch (webServiceOperation) {
-                   case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
 
-                       soapObject = SoapServices.getServerTaskList(getContext(),idTeam,idStatus);
-                       validOperation = (soapObject.getPropertyCount() > 0);
+                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
+                        validOperation = (soapObject.getPropertyCount() > 0);
 
-                       break;
-               }
-           } catch (Exception e) {
-               textError = e.getMessage();
-               validOperation = false;
-           }
+                        break;
+                }
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
+            }
 
             return validOperation;
         }
@@ -178,7 +176,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                         Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(),t);
 
                         if (tempTask.getTask_id() == null) {
-                            BDTasksManagerQuery.addTasks(getContext(),t);
+                            BDTasksManagerQuery.addTask(getContext(), t);
                         } else if (tempTask.getTask_status() != t.getTask_status()) progressTask.remove(t);
 
                     } catch (Exception e) {

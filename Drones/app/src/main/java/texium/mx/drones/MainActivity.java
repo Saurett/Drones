@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,13 +14,15 @@ import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.net.ConnectException;
+
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private SoapObject soapObject;
     private EditText usernameLogin, passwordLogin;
     private View mLoginFormView,mProgressView;
 
@@ -28,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        mLoginFormView = findViewById(R.id.login_form);
 
         Button loginButton = (Button) findViewById(R.id.login_button);
         Button cleanButton = (Button) findViewById(R.id.clean_button);
@@ -39,6 +42,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loginButton.setOnClickListener(this);
         cleanButton.setOnClickListener(this);
+
+        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
+        wsAllTask.execute();
     }
 
     //Login action
@@ -98,17 +104,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean>  {
 
+        private SoapObject soapObject;
         private Integer webServiceOperation;
         private String username;
         private String password;
         private String textError;
+        private Boolean localAccess;
 
+        private AsyncCallWS(Integer wsOperation) {
+            webServiceOperation = wsOperation;
+            textError = "";
+        }
 
         private AsyncCallWS(Integer wsOperation,String wsUsername, String wsPassword) {
             webServiceOperation = wsOperation;
             username = wsUsername;
             password = wsPassword;
             textError = "";
+            localAccess = false;
         }
 
         @Override
@@ -121,27 +134,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Boolean validOperation;
 
-           try{
-               switch (webServiceOperation) {
-                   case Constants.WS_KEY_PUBLIC_TEST:
-                       SoapServices.calculate(username);
-                       validOperation = true;
-                       break;
-                   case Constants.WS_KEY_LOGIN_SERVICE:
-                       soapObject = SoapServices.checkUser(getApplicationContext(),username,password);
-                       Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
+            try{
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_PUBLIC_TEST:
+                        SoapServices.calculate(username);
+                        validOperation = true;
+                        break;
+                    case Constants.WS_KEY_LOGIN_SERVICE:
+                        soapObject = SoapServices.checkUser(getApplicationContext(),username,password);
+                        Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
-                       validOperation = (id > 0);
-                       break;
-                   default:
-                       Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();
-                       validOperation = false;
-                       break;
-               }
-           } catch (Exception e) {
-               textError = e.getMessage();
-               validOperation = false;
-           }
+                        validOperation = (id > 0);
+                        break;
+                    case Constants.WS_KEY_ALL_USERS:
+                        soapObject = SoapServices.getServerAllUsers(getApplicationContext());
+                        validOperation = (soapObject.getPropertyCount() > 0);
+                        break;
+                    default:
+                        Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();
+                        validOperation = false;
+                        break;
+                }
+            } catch (ConnectException e){
+
+                textError = e.getMessage();
+                validOperation = false;
+
+                if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
+                    try {
+
+                        Users u = new Users();
+                        u.setUserName(username.trim());
+                        u.setPassword(password.trim());
+
+                        Users tempUser = BDTasksManagerQuery.getUserByCredentials(getApplicationContext(), u);
+                        validOperation = (tempUser.getIdUser() != null);
+                        localAccess = (tempUser.getIdUser() != null);
+
+                    } catch (Exception ex) {
+                        textError = ex.getMessage();
+
+                        ex.printStackTrace();
+                        Log.e("ValidationUserException: ", "Unknown error");
+                    }
+                }
+
+            } catch (Exception e) {
+                textError = e.getMessage();
+                validOperation = false;
+            }
 
             return validOperation;
         }
@@ -151,40 +192,104 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showProgress(false);
             if(success) {
 
-                if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
-                    Intent intentNavigationDrawer = new Intent(MainActivity.this,NavigationDrawerActivity.class);
+                Intent intentNavigationDrawer = new Intent(MainActivity.this,NavigationDrawerActivity.class);
+                Users user = new Users();
 
-                    if(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()) == 0) {
-                        Toast.makeText(MainActivity.this,getString(R.string.no_user_team_login_error), Toast.LENGTH_LONG).show();
-                        return;
-                    }
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_LOGIN_SERVICE:
 
-                    SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+                        if (localAccess) {
 
-                    Users user = new Users();
+                            try {
 
-                    user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
-                    user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
-                    user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
-                    user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
-                    user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
-                    user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
-                    user.setIdTeam(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
-                    user.setTeamName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_NAME).toString());
-                    user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
-                    user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
-                    user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+                                Users u = new Users();
+                                u.setUserName(username.trim());
+                                u.setPassword(password.trim());
 
-                    usernameLogin.clearFocus();
-                    passwordLogin.clearFocus();
+                                Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
 
-                    intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
-                    cleanAllLogin();
-                    startActivity(intentNavigationDrawer);
-                } else {
-                    Toast.makeText(MainActivity.this, "TEST", Toast.LENGTH_LONG).show();
+                                if (tempUser.getIdUser() != 0) {
+
+                                    if(Integer.valueOf(tempUser.getIdActor()) == 0) {
+                                        Toast.makeText(MainActivity.this,getString(R.string.no_user_team_login_error), Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+
+                                    user = tempUser;
+                                }
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                Log.e("SQLite Exception ", ex.getMessage());
+                            }
+
+                        } else {
+
+                            if(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()) == 0) {
+                                Toast.makeText(MainActivity.this,getString(R.string.no_user_team_login_error), Toast.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+
+                            user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                            user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
+                            user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                            user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
+                            user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                            user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
+                            user.setIdTeam(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
+                            user.setTeamName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_NAME).toString());
+                            user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
+                            user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+                            user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+                        }
+
+
+                        usernameLogin.clearFocus();
+                        passwordLogin.clearFocus();
+
+                        intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
+                        cleanAllLogin();
+                        startActivity(intentNavigationDrawer);
+                        break;
+                    case Constants.WS_KEY_ALL_USERS:
+
+                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+
+                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                            SoapObject uLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+
+                            user.setIdUser(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                            user.setUserName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
+                            user.setIdActor(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                            user.setActorName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
+                            user.setActorType(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                            user.setActorTypeName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
+                            user.setIdTeam(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM).toString()));
+                            user.setTeamName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_NAME).toString());
+                            user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
+                            user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+                            user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+
+                            try {
+                                Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
+
+                                if (tempUser.getIdUser() == null) BDTasksManagerQuery.addUser(getApplicationContext(), user);
+
+                                //TODO Si ya existe el usuario, actualizarlo
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                Log.e("SQLite Exception ", ex.getMessage());
+                            }
+                        }
+
+                        break;
+                    default:
+                        Toast.makeText(MainActivity.this, "TEST", Toast.LENGTH_LONG).show();
+                        break;
                 }
-
             } else {
                 String tempTextMsg = (textError.isEmpty() ? getString(R.string.default_login_error) : textError);
                 Toast.makeText(MainActivity.this,tempTextMsg, Toast.LENGTH_LONG).show();

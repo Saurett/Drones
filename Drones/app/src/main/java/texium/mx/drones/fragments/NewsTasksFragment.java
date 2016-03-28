@@ -95,7 +95,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()) {
             case R.id.task_title_close_button:
                 activityListener.closeActiveTaskFragment(v);
-            break;
+                break;
             default:
                 break;
         }
@@ -133,7 +133,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_NEWS:
 
-                        soapObject = SoapServices.getServerTaskList(getContext(),idTeam, idStatus);
+                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         break;
@@ -176,7 +176,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                         Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
                         if (tempTask.getTask_id() == null) {
-                            BDTasksManagerQuery.addTasks(getContext(),t);
+                            BDTasksManagerQuery.addTask(getContext(), t);
                         } else if (tempTask.getTask_status() != t.getTask_status()) newsTask.remove(t);
 
                     } catch (Exception e) {

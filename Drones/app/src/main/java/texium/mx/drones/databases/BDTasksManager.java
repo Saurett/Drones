@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class BDTasksManager extends SQLiteOpenHelper {
 
     String sqlCreateTaskTable = "CREATE TABLE \"Tasks\" ( \t`task_dni`\tINTEGER PRIMARY KEY AUTOINCREMENT, \t`task_title`\tTEXT, \t`task_content`\tTEXT, \t`task_priority`\tINTEGER, \t`task_begin_date`\tTEXT, \t`task_end_date`\tTEXT, \t`task_id`\tINTEGER, \t`task_latitude`\tREAL, \t`task_longitude`\tREAL, \t`task_status`\tINTEGER, \t`task_user_id`\tINTEGER )";
-    String sqlCreateUserTable = "CREATE TABLE `Users` ( \t`cve_user`\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, \t`idUser`\tINTEGER, \t`userName`\tTEXT, \t`idActor`\tINTEGER, \t`actorName`\tTEXT, \t`actorType`\tINTEGER, \t`actorTypeName`\tTEXT, \t`idTeam`\tINTEGER, \t`teamName`\tTEXT, \t`latitude`\tREAL, \t`longitude`\tREAL, \t`lastTeamConnection`\tTEXT )";
+    String sqlCreateUserTable = "CREATE TABLE `Users` ( \t`cve_user`\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, \t`idUser`\tINTEGER, \t`userName`\tTEXT, \t`idActor`\tINTEGER, \t`actorName`\tTEXT, \t`actorType`\tINTEGER, \t`actorTypeName`\tTEXT, \t`idTeam`\tINTEGER, \t`teamName`\tTEXT, \t`latitude`\tREAL, \t`longitude`\tREAL, \t`lastTeamConnection`\tTEXT,  \t`password`\tTEXT )";
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);

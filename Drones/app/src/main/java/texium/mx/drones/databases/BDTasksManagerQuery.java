@@ -18,9 +18,9 @@ import texium.mx.drones.models.Users;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 5;
+    static Integer BDVersion = 7;
 
-    public static void addTasks(Context context,Tasks t) throws Exception {
+    public static void addTask(Context context, Tasks t) throws Exception {
         try{
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -54,21 +54,22 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            ContentValues cvCloseTask = new ContentValues();
+            ContentValues cv = new ContentValues();
 
-            cvCloseTask.put("idUser", u.getIdUser());
-            cvCloseTask.put("userName",u.getUserName());
-            cvCloseTask.put("idActor",u.getIdActor());
-            cvCloseTask.put("actorName", u.getActorName());
-            cvCloseTask.put("actorType", u.getActorType());
-            cvCloseTask.put("actorTypeName",u.getActorTypeName());
-            cvCloseTask.put("idTeam",u.getIdTeam());
-            cvCloseTask.put("teamName",u.getIdTeam());
-            cvCloseTask.put("latitude",u.getLatitude());
-            cvCloseTask.put("longitude",u.getLongitude());
-            cvCloseTask.put("lastTeamConnection",u.getLastTeamConnection());
+            cv.put("idUser", u.getIdUser());
+            cv.put("userName",u.getUserName());
+            cv.put("idActor",u.getIdActor());
+            cv.put("actorName", u.getActorName());
+            cv.put("actorType", u.getActorType());
+            cv.put("actorTypeName",u.getActorTypeName());
+            cv.put("idTeam",u.getIdTeam());
+            cv.put("teamName",u.getIdTeam());
+            cv.put("latitude",u.getLatitude());
+            cv.put("longitude",u.getLongitude());
+            cv.put("lastTeamConnection",u.getLastTeamConnection());
+            cv.put("password",u.getPassword());
 
-            bd.insert("Users", null, cvCloseTask);
+            bd.insert("Users", null, cv);
             bd.close();
 
             Log.i("SQLite: ", "Add user in the bd with user_id : " + u.getIdUser());
@@ -121,14 +122,64 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName,null,BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            Cursor result = bd.rawQuery("select * from users where user_id=" + u.getIdUser(),null);
+            Cursor result = bd.rawQuery("select * from users where idUser=" + u.getIdUser(),null);
 
             if (result.moveToFirst()) {
                 do {
 
                     data.setCve_user(result.getInt(0));
+                    data.setIdUser(result.getInt(1));
+                    data.setUserName(result.getString(2));
+                    data.setIdActor(result.getInt(3));
+                    data.setActorName(result.getString(4));
+                    data.setActorType(result.getInt(5));
+                    data.setActorTypeName(result.getString(6));
+                    data.setIdTeam(result.getInt(7));
+                    data.setTeamName(result.getString(8));
+                    data.setLatitude(result.getDouble(9));
+                    data.setLongitude(result.getDouble(10));
+                    data.setLastTeamConnection(result.getString(11));
+                    data.setPassword(result.getString(12));
 
-                    Log.i("SQLite: ", "Get user in the bd with user_id :" + data.getIdUser());
+                    Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser());
+                } while (result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+        return data;
+    }
+
+    public static Users getUserByCredentials(Context context,Users u) throws Exception {
+        Users data = new Users();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName,null,BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from users where userName='" + u.getUserName() + "'",null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    data.setCve_user(result.getInt(0));
+                    data.setIdUser(result.getInt(1));
+                    data.setUserName(result.getString(2));
+                    data.setIdActor(result.getInt(3));
+                    data.setActorName(result.getString(4));
+                    data.setActorType(result.getInt(5));
+                    data.setActorTypeName(result.getString(6));
+                    data.setIdTeam(result.getInt(7));
+                    data.setTeamName(result.getString(8));
+                    data.setLatitude(result.getDouble(9));
+                    data.setLongitude(result.getDouble(10));
+                    data.setLastTeamConnection(result.getString(11));
+                    data.setPassword(result.getString(12));
+
+                    Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser());
                 } while (result.moveToNext());
             }
 

@@ -91,7 +91,7 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
-    public static final String WEB_SERVICE_URL = "http://192.168.12.111/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     //public static final String WEB_SERVICE_URL = "http://192.168.1.98/ServicioWeb/Servicio_Android.asmx";
     //endregion SOAP CONFIGURATION//
 
@@ -137,6 +137,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_LOGIN_LATITUDE = "Latitud";
     public static final String SOAP_OBJECT_KEY_LOGIN_LONGITUDE = "Longitud";
     public static final String SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION = "ultimaconexioncuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_PASSWORD = "ultimaconexioncuadrilla";
     public static final String SOAP_OBJECT_KEY_TASK_ID = "ID";
     public static final String SOAP_OBJECT_KEY_TASK_TITTLE = "Nombre";
     public static final String SOAP_OBJECT_KEY_TASK_CONTENT = "Descripcion";

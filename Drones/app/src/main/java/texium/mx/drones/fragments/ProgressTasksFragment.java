@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,6 +110,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         private Integer webServiceOperation;
         private Integer idTeam;
         private Integer idStatus;
+        private List<Tasks> tempTaskList;
 
         private String textError;
 
@@ -117,6 +119,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
             textError = "";
+            tempTaskList = new ArrayList<>();
         }
 
         @Override
@@ -137,6 +140,24 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
                         break;
                 }
+            } catch (ConnectException e) {
+
+                textError = e.getMessage();
+                validOperation = false;
+
+                Tasks t = new Tasks();
+                t.setTask_status(idStatus);
+
+                try {
+                   tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                   validOperation = (tempTaskList.size() > 0);
+                } catch (Exception ex) {
+                    textError = ex.getMessage();
+
+                    ex.printStackTrace();
+                    Log.e("ProgressTasksException: ", "Unknown error");
+                }
+
             } catch (Exception e) {
                 textError = e.getMessage();
                 validOperation = false;
@@ -152,38 +173,39 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
             if(success) {
 
+                if (tempTaskList.size() == 0) {
+                    for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                        Tasks t = new Tasks();
 
-                for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
-                    Tasks t = new Tasks();
+                        SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                        SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
 
-                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+                        t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                        t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                        t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                        t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                        t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                        t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                        t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                        t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                        t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                        t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
 
-                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
-                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                    t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                        progressTask.add(t);
 
-                    progressTask.add(t);
+                        try {
+                            Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(),t);
 
-                    try {
-                        Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(),t);
+                            if (tempTask.getTask_id() == null) {
+                                BDTasksManagerQuery.addTask(getContext(), t);
+                            } else if (tempTask.getTask_status() != t.getTask_status()) progressTask.remove(t);
 
-                        if (tempTask.getTask_id() == null) {
-                            BDTasksManagerQuery.addTask(getContext(), t);
-                        } else if (tempTask.getTask_status() != t.getTask_status()) progressTask.remove(t);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.e("ProgressTasksException: ", "Unknown error");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("ProgressTasksException: ", "Unknown error");
+                        }
                     }
-                }
+                } else progressTask.addAll(tempTaskList);
 
                 task_list_adapter.addAll(progressTask);
                 task_list_title_adapter.addAll(progressTaskTitle);

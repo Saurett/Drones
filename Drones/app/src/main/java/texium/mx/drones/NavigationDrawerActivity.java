@@ -235,6 +235,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private void callWebServiceLocation(int type) {
         TasksDecode tasksDecode = new TasksDecode();
         tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
+
+        SESSION_DATA.getLatitude();
+
+
         tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
         tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
         tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
@@ -581,8 +585,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             mMap.clear();
 
-            for (Tasks actualTask :
-                    tasksList) {
+            for (Tasks actualTask : tasksList) {
 
                 LatLng taskLatLng = new LatLng(actualTask.getTask_latitude(), actualTask.getTask_longitude());
 
@@ -895,7 +898,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 }
             } else {
 
-                if (webServiceTaskDecode != null) {
+                if (webServiceTaskDecode.getOrigin_button() != null) {
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
                         pDialog.dismiss();

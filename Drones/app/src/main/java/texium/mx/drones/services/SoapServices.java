@@ -82,7 +82,7 @@ public class SoapServices {
         } catch (SocketTimeoutException e ) {
             e.printStackTrace();
             Log.e("Soap SocketTimeoutException", e.getMessage());
-            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -90,7 +90,7 @@ public class SoapServices {
         } catch (SoapFault e){
             e.printStackTrace();
             Log.e("Soap Fault",e.getMessage());
-            throw new Exception(e.getMessage());
+            throw new ConnectException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());
@@ -129,7 +129,7 @@ public class SoapServices {
         } catch (java.net.SocketTimeoutException e ) {
             e.printStackTrace();
             Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
-            throw  new java.net.SocketTimeoutException(context.getString(R.string.default_connect_error));
+            throw  new java.net.ConnectException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());

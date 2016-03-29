@@ -202,11 +202,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             try {
 
-                                Users u = new Users();
-                                u.setUserName(username.trim());
-                                u.setPassword(password.trim());
+                                user.setUserName(username.trim());
+                                user.setPassword(password.trim());
 
-                                Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
+                                Users tempUser = BDTasksManagerQuery.getUserByCredentials(getApplicationContext(), user);
 
                                 if (tempUser.getIdUser() != 0) {
 
@@ -271,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
                             user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
                             user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+                            user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
 
                             try {
                                 Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);

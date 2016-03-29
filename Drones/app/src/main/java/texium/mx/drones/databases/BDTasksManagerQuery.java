@@ -18,27 +18,27 @@ import texium.mx.drones.models.Users;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 7;
+    static Integer BDVersion = 8;
 
     public static void addTask(Context context, Tasks t) throws Exception {
         try{
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            ContentValues cvCloseTask = new ContentValues();
+            ContentValues cv = new ContentValues();
 
-            cvCloseTask.put("task_title", t.getTask_tittle());
-            cvCloseTask.put("task_content",t.getTask_content());
-            cvCloseTask.put("task_priority",t.getTask_priority());
-            cvCloseTask.put("task_begin_date",t.getTask_end_date());
-            cvCloseTask.put("task_end_date", t.getTask_end_date());
-            cvCloseTask.put("task_id",t.getTask_id());
-            cvCloseTask.put("task_latitude",t.getTask_latitude());
-            cvCloseTask.put("task_longitude",t.getTask_longitude());
-            cvCloseTask.put("task_status",t.getTask_status());
-            cvCloseTask.put("task_user_id",t.getTask_user_id());
+            cv.put("task_title", t.getTask_tittle());
+            cv.put("task_content", t.getTask_content());
+            cv.put("task_priority", t.getTask_priority());
+            cv.put("task_begin_date", t.getTask_end_date());
+            cv.put("task_end_date", t.getTask_end_date());
+            cv.put("task_id", t.getTask_id());
+            cv.put("task_latitude", t.getTask_latitude());
+            cv.put("task_longitude", t.getTask_longitude());
+            cv.put("task_status", t.getTask_status());
+            cv.put("task_user_id", t.getTask_user_id());
 
-            bd.insert("Tasks", null, cvCloseTask);
+            bd.insert("Tasks", null, cv);
             bd.close();
 
             Log.i("SQLite: ","Add task in the bd with task_id :" + t.getTask_id());
@@ -160,7 +160,8 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName,null,BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            Cursor result = bd.rawQuery("select * from users where userName='" + u.getUserName() + "'",null);
+            //Cursor result = bd.rawQuery("select * from users where userName='" + u.getUserName() + "'", null);
+            Cursor result = bd.rawQuery("select * from users where userName = '" + u.getUserName() + "'",null);
 
             if (result.moveToFirst()) {
                 do {
@@ -202,13 +203,23 @@ public class BDTasksManagerQuery {
 
             if (result.moveToFirst()) {
                 do {
-                    Tasks tempTask = new Tasks();
+                    Tasks data = new Tasks();
 
-                    tempTask.setTask_id(result.getInt(0));
+                    data.setTask_cve(result.getInt(0));
+                    data.setTask_tittle(result.getString(1));
+                    data.setTask_content(result.getString(2));
+                    data.setTask_priority(result.getInt(3));
+                    data.setTask_begin_date(result.getString(4));
+                    data.setTask_end_date(result.getString(5));
+                    data.setTask_id(result.getInt(6));
+                    data.setTask_latitude(result.getDouble(7));
+                    data.setTask_longitude(result.getDouble(8));
+                    data.setTask_status(result.getInt(9));
+                    data.setTask_user_id(result.getInt(10));
 
-                    dataList.add(tempTask);
+                    dataList.add(data);
 
-                    Log.i("SQLite: ", "Get task in the bd with task_id :" + tempTask.getTask_id());
+                    Log.i("SQLite: ", "Get task in the bd with task_id :" + data.getTask_id());
                 } while(result.moveToNext());
             }
 

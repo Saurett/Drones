@@ -160,8 +160,8 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName,null,BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            //Cursor result = bd.rawQuery("select * from users where userName='" + u.getUserName() + "'", null);
-            Cursor result = bd.rawQuery("select * from users where userName = '" + u.getUserName() + "'",null);
+            Cursor result = bd.rawQuery("select * from users where userName = '" + u.getUserName()
+                    + "' and password ='" + u.getPassword() +"'",null);
 
             if (result.moveToFirst()) {
                 do {
@@ -195,11 +195,11 @@ public class BDTasksManagerQuery {
 
     public static List<Tasks> getListTaskByStatus(Context context, Tasks t) throws Exception {
         List<Tasks> dataList = new ArrayList<>();
-        try{
+        try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            Cursor result = bd.rawQuery("select * from tasks where  task_status=" + t.getTask_status(), null);
+            Cursor result = bd.rawQuery("select * from tasks where task_status=" + t.getTask_status(), null);
 
             if (result.moveToFirst()) {
                 do {

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +111,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
         private Integer webServiceOperation;
         private Integer idTeam;
         private Integer idStatus;
-
+        private List<Tasks> tempTaskList;
         private String textError;
 
         private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
@@ -118,6 +119,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
             textError = "";
+            tempTaskList = new ArrayList<>();
         }
 
         @Override
@@ -138,7 +140,27 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
                         break;
                 }
-            } catch (Exception e) {
+            }  catch (ConnectException e) {
+
+                textError = e.getMessage();
+                validOperation = false;
+
+                Tasks t = new Tasks();
+                t.setTask_status(idStatus);
+
+                try {
+                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                    validOperation = (tempTaskList.size() > 0);
+                    textError =  (tempTaskList.size() > 0) ? textError
+                            : getString(R.string.default_empty_task_list);
+                } catch (Exception ex) {
+                    textError = ex.getMessage();
+
+                    ex.printStackTrace();
+                    Log.e("PendingTasksException: ", "Unknown error");
+                }
+
+            }  catch (Exception e) {
                 textError = e.getMessage();
                 validOperation = false;
             }
@@ -152,37 +174,39 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
             pendingTask = new ArrayList<>();
             if(success) {
 
-                for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
-                    Tasks t = new Tasks();
+                if (tempTaskList.size() == 0) {
+                    for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                        Tasks t = new Tasks();
 
-                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+                        SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                        SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
 
-                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
-                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                    t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                        t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                        t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                        t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                        t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                        t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                        t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                        t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                        t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                        t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                        t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
 
-                    pendingTask.add(t);
+                        pendingTask.add(t);
 
-                    try {
-                        Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
+                        try {
+                            Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
-                        if (tempTask.getTask_id() == null) {
-                            BDTasksManagerQuery.addTask(getContext(), t);
-                        } else if (tempTask.getTask_status() != t.getTask_status()) pendingTask.remove(t);
+                            if (tempTask.getTask_id() == null) {
+                                BDTasksManagerQuery.addTask(getContext(), t);
+                            } else if (tempTask.getTask_status() != t.getTask_status()) pendingTask.remove(t);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.e("PendingTasksException: ", "Unknown error");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("PendingTasksException: ", "Unknown error");
+                        }
                     }
-                }
+                } else pendingTask.addAll(tempTaskList);
 
                 task_list_adapter.addAll(pendingTask);
                 task_list_title_adapter.addAll(pendingTaskTitle);

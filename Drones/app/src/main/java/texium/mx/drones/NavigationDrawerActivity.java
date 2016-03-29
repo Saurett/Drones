@@ -27,6 +27,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -154,11 +155,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_TASKS,tasksDecode);
         wsAllTask.execute();
-        //TODO EJECUTAR EL WS PARA OBTENER TODAS LAS TAREAS// //DONE//
-        //TODO SI LA CONEXION FALLA MOSTRAR LAS TAREAS DE LA BASE DE DATOS
-        //TODO SI EXISTEN TAREAS REGISTRARLAS EN LA BASE DE DATOS
-        //TODO REGISTRAR EN LA BASE DE DATOS SOLO LAS TAREAS QUE NO EXISTAN
-
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -905,8 +901,25 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     }
                 }
 
-                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
-                Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+                String tempText = "";
+                switch (webServiceOperation) {
+
+                    case Constants.WS_KEY_SEND_LOCATION:
+
+                        tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
+                        Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+                        break;
+
+                        case Constants.WS_KEY_UPDATE_TASK_FILE:
+                            case Constants.WS_KEY_UPDATE_TASK:
+
+                                tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                                Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+                                break;
+                    default:
+                        Log.i("INFO ", "NO DISPLAY MESSAGE");
+                        break;
+                }
             }
         }
     }

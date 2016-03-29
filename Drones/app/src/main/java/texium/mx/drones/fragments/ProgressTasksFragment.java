@@ -111,7 +111,6 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         private Integer idTeam;
         private Integer idStatus;
         private List<Tasks> tempTaskList;
-
         private String textError;
 
         private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
@@ -151,6 +150,8 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                 try {
                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
                    validOperation = (tempTaskList.size() > 0);
+                    textError =  (tempTaskList.size() > 0) ? textError
+                            : getString(R.string.default_empty_task_list);
                 } catch (Exception ex) {
                     textError = ex.getMessage();
 

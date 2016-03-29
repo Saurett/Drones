@@ -203,7 +203,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.e("ProgressTasksException: ", "Unknown error");
+                            Log.e("ProgressTasksException: ", "Unknown error : " + e.getMessage());
                         }
                     }
                 } else progressTask.addAll(tempTaskList);

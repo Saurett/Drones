@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.FinishTasksFragment;
@@ -786,11 +787,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 }
             } catch (ConnectException e) {
 
-                if (webServiceOperation == Constants.WS_KEY_ALL_TASKS) {
+                textError = e.getMessage();
+                validOperation = false;
 
-                    //TODO LLAMAR A BASE DE DATOS PARA TRAER LISTA DE TAREAS
-                    //TODO SI TRAE DATOS CONTINUAR CON LA OPERACIÓN
-                    //validOperation = true;
+                e.printStackTrace();
+                Log.e("WebServiceException","Unknown error : " + e.getMessage());
+
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_UPDATE_TASK: validOperation = true;
+                    break;
+
                 }
 
             } catch (Exception e) {
@@ -819,8 +825,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             pDialog.dismiss();
                         }
 
-                        switch (webServiceTask.getTask_status()) {
+                        try {
+                            BDTasksManagerQuery.updateCommonTask(getApplicationContext(),webServiceTask.getTask_id()
+                                    , webServiceTaskDecode.getTask_comment()
+                                    , webServiceTaskDecode.getTask_update_to()
+                                    , webServiceTask.getTask_user_id()
+                                    , webServiceTaskDecode.getSendFiles()
+                                    , textError.length() == 0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("UpdateTaskException",e.getMessage());
+                        }
 
+                        switch (webServiceTask.getTask_status()) {
+                            //Actual Status
                             case Constants.NEWS_TASK:
 
                                 FragmentTransaction ftNews = fragmentManager.beginTransaction();
@@ -844,7 +862,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 break;
                         }
                         taskToken.clear();
-                        Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
+                        String tempMsg = (textError.length() > 0) ? "Tarea actualizada correctamente" : soapPrimitive.toString();
+                        Toast.makeText(NavigationDrawerActivity.this, tempMsg, Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
                         onMapReady(mMap);
@@ -888,6 +907,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                Log.e("GeneralException","Unknown error : " + e.getMessage());
                             }
                         }
                         break;

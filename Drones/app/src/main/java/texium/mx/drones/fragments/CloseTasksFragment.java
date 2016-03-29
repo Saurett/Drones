@@ -204,7 +204,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
 
                        } catch (Exception e) {
                            e.printStackTrace();
-                           Log.e("PendingTasksException: ", "Unknown error");
+                           Log.e("CloseTasksException: ", "Unknown error: " +  e.getMessage());
                        }
                    }
                } else closeTask.addAll(tempTaskList);

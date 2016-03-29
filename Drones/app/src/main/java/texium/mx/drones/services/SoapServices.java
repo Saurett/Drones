@@ -11,6 +11,7 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpResponseException;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.EOFException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.List;
@@ -75,6 +76,10 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapObject = (SoapObject) soapEnvelope.getResponse();
 
+        } catch (EOFException e ) {
+            e.printStackTrace();
+            Log.e("Soap EOFException", e.getMessage());
+            throw  new Exception(context.getString(R.string.default_exception_error));
         } catch (ConnectException e) {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
@@ -157,9 +162,6 @@ public class SoapServices {
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_LOGIN_USERNAME, username);
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_LOGIN_PASSWORD, password);
-
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;
             soapEnvelope.setOutputSoapObject(Request);
@@ -169,6 +171,10 @@ public class SoapServices {
             transport.call(SOAP_ACTION, soapEnvelope);
             soapObject = (SoapObject) soapEnvelope.getResponse();
 
+        } catch (EOFException e) {
+            e.printStackTrace();
+            Log.e("Soap EOFException",e.getMessage());
+            throw  new Exception(context.getString(R.string.default_exception_error));
         } catch (ConnectException e) {
             e.printStackTrace();
             Log.e("Soap ConnectException", e.getMessage());
@@ -233,7 +239,7 @@ public class SoapServices {
         } catch (SocketTimeoutException e ) {
             e.printStackTrace();
             Log.e("Soap SocketTimeoutException", e.getMessage());
-            throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -241,7 +247,7 @@ public class SoapServices {
         } catch (SoapFault e){
             e.printStackTrace();
             Log.e("Soap Fault",e.getMessage());
-            throw new Exception(e.getMessage());
+            throw new ConnectException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Soap Exception", e.getMessage());

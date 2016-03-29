@@ -204,7 +204,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.e("PendingTasksException: ", "Unknown error");
+                            Log.e("NewsTasksException: ", "Unknown error: " + e.getMessage());
                         }
                     }
 

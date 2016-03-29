@@ -18,7 +18,7 @@ import texium.mx.drones.models.Users;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 8;
+    static Integer BDVersion = 11;
 
     public static void addTask(Context context, Tasks t) throws Exception {
         try{
@@ -63,7 +63,7 @@ public class BDTasksManagerQuery {
             cv.put("actorType", u.getActorType());
             cv.put("actorTypeName",u.getActorTypeName());
             cv.put("idTeam",u.getIdTeam());
-            cv.put("teamName",u.getIdTeam());
+            cv.put("teamName",u.getTeamName());
             cv.put("latitude",u.getLatitude());
             cv.put("longitude",u.getLongitude());
             cv.put("lastTeamConnection",u.getLastTeamConnection());
@@ -231,5 +231,27 @@ public class BDTasksManagerQuery {
         }
 
         return dataList;
+    }
+
+    public static void updateCommonTask(Context context, Integer task, String comment
+            ,Integer status,Integer user,List<String> encodedFile,Boolean serverSync) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnTasks.TASK_STATUS,status);
+            cv.put(BDTasksManager.ColumnTasks.TASK_USER_ID,user);
+
+            bd.update(BDTasksManager.TASKS_TABLE_NAME, cv, BDTasksManager.ColumnTasks.TASK_ID + " = " + task, null);
+            bd.close();
+
+            Log.i("SQLite: ", "Update task in the bd with task_id : " + task);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
     }
 }

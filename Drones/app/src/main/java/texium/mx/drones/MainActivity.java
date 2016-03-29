@@ -160,6 +160,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 textError = e.getMessage();
                 validOperation = false;
 
+                e.printStackTrace();
+                Log.e("LoginUserException: ", "Unknown error : " + e.getMessage());
+
                 if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
                     try {
 
@@ -270,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
                             user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
                             user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-                            user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+                            user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_PASSWORD).toString());
 
                             try {
                                 Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);

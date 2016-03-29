@@ -203,7 +203,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.e("PendingTasksException: ", "Unknown error");
+                            Log.e("PendingTasksException: ", "Unknown error: "+ e.getMessage());
                         }
                     }
                 } else pendingTask.addAll(tempTaskList);

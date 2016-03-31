@@ -23,6 +23,8 @@
 
     <string name="password_login_error">This password is invalid</string>
     <string name="username_login_error">This field is required</string>
+    <string name="default_user_unregister">Unregister user</string>
+    <string name="default_incorrect_password">Incorrect password</string>
     <string name="default_ws_operation">Web Service default is not Online.</string>
     <string name="default_login_error">The email address and password you entered do not match.</string>
     <string name="no_user_team_login_error">The user is not assigned a team.</string>

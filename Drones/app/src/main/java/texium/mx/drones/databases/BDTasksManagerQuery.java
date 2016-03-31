@@ -161,7 +161,7 @@ public class BDTasksManagerQuery {
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
             Cursor result = bd.rawQuery("select * from users where userName = '" + u.getUserName()
-                    + "' and password ='" + u.getPassword() +"'",null);
+                    + "'",null);
 
             if (result.moveToFirst()) {
                 do {
@@ -180,7 +180,8 @@ public class BDTasksManagerQuery {
                     data.setLastTeamConnection(result.getString(11));
                     data.setPassword(result.getString(12));
 
-                    Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser());
+                    Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser()
+                    + " username : " + data.getUserName() + " password :" + data.getPassword());
                 } while (result.moveToNext());
             }
 

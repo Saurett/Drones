@@ -157,11 +157,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             } catch (ConnectException e){
 
-                textError = e.getMessage();
-                validOperation = false;
 
-                e.printStackTrace();
-                Log.e("LoginUserException: ", "Unknown error : " + e.getMessage());
+                textError = (e != null) ? e.getMessage() : "Unknown error";
+                validOperation = false;
+                if (e != null) e.printStackTrace();
+
+                Log.e("LoginUserException: ", "Unknown error : " + textError);
 
                 if (webServiceOperation == Constants.WS_KEY_LOGIN_SERVICE) {
                     try {
@@ -173,6 +174,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Users tempUser = BDTasksManagerQuery.getUserByCredentials(getApplicationContext(), u);
                         validOperation = (tempUser.getIdUser() != null);
                         localAccess = (tempUser.getIdUser() != null);
+                        textError = (tempUser.getIdUser() != null) ? "" : getString(R.string.default_user_unregister);
+
+                        if (!validOperation) return validOperation;
+
+                        //Check validOperation with the user password
+                        validOperation = (password.equals(tempUser.getPassword()));
+                        textError = (validOperation) ? textError : getString(R.string.default_incorrect_password);
 
                     } catch (Exception ex) {
                         textError = ex.getMessage();

@@ -134,7 +134,7 @@ public class SoapServices {
         } catch (java.net.SocketTimeoutException e ) {
             e.printStackTrace();
             Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
-            throw  new java.net.ConnectException(context.getString(R.string.default_connect_error));
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
         } catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
@@ -144,9 +144,18 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new ConnectException(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new ConnectException(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+
+
+
         }
 
         return soapObject;
@@ -183,7 +192,11 @@ public class SoapServices {
             e.printStackTrace();
             Log.e("Soap SocketTimeoutException", e.getMessage());
             throw  new SocketTimeoutException(context.getString(R.string.default_connect_error));
-        } catch (HttpResponseException e){
+        } catch (java.net.SocketException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketException", e.getMessage());
+            throw  new Exception(context.getString(R.string.default_connect_error));
+        }  catch (HttpResponseException e){
             e.printStackTrace();
             Log.e("Soap HttpResponseException",e.getMessage());
             throw new Exception(context.getString(R.string.default_soap_error));

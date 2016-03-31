@@ -89,6 +89,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnUsers.PASSWORD + " " + STRING_TYPE +
                     ")";
 
+    //TODO insert user script
+
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }

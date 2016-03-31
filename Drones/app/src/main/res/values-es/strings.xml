@@ -24,6 +24,8 @@
 
     <string name="password_login_error">Contraseña invalida</string>
     <string name="username_login_error">El campo es requerido</string>
+    <string name="default_user_unregister">Usuario no registrado</string>
+    <string name="default_incorrect_password">Contraseña incorrecta</string>
     <string name="default_ws_operation">El webservice no esta disponible.</string>
     <string name="default_login_error">El email y la contraseña no coinciden.</string>
     <string name="no_user_team_login_error">El usuario no tiene cuadrilla asignada.</string>
@@ -50,7 +52,6 @@
 
     <string name="default_attaching_img">Comprimiendo imágenes. Por favor espere…</string>
     <string name="default_update_task">Actualizando tarea. Por favor espere…</string>
-
 
 
 </resources>

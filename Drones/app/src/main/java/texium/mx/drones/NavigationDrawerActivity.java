@@ -35,6 +35,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -78,7 +81,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     //Principal Buttons//
-    private FloatingActionButton fab, chat_fab,camera_fab,video_fab;
+    private FloatingActionButton fab, chat_fab, camera_fab, video_fab;
 
     //Dynamic Header//
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
@@ -101,11 +104,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private static Users SESSION_DATA;
 
     //Collections Controls//
-    public Map<Long,Object> taskToken = new HashMap<>();
-    public static Map<Integer,FilesManager> TASK_FILE = new HashMap<>();
+    public Map<Long, Object> taskToken = new HashMap<>();
+    public static Map<Integer, FilesManager> TASK_FILE = new HashMap<>();
     public static Integer ACTUAL_POSITION;
 
     private ProgressDialog pDialog;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -115,15 +123,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        SESSION_DATA =  (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
+        SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setTitle(""); //Set activity tittle
 
-        TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(),R.id.drawer_layout);
-        AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC,td);
+        TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(), R.id.drawer_layout);
+        AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC, td);
         wsServerSync.execute();
 
         //Principal floatingButtons//
@@ -161,8 +169,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
         tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
         tasksDecode.setTask_status(Constants.ALL_TASK);
 
-        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_TASKS,tasksDecode);
+        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_TASKS, tasksDecode);
         wsAllTask.execute();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -176,7 +187,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         task_force_longitude = (TextView) headerLayout.findViewById(R.id.task_force_longitude);
 
         task_force_name.setText(SESSION_DATA.getTeamName());
-        task_element_name.setText(SESSION_DATA.getActorName().replace("-","\n"));
+        task_element_name.setText(SESSION_DATA.getActorName().replace("-", "\n"));
         task_force_location.setText("CIUDAD DE MÉXICO");
 
         getLocation();
@@ -205,7 +216,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
         } else {
-            Toast.makeText(this,getString(R.string.default_gps_error), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.default_gps_error), Toast.LENGTH_LONG).show();
             taskToken.clear();
             finish();
         }
@@ -224,10 +235,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         .setAction("Action", null).show();
                 break;
             case R.id.camera_fab:
-                mediaContent(MediaStore.ACTION_IMAGE_CAPTURE,CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                mediaContent(MediaStore.ACTION_IMAGE_CAPTURE, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.video_fab:
-                mediaContent(MediaStore.ACTION_VIDEO_CAPTURE,CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+                mediaContent(MediaStore.ACTION_VIDEO_CAPTURE, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
                 break;
             default:
                 Snackbar.make(v, "La opción no esta habilitada", Snackbar.LENGTH_LONG)
@@ -246,7 +257,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
         tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
 
-        AsyncCallWS wsLocation = new AsyncCallWS(type,tasksDecode);
+        AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
         wsLocation.execute();
     }
 
@@ -254,7 +265,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private void mediaContent(String mediaType, int requestType) {
         cameraIntent = new Intent(mediaType);
 
-        if(cameraIntent.resolveActivity(getPackageManager()) != null) {
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(cameraIntent, requestType);
         }
     }
@@ -262,7 +273,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
-    public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
+    public void taskActions(View v, TaskListAdapter taskListAdapter, Tasks task, TasksDecode tasksDecode) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -273,9 +284,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 imgGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(imgGalleryIntent, GALLERY_IMAGE_ACTIVITY_REQUEST_CODE);
 
-                Toast.makeText(this, getString(R.string.default_file_single_selection)+"\n"
+                Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
                         + getString(R.string.default_file_multiple_selection)
-                        ,Toast.LENGTH_LONG).show();
+                        , Toast.LENGTH_LONG).show();
 
                 ACTUAL_POSITION = tasksDecode.getTask_position();
 
@@ -286,9 +297,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 videoGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(videoGalleryIntent, GALLERY_VIDEO_ACTIVITY_REQUEST_CODE);
 
-                Toast.makeText(this, getString(R.string.default_file_single_selection)+"\n"
+                Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
                         + getString(R.string.default_file_multiple_selection)
-                        ,Toast.LENGTH_LONG).show();
+                        , Toast.LENGTH_LONG).show();
 
                 ACTUAL_POSITION = tasksDecode.getTask_position();
 
@@ -298,14 +309,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
                 tasksDecode.setTask_comment(getString(R.string.default_task_agree_msg));
                 tasksDecode.setOrigin_button(v.getId());
+                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
 
-                AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
                 wsAgree.execute();
 
                 break;
             case R.id.decline_task_button:
 
                 tasksDecode.setOrigin_button(v.getId());
+                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
                 setToken(v, taskListAdapter, task, tasksDecode);
 
                 closeActiveTaskFragment(v);
@@ -318,7 +331,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case R.id.finish_task_button:
 
                 tasksDecode.setOrigin_button(v.getId());
-                setToken(v,taskListAdapter,task,tasksDecode);
+                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                setToken(v, taskListAdapter, task, tasksDecode);
 
                 closeActiveTaskFragment(v);
 
@@ -331,19 +345,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 closeActiveTaskFragment(v);
 
                 tasksDecode.setTask_update_to((tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
+                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
 
-                AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK,task,tasksDecode);
+                AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
                 wsClose.execute();
                 break;
             default:
-                Snackbar.make(v, "Acción no registrada " , Snackbar.LENGTH_LONG)
+                Snackbar.make(v, "Acción no registrada ", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
         }
 
         if (taskListAdapter.getItemCount() == 0) {
             closeActiveTaskFragment(v);
-            Toast.makeText(this,getString(R.string.default_empty_task_list), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.default_empty_task_list), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -356,7 +371,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                     if (data.getClipData() != null) {
                         //select multiple file picture
-                        selectMultipleFile(data.getClipData(),requestCode);
+                        selectMultipleFile(data.getClipData(), requestCode);
                     } else if (data.getData() != null) {
                         //select unique file picture
                         selectUniqueFile(data.getData(), requestCode);
@@ -387,7 +402,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Image captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this,getString(R.string.default_save_img_msg), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.default_save_img_msg), Toast.LENGTH_LONG).show();
                 } else if (resultCode == RESULT_CANCELED) {
                     // User cancelled the image capture
                 } else {
@@ -397,7 +412,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Video captured and saved to fileUri specified in the Intent
-                    Toast.makeText(this,getString(R.string.default_save_video_msg), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.default_save_video_msg), Toast.LENGTH_LONG).show();
                 } else if (resultCode != RESULT_CANCELED) {
                     // Video capture failed, advise user
                 } else {
@@ -470,7 +485,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         TASK_FILE.put(ACTUAL_POSITION, taskFiles);
     }
-
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -633,8 +647,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_server_sync) {
-            TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(),id);
-            AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC,td);
+            TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(), id);
+            AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC, td);
             wsServerSync.execute();
             return true;
         }
@@ -656,18 +670,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public Map<Long,Object> getToken() {
+    public Map<Long, Object> getToken() {
         return taskToken;
     }
 
     @Override
-    public Map<Integer,FilesManager> getTaskFiles() {
+    public Map<Integer, FilesManager> getTaskFiles() {
         return TASK_FILE;
     }
 
 
-
-    public Map<Long,Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task,TasksDecode tasksDecode) {
+    public Map<Long, Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task, TasksDecode tasksDecode) {
 
         clearTaskToken();
 
@@ -712,10 +725,61 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLocationChanged(Location location) { getLocation(); }
-    @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
-    @Override public void onProviderEnabled(String provider) {}
-    @Override public void onProviderDisabled(String provider) {}
+    public void onLocationChanged(Location location) {
+        getLocation();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "NavigationDrawer Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://texium.mx.drones/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "NavigationDrawer Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://texium.mx.drones/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 
     //WEB SERVICE CLASS CALL//
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
@@ -735,7 +799,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             textError = "";
         }
 
-        private AsyncCallWS(Integer wsOperation,Tasks wsTask,TasksDecode wsServiceTaskDecode) {
+        private AsyncCallWS(Integer wsOperation, Tasks wsTask, TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceTask = wsTask;
             webServiceTaskDecode = wsServiceTaskDecode;
@@ -746,8 +810,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         protected void onPreExecute() {
             switch (webServiceOperation) {
                 case Constants.WS_KEY_UPDATE_TASK:
-                    case Constants.WS_KEY_UPDATE_TASK_FILE:
-                        case Constants.WS_KEY_SERVER_SYNC:
+                case Constants.WS_KEY_UPDATE_TASK_FILE:
+                case Constants.WS_KEY_SERVER_SYNC:
 
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
@@ -772,23 +836,25 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             Boolean validOperation = false;
 
-            try{
+            try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK:
-                        soapPrimitive = SoapServices.updateTask(getApplicationContext(),webServiceTask.getTask_id()
+                        soapPrimitive = SoapServices.updateTask(getApplicationContext(), webServiceTask.getTask_id()
                                 , webServiceTaskDecode.getTask_comment()
                                 , webServiceTaskDecode.getTask_update_to()
-                                , webServiceTask.getTask_user_id()
-                                ,webServiceTaskDecode.getSendFiles());
+                                , webServiceTaskDecode.getTask_user_id()
+                                , webServiceTaskDecode.getSendFiles());
                         validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
-                        soapPrimitive = SoapServices.sendFile(getApplicationContext(),webServiceTask.getTask_id()
+                        soapPrimitive = SoapServices.sendFile(getApplicationContext(), webServiceTask.getTask_id()
                                 , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendFiles());
                         validOperation = (soapPrimitive != null);
                         break;
-                    case Constants.WS_KEY_SEND_LOCATION: case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
-                        soapPrimitive = SoapServices.updateLocation(getApplicationContext(),webServiceTaskDecode.getTask_team_id()
+                    case Constants.WS_KEY_SEND_LOCATION:
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+                        soapPrimitive = SoapServices.updateLocation(getApplicationContext()
+                                , webServiceTaskDecode.getTask_team_id()
                                 , webServiceTaskDecode.getTask_latitude()
                                 , webServiceTaskDecode.getTask_longitude()
                                 , webServiceTaskDecode.getTask_user_id());
@@ -802,11 +868,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     case Constants.WS_KEY_SERVER_SYNC:
                         List<SyncTaskServer> NoSyncTasks = BDTasksManagerQuery.getAllSyncTaskServer(
                                 getApplicationContext()
-                                ,webServiceTaskDecode.getTask_user_id()
-                                ,Constants.SERVER_SYNC_FALSE);
+                                , webServiceTaskDecode.getTask_user_id()
+                                , Constants.SERVER_SYNC_FALSE);
 
-                        if (NoSyncTasks.size() == 0) validOperation = false;
-                        textError = (validOperation) ? "" : "Ninguna tarea sincronizada";
+                        if (NoSyncTasks.size() > 0) validOperation = true;
+                        textError = (validOperation) ? "" : NoSyncTasks.size() + " "
+                                + getString(R.string.default_no_synchronized_task);
 
                         for (SyncTaskServer syncTaskServer : NoSyncTasks) {
                             soapPrimitive = SoapServices.updateTask(getApplicationContext()
@@ -831,11 +898,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 validOperation = false;
 
                 e.printStackTrace();
-                Log.e("WebServiceException","Unknown error : " + e.getMessage());
+                Log.e("WebServiceException", "Unknown error : " + e.getMessage());
 
                 switch (webServiceOperation) {
-                    case Constants.WS_KEY_UPDATE_TASK: validOperation = true;
-                    break;
+                    case Constants.WS_KEY_UPDATE_TASK:
+                        validOperation = true;
+                        break;
 
                 }
 
@@ -850,9 +918,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(final Boolean success) {
 
-            if(success) {
+            if (success) {
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
+
+                if (webServiceTaskDecode.getOrigin_button() != null ) {
+                    if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
+                        pDialog.dismiss();
+                    }
+                }
 
                 switch (webServiceOperation) {
 
@@ -860,23 +937,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         removeAllFragment(fragmentManager);
 
-                        if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
-                                || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
-                                    || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
-                                        || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
-                            pDialog.dismiss();
-                        }
-
                         try {
-                            BDTasksManagerQuery.updateCommonTask(getApplicationContext(),webServiceTask.getTask_id()
+                            BDTasksManagerQuery.updateCommonTask(getApplicationContext(), webServiceTask.getTask_id()
                                     , webServiceTaskDecode.getTask_comment()
                                     , webServiceTaskDecode.getTask_update_to()
-                                    , webServiceTask.getTask_user_id()
+                                    , webServiceTaskDecode.getTask_user_id()
                                     , webServiceTaskDecode.getSendFiles()
                                     , textError.length() == 0); //if textError is > 0, update is not server sync
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.e("UpdateTaskException",e.getMessage());
+                            Log.e("UpdateTaskException", e.getMessage());
                         }
 
                         switch (webServiceTask.getTask_status()) {
@@ -925,7 +995,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                     case Constants.WS_KEY_ALL_TASKS:
 
-                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                        for (int i = 0; i < soapObject.getPropertyCount(); i++) {
                             Tasks t = new Tasks();
 
                             SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
@@ -945,11 +1015,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             try {
                                 Tasks tempTask = BDTasksManagerQuery.getTaskById(getApplicationContext(), t);
 
-                                if (tempTask.getTask_id() == null) BDTasksManagerQuery.addTask(getApplicationContext(), t);
+                                if (tempTask.getTask_id() == null)
+                                    BDTasksManagerQuery.addTask(getApplicationContext(), t);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Log.e("GeneralException","Unknown error : " + e.getMessage());
+                                Log.e("GeneralException", "Unknown error : " + e.getMessage());
                             }
                         }
                         break;
@@ -959,8 +1030,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 if (webServiceTaskDecode.getOrigin_button() != null) {
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
-                                || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
-                                    || (webServiceTaskDecode.getOrigin_button() ==  R.id.drawer_layout)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
                         pDialog.dismiss();
                     }
                 }
@@ -972,7 +1043,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
                         break;
-                    case Constants.WS_KEY_UPDATE_TASK_FILE: case Constants.WS_KEY_UPDATE_TASK:
+                    case Constants.WS_KEY_UPDATE_TASK_FILE:
+                    case Constants.WS_KEY_UPDATE_TASK:
                         tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
                         break;
@@ -984,7 +1056,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                     default:
                         Log.i("INFO ", "NO DISPLAY MESSAGE");
-                    break;
+                        break;
                 }
             }
         }

@@ -57,6 +57,7 @@
 
     <string name="server_sync">Sincronizando con el servidor</string>
     <string name="default_server_sync_error">Error intentando sincronizar con el servidor</string>
+    <string name="default_no_synchronized_task">Tareas Sincronizadas</string>
 
 
 </resources>

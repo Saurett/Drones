@@ -1,6 +1,7 @@
 package texium.mx.drones.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -50,6 +51,8 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
     static TaskListAdapter task_list_adapter;
     TaskListTitleAdapter task_list_title_adapter;
+
+    private ProgressDialog pDialog;
 
 
     @Override
@@ -124,6 +127,11 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
 
         @Override
         protected void onPreExecute() {
+            pDialog = new ProgressDialog(getContext());
+            pDialog.setMessage(getString(R.string.tasks_loading));
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
         }
 
         @Override
@@ -171,58 +179,63 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
         @Override
         protected void onPostExecute(final Boolean success) {
 
-            pendingTask = new ArrayList<>();
-            if(success) {
+            try {
+                pendingTask = new ArrayList<>();
+                pDialog.dismiss();
+                if(success) {
 
-                if (tempTaskList.size() == 0) {
-                    for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
-                        Tasks t = new Tasks();
+                    if (tempTaskList.size() == 0) {
+                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                            Tasks t = new Tasks();
 
-                        SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                        SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                            SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
 
-                        t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                        t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
-                        t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                        t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                        t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                        t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                        t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                        t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                        t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                        t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                            t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                            t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                            t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                            t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                            t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                            t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                            t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                            t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                            t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                            t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
 
-                        pendingTask.add(t);
+                            pendingTask.add(t);
 
-                        try {
-                            Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
+                            try {
+                                Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
-                            if (tempTask.getTask_id() == null) {
-                                BDTasksManagerQuery.addTask(getContext(), t);
-                            } else if (tempTask.getTask_status() != t.getTask_status()) pendingTask.remove(t);
+                                if (tempTask.getTask_id() == null) {
+                                    BDTasksManagerQuery.addTask(getContext(), t);
+                                } else if (tempTask.getTask_status() != t.getTask_status()) pendingTask.remove(t);
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Log.e("PendingTasksException: ", "Unknown error: "+ e.getMessage());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.e("PendingTasksException: ", "Unknown error: "+ e.getMessage());
+                            }
                         }
-                    }
-                } else pendingTask.addAll(tempTaskList);
+                    } else pendingTask.addAll(tempTaskList);
 
-                task_list_adapter.addAll(pendingTask);
-                task_list_title_adapter.addAll(pendingTaskTitle);
+                    task_list_adapter.addAll(pendingTask);
+                    task_list_title_adapter.addAll(pendingTaskTitle);
 
-                tasks_list.setAdapter(task_list_adapter);
-                tasks_list_tittle.setAdapter(task_list_title_adapter);
+                    tasks_list.setAdapter(task_list_adapter);
+                    tasks_list_tittle.setAdapter(task_list_title_adapter);
 
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-                tasks_list.setLayoutManager(linearLayoutManager);
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                    tasks_list.setLayoutManager(linearLayoutManager);
 
-                LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
-                tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+                    LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
+                    tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
 
-            } else {
-                String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
-                Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
+                } else {
+                    String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                    Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             activityListener.addTasksListMarkers(pendingTask);

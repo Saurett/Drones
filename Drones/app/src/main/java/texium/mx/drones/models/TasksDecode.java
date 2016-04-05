@@ -23,6 +23,11 @@ public class TasksDecode {
         sendFiles = new ArrayList<>();
     }
 
+    public TasksDecode(Integer tk_user_id, Integer tk_origin_button) {
+        task_user_id = tk_user_id;
+        origin_button = tk_origin_button;
+    }
+
     public Integer getTask_update_to() {
         return task_update_to;
     }

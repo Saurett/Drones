@@ -19,6 +19,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_server_sync">Server synchronized</string>
     <string name="title_activity_maps">Map</string>
 
     <string name="password_login_error">This password is invalid</string>
@@ -51,7 +52,10 @@
 
     <string name="default_attaching_img">Attaching images. Please wait…</string>
     <string name="default_update_task">Update task. Please wait…</string>
+    <string name="tasks_loading">Tasks Loading…</string>
 
+    <string name="server_sync">Server Synchronized</string>
+    <string name="default_server_sync_error">Server Synchronized Error</string>
 
 
 </resources>

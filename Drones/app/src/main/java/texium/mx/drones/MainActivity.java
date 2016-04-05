@@ -176,11 +176,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         localAccess = (tempUser.getIdUser() != null);
                         textError = (tempUser.getIdUser() != null) ? "" : getString(R.string.default_user_unregister);
 
+                        Log.i("INFO MSG", textError);
+
                         if (!validOperation) return validOperation;
 
                         //Check validOperation with the user password
                         validOperation = (password.equals(tempUser.getPassword()));
                         textError = (validOperation) ? textError : getString(R.string.default_incorrect_password);
+
+                        Log.i("INFO MSG", textError);
 
                     } catch (Exception ex) {
                         textError = ex.getMessage();
@@ -287,8 +291,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
 
                                 if (tempUser.getIdUser() == null) BDTasksManagerQuery.addUser(getApplicationContext(), user);
-
-                                //TODO Si ya existe el usuario, actualizarlo
+                                if (tempUser.getIdUser() != null) BDTasksManagerQuery.updateUser(getApplicationContext(), user);
 
                             } catch (Exception ex) {
                                 ex.printStackTrace();

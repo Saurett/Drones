@@ -20,6 +20,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Configuraciones</string>
+    <string name="action_server_sync">Sincronizar</string>
     <string name="title_activity_maps">Mapas</string>
 
     <string name="password_login_error">Contraseña invalida</string>
@@ -52,6 +53,10 @@
 
     <string name="default_attaching_img">Comprimiendo imágenes. Por favor espere…</string>
     <string name="default_update_task">Actualizando tarea. Por favor espere…</string>
+    <string name="tasks_loading">Buscando Tareas…</string>
+
+    <string name="server_sync">Sincronizando con el servidor</string>
+    <string name="default_server_sync_error">Error intentando sincronizar con el servidor</string>
 
 
 </resources>

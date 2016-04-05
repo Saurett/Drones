@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -53,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.FinishTasksFragment;
@@ -63,6 +63,7 @@ import texium.mx.drones.fragments.ProgressTasksFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
@@ -112,12 +113,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         SESSION_DATA =  (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setTitle(""); //Set activity tittle
+
+        TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(),R.id.drawer_layout);
+        AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC,td);
+        wsServerSync.execute();
 
         //Principal floatingButtons//
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -234,7 +241,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
 
         SESSION_DATA.getLatitude();
-
 
         tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
         tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
@@ -516,6 +522,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
+
             taskToken.clear();
             finish();
         }
@@ -625,7 +632,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_server_sync) {
+            TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(),id);
+            AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC,td);
+            wsServerSync.execute();
             return true;
         }
 
@@ -735,13 +745,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             switch (webServiceOperation) {
-                case Constants.WS_KEY_UPDATE_TASK: case Constants.WS_KEY_UPDATE_TASK_FILE:
-
+                case Constants.WS_KEY_UPDATE_TASK:
+                    case Constants.WS_KEY_UPDATE_TASK_FILE:
+                        case Constants.WS_KEY_SERVER_SYNC:
 
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
                         pDialog = new ProgressDialog(NavigationDrawerActivity.this);
                         pDialog.setMessage(getString(R.string.default_update_task));
+                        pDialog.setIndeterminate(false);
+                        pDialog.setCancelable(false);
+                        pDialog.show();
+                    } else if ((webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
+                        pDialog = new ProgressDialog(NavigationDrawerActivity.this);
+                        pDialog.setMessage(getString(R.string.server_sync));
                         pDialog.setIndeterminate(false);
                         pDialog.setCancelable(false);
                         pDialog.show();
@@ -781,8 +799,30 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getTask_status());
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
-                    default:
+                    case Constants.WS_KEY_SERVER_SYNC:
+                        List<SyncTaskServer> NoSyncTasks = BDTasksManagerQuery.getAllSyncTaskServer(
+                                getApplicationContext()
+                                ,webServiceTaskDecode.getTask_user_id()
+                                ,Constants.SERVER_SYNC_FALSE);
 
+                        if (NoSyncTasks.size() == 0) validOperation = false;
+                        textError = (validOperation) ? "" : "Ninguna tarea sincronizada";
+
+                        for (SyncTaskServer syncTaskServer : NoSyncTasks) {
+                            soapPrimitive = SoapServices.updateTask(getApplicationContext()
+                                    , syncTaskServer.getTask_id()
+                                    , syncTaskServer.getTask_comment()
+                                    , syncTaskServer.getTask_status()
+                                    , syncTaskServer.getTask_user_id()
+                                    , syncTaskServer.getSendFiles());
+                            validOperation = (soapPrimitive != null);
+
+                            BDTasksManagerQuery.updateTaskDetail(getApplicationContext()
+                                    , syncTaskServer.getTask_detail_cve()
+                                    , Constants.SERVER_SYNC_TRUE);
+                        }
+                        break;
+                    default:
                         break;
                 }
             } catch (ConnectException e) {
@@ -821,7 +861,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         removeAllFragment(fragmentManager);
 
                         if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
-                                || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                                || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
+                                    || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
+                                        || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
                             pDialog.dismiss();
                         }
 
@@ -831,7 +873,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , webServiceTaskDecode.getTask_update_to()
                                     , webServiceTask.getTask_user_id()
                                     , webServiceTaskDecode.getSendFiles()
-                                    , textError.length() == 0);
+                                    , textError.length() == 0); //if textError is > 0, update is not server sync
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("UpdateTaskException",e.getMessage());
@@ -916,7 +958,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 if (webServiceTaskDecode.getOrigin_button() != null) {
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
-                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
+                                || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
+                                    || (webServiceTaskDecode.getOrigin_button() ==  R.id.drawer_layout)) {
                         pDialog.dismiss();
                     }
                 }
@@ -925,20 +969,22 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 switch (webServiceOperation) {
 
                     case Constants.WS_KEY_SEND_LOCATION:
-
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
                         break;
-
-                        case Constants.WS_KEY_UPDATE_TASK_FILE:
-                            case Constants.WS_KEY_UPDATE_TASK:
-
-                                tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
-                                Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
-                                break;
+                    case Constants.WS_KEY_UPDATE_TASK_FILE: case Constants.WS_KEY_UPDATE_TASK:
+                        tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                        Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+                        break;
+                    case Constants.WS_KEY_SERVER_SYNC:
+                        if (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync) {
+                            tempText = (textError.isEmpty() ? getString(R.string.default_server_sync_error) : textError);
+                            Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+                        }
+                        break;
                     default:
                         Log.i("INFO ", "NO DISPLAY MESSAGE");
-                        break;
+                    break;
                 }
             }
         }

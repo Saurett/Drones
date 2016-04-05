@@ -13,18 +13,13 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static final String TASK_DETAILS_TABLE_NAME = "Task_Details";
     public static final String TASKS_TABLE_NAME = "Tasks";
     public static final String USERS_TABLE_NAME = "Users";
+    public static final String TASKS_FILES_TABLE_NAME = "Tasks_Files";
 
     public static final String STRING_TYPE = "text";
     public static final String INT_TYPE = "integer";
     public static final String BLOB_TYPE = "blob";
     public static final String REAL_TYPE = "real";
     public static final String NUMERIC_TYPE = "numeric";
-
-    public static class ColumnTaskDetails {
-        public static final String TASK_DETAIL_CVE = "cve_task_detail";
-        public static final String TASK_ID = "task_id";
-        public static final String TASK_STATUS = "task_status";
-    }
 
     public static class ColumnTasks {
         public static final String TASK_CVE = "task_cve";
@@ -57,13 +52,28 @@ public class BDTasksManager extends SQLiteOpenHelper {
 
     }
 
+    public static class ColumnTaskDetails {
+        public static final String TASK_DETAIL_CVE = "task_detail_cve";
+        public static final String TASK_ID = "task_id";
+        public static final String TASK_STATUS = "task_status";
+        public static final String TASK_USER_ID = "task_user_id";
+        public static final String SERVER_SYNC = "server_sync";
+        public static final String TASK_COMMENT = "task_comment";
+    }
+
+    public static class ColumnTasksFiles {
+        public static final String TASK_FILE_CVE = "task_file_cve";
+        public static final String TASK_DETAIL_CVE = "task_detail_cve";
+        public static final String BASE_FILE = "base_file";
+    }
+
     public static final String CREATE_TASKS_TABLE_SCRIPT =
             "create table " + TASKS_TABLE_NAME + "(" +
                     ColumnTasks.TASK_CVE + " " + INT_TYPE + " primary key autoincrement," +
                     ColumnTasks.TASK_TITLE + " " + STRING_TYPE + "," +
                     ColumnTasks.TASK_CONTENT + " " + STRING_TYPE + "," +
                     ColumnTasks.TASK_PRIORITY + " " + INT_TYPE + "," +
-                    ColumnTasks.TASK_BEGIN_DATE + " " + STRING_TYPE + "," +
+                    ColumnTasks.TASK_BEGIN_DATE + " " + STRING_TYPE     + "," +
                     ColumnTasks.TASK_END_DATE + " " + STRING_TYPE + "," +
                     ColumnTasks.TASK_ID + " " + INT_TYPE + "," +
                     ColumnTasks.TASK_LATITUDE + " " + REAL_TYPE + "," +
@@ -89,7 +99,24 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnUsers.PASSWORD + " " + STRING_TYPE +
                     ")";
 
-    //TODO insert user script
+    public static final String CREATE_TASKS_FILES_TABLE_SCRIPT =
+            "create table " + TASKS_FILES_TABLE_NAME + "(" +
+                    ColumnTasksFiles.TASK_FILE_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnTasksFiles.TASK_DETAIL_CVE + " " + INT_TYPE + "," +
+                    ColumnTasksFiles.BASE_FILE + " " + STRING_TYPE +
+            ")";
+
+    public static final  String CREATE_TASK_DETAILS_TABLE_SCRIPT =
+            "create table " + TASK_DETAILS_TABLE_NAME + "(" +
+                    ColumnTaskDetails.TASK_DETAIL_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnTaskDetails.TASK_ID + " " + INT_TYPE  + "," +
+                    ColumnTaskDetails.TASK_STATUS + " " + INT_TYPE + "," +
+                    ColumnTaskDetails.TASK_USER_ID + " " + INT_TYPE + "," +
+                    ColumnTaskDetails.SERVER_SYNC + " " + INT_TYPE + "," +
+                    ColumnTaskDetails.TASK_COMMENT + " " + STRING_TYPE + " " +
+            ")";
+
+    //TODO insert user script for backdoor?
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -105,10 +132,14 @@ public class BDTasksManager extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS Tasks");
-        db.execSQL("DROP TABLE IF EXISTS Users");
+        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.TASKS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.USERS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.TASK_DETAILS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.TASKS_FILES_TABLE_NAME);
 
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);
+        db.execSQL(CREATE_TASK_DETAILS_TABLE_SCRIPT);
+        db.execSQL(CREATE_TASKS_FILES_TABLE_SCRIPT);
     }
 }

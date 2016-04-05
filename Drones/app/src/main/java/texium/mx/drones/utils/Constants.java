@@ -16,6 +16,8 @@ public final class Constants {
 
     //region SYS CONSTANTS//
     public static final String NUMBER_ZERO = "0";
+    public static final Integer SERVER_SYNC_FALSE = 0;
+    public static final Integer SERVER_SYNC_TRUE = 1;
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -65,6 +67,7 @@ public final class Constants {
     public static final int WS_KEY_TASK_SERVICE_CLOSE = 13;
     public static final int WS_KEY_ALL_TASKS = 14;
     public static final int WS_KEY_ALL_USERS = 15;
+    public static final int WS_KEY_SERVER_SYNC = 16;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -91,8 +94,8 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
-    public static final String WEB_SERVICE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    //public static final String WEB_SERVICE_URL = "http://192.168.1.98/ServicioWeb/Servicio_Android.asmx";
+    //public static final String WEB_SERVICE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
     //endregion SOAP CONFIGURATION//
 
     //region SOAP OPERATION//
@@ -154,7 +157,6 @@ public final class Constants {
     //region ACTIVITY PARAMS//
     public static final String ACTIVITY_EXTRA_PARAMS_LOGIN = "data";
     //endregion ACTIVITY PARAMS//
-
 
     //region ACCESS TO MAP TASK PRIORITY//
     public static final Integer TASK_PRIORITY_LOW_ID = 1;

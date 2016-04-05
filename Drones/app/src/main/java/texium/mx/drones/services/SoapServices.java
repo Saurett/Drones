@@ -153,9 +153,6 @@ public class SoapServices {
                 Log.e("Soap Exception", "FalseNullPointer");
                 throw  new ConnectException(context.getString(R.string.default_connect_error));
             }
-
-
-
         }
 
         return soapObject;

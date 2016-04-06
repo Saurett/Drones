@@ -21,6 +21,10 @@ public class Tasks {
 
     }
 
+    public Tasks(Integer tTaskStatus) {
+        task_status = tTaskStatus;
+    }
+
     public Integer getTask_cve() {
         return task_cve;
     }

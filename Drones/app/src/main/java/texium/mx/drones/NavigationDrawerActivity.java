@@ -872,22 +872,28 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , Constants.SERVER_SYNC_FALSE);
 
                         if (NoSyncTasks.size() > 0) validOperation = true;
-                        textError = (validOperation) ? "" : NoSyncTasks.size() + " "
-                                + getString(R.string.default_no_synchronized_task);
 
+                        Integer numSync = 0;
                         for (SyncTaskServer syncTaskServer : NoSyncTasks) {
+
                             soapPrimitive = SoapServices.updateTask(getApplicationContext()
                                     , syncTaskServer.getTask_id()
                                     , syncTaskServer.getTask_comment()
                                     , syncTaskServer.getTask_status()
                                     , syncTaskServer.getTask_user_id()
                                     , syncTaskServer.getSendFiles());
+
                             validOperation = (soapPrimitive != null);
+
+                            numSync = (validOperation) ? numSync + 1 : numSync;
 
                             BDTasksManagerQuery.updateTaskDetail(getApplicationContext()
                                     , syncTaskServer.getTask_detail_cve()
                                     , Constants.SERVER_SYNC_TRUE);
                         }
+
+                        textError = numSync + " " + getString(R.string.default_no_synchronized_task);
+
                         break;
                     default:
                         break;
@@ -1023,6 +1029,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 Log.e("GeneralException", "Unknown error : " + e.getMessage());
                             }
                         }
+                        break;
+                    case Constants.WS_KEY_SERVER_SYNC:
+                        Toast.makeText(NavigationDrawerActivity.this, textError, Toast.LENGTH_LONG).show();
+                        break;
+                    default:
                         break;
                 }
             } else {

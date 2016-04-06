@@ -145,6 +145,13 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
 
                         soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
+
+                        if (!validOperation) {
+                            Tasks t = new Tasks(idStatus);
+                            tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                            if (tempTaskList.size() > 0) validOperation = true;
+                        }
+
                         break;
                 }
             } catch (ConnectException e) {
@@ -152,8 +159,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                 textError = e.getMessage();
                 validOperation = false;
 
-                Tasks t = new Tasks();
-                t.setTask_status(idStatus);
+                Tasks t = new Tasks(idStatus);
 
                 try {
                     tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
@@ -207,28 +213,61 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                             try {
                                 Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
-                                if (tempTask.getTask_id() == null) {
-                                    BDTasksManagerQuery.addTask(getContext(), t);
-                                } else if (tempTask.getTask_status() != t.getTask_status()) closeTask.remove(t);
+                                Integer tempTaskStatus = (tempTask.getTask_id() != null)
+                                        ? tempTask.getTask_status() : Constants.INACTIVE;
+
+                                switch (tempTaskStatus) {
+                                    case Constants.INACTIVE:
+                                        BDTasksManagerQuery.addTask(getContext(), t);
+                                        break;
+                                    case Constants.NEWS_TASK:
+                                        case Constants.PROGRESS_TASK:
+                                            case Constants.PENDING_TASK:
+                                                closeTask.remove(t);
+                                        break;
+                                    default:
+                                        Log.i("CloseTasks","No remove task");
+                                        break;
+                                }
 
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 Log.e("CloseTasksException: ", "Unknown error: " +  e.getMessage());
                             }
                         }
+
+                        Tasks t = new Tasks(idStatus);
+                        tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+
+                        for (Tasks tempTask : tempTaskList) {
+                            Boolean contain = false;
+
+                            for (Tasks actualTask : closeTask) {
+                                contain = (actualTask.getTask_id()
+                                        == tempTask.getTask_id());
+                                if (contain) break;
+                            }
+
+                            if (!contain) closeTask.add(tempTask);
+                        }
+
                     } else closeTask.addAll(tempTaskList);
 
-                    task_list_adapter.addAll(closeTask);
-                    task_list_title_adapter.addAll(closeTaskTitle);
+                    if (closeTask.size() > 0) {
+                        task_list_adapter.addAll(closeTask);
+                        task_list_title_adapter.addAll(closeTaskTitle);
 
-                    tasks_list.setAdapter(task_list_adapter);
-                    tasks_list_tittle.setAdapter(task_list_title_adapter);
+                        tasks_list.setAdapter(task_list_adapter);
+                        tasks_list_tittle.setAdapter(task_list_title_adapter);
 
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-                    tasks_list.setLayoutManager(linearLayoutManager);
+                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                        tasks_list.setLayoutManager(linearLayoutManager);
 
-                    LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
-                    tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+                        LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
+                        tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.default_empty_task_list), Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
                     Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();

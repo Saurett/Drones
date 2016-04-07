@@ -20,7 +20,7 @@ import texium.mx.drones.utils.Constants;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 16;
+    static Integer BDVersion = 17;
 
     public static void addTask(Context context, Tasks t) throws Exception {
         try{

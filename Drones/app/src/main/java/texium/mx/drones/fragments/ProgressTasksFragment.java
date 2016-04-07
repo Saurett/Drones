@@ -242,8 +242,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                             Boolean contain = false;
 
                             for (Tasks actualTask : progressTask) {
-                                contain = (actualTask.getTask_id()
-                                        == tempTask.getTask_id());
+                                contain = (actualTask.getTask_id().equals(tempTask.getTask_id()));
                                 if (contain) break;
                             }
 

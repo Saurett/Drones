@@ -533,6 +533,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             taskToken.clear();
 
+        } else if (id == R.id.restore_device) {
+
         } else if (id == R.id.nav_logout) {
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
@@ -839,6 +841,32 @@ public class NavigationDrawerActivity extends AppCompatActivity
             try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK:
+                        List<SyncTaskServer> NoSyncTasksActual = BDTasksManagerQuery.getAllSyncTaskServer(
+                                getApplicationContext()
+                                , webServiceTaskDecode.getTask_user_id()
+                                , Constants.SERVER_SYNC_FALSE);
+
+                        if (NoSyncTasksActual.size() > 0) validOperation = true;
+
+                        for (SyncTaskServer syncTaskServer : NoSyncTasksActual) {
+
+                            soapPrimitive = SoapServices.updateTask(getApplicationContext()
+                                    , syncTaskServer.getTask_id()
+                                    , syncTaskServer.getTask_comment()
+                                    , syncTaskServer.getTask_status()
+                                    , syncTaskServer.getTask_user_id()
+                                    , syncTaskServer.getSendFiles());
+
+                            validOperation = (soapPrimitive != null);
+
+                            BDTasksManagerQuery.updateTaskDetail(getApplicationContext()
+                                    , syncTaskServer.getTask_detail_cve()
+                                    , Constants.SERVER_SYNC_TRUE);
+
+                            Log.i("Sync Task", "task_id " + syncTaskServer.getTask_id()
+                                    + " comment " + syncTaskServer.getTask_comment());
+                        }
+
                         soapPrimitive = SoapServices.updateTask(getApplicationContext(), webServiceTask.getTask_id()
                                 , webServiceTaskDecode.getTask_comment()
                                 , webServiceTaskDecode.getTask_update_to()
@@ -890,6 +918,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             BDTasksManagerQuery.updateTaskDetail(getApplicationContext()
                                     , syncTaskServer.getTask_detail_cve()
                                     , Constants.SERVER_SYNC_TRUE);
+
+                            Log.i("Sync Task", "task_id " + syncTaskServer.getTask_id()
+                                    + " comment " + syncTaskServer.getTask_comment());
                         }
 
                         textError = numSync + " " + getString(R.string.default_no_synchronized_task);
@@ -1051,6 +1082,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 switch (webServiceOperation) {
 
                     case Constants.WS_KEY_SEND_LOCATION:
+                        onMapReady(mMap);
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
                         break;

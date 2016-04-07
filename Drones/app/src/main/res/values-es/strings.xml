@@ -3,7 +3,7 @@
     <string name="title_activity_main">CIVAR II</string>
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
 
-    <string name="app_bar_navigation_name">SISTEMA DE MONITOREO DE RESERVAS NATURALES DEL DISTRITO FEDERAL</string>
+    <string name="app_bar_navigation_name">CUADRILLAS DE INSPECCCIÓN</string>
 
     <string name="task_validity_label">VIGENCIA</string>
     <string name="task_priority_label">PRIORIDAD</string>

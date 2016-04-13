@@ -9,6 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
+import texium.mx.drones.models.FilesManager;
 
 /**
  * Created by texiumuser on 11/03/2016.
@@ -51,15 +53,15 @@ public class FileServices {
         return stringsPicture;
     }
 
-    public static List<String> attachVideo(Activity activity, List<Uri> uriFileVideo) throws Exception {
-        List<String> stringsVideo = new ArrayList<>();
+    public static List<FilesManager> attachVideo(Activity activity, List<Uri> uriFileVideo) throws Exception {
+        List<FilesManager> encodeVideos = new ArrayList<>();
 
         Context context = activity.getApplicationContext();
         try {
 
             for (Uri uri : uriFileVideo) {
 
-                String videoEncoded = "";
+                FilesManager encodeVideo = new FilesManager();
 
                 InputStream is = activity.getContentResolver().openInputStream(uri);
 
@@ -75,33 +77,35 @@ public class FileServices {
                     byteBuffer.write(buffer, 0, len);
                 }
                 // and then we can return your byte array.
-                videoEncoded += getPackageBase64(context, byteBuffer.toByteArray());
+                encodeVideo =  getPackageBase64(context, byteBuffer.toByteArray());
 
-                stringsVideo.add(videoEncoded);
+                encodeVideos.add(encodeVideo);
             }
 
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
             Log.e("OutOfMemoryVideo Exception",e.getMessage());
-            throw  new Exception("Memoria insuficiente");
+            throw  new Exception(context.getString(R.string.default_out_of_memory));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("AttachVideo Exception", e.getMessage());
             throw new Exception(context.getString(R.string.default_attaching_video_error));
         }
 
-        return stringsVideo;
+        return encodeVideos;
     }
 
-    public static String getPackageBase64(Context context, byte[] dataPackage) throws Exception {
+    public static FilesManager getPackageBase64(Context context, byte[] dataPackage) throws Exception {
 
-        String data = new String();
+        FilesManager data = new FilesManager();
+
         int minBitPackage = 100000;
-        int maxBitPackage = 150000;
-        //int midBitPackage = 1000000;
+        int maxBitPackage = 2500000;
+
+        List<String> fmEncodeVideo = new ArrayList<>();
 
         try {
-            int  packSize = dataPackage.length;
+            int packSize = dataPackage.length;
             int pack = (packSize > maxBitPackage) ? maxBitPackage : minBitPackage;
             int packNumbers = packSize / pack;
             int packSpecial = packSize - (packNumbers * pack);
@@ -112,8 +116,9 @@ public class FileServices {
 
             for (int i = 0; i <= packNumbers;) {
 
-                String tempData = new String();
+                String tempData = "";
 
+                //Only the last iteration
                 if ((i == packNumbers) && (specialItem)) {
 
                     tempData = Base64.encodeToString(Arrays.copyOfRange(dataPackage, starCount
@@ -129,12 +134,17 @@ public class FileServices {
 
                 i++;
 
-                data = data + tempData;
+                fmEncodeVideo.add(tempData);
+
             }
+
+            data.setEncodeVideoFiles(fmEncodeVideo);
+
+
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
             Log.e("OutOfMemoryVideo Exception",e.getMessage());
-            throw  new OutOfMemoryError("Memoria insuficiente" + e);
+            throw  new OutOfMemoryError(context.getString(R.string.default_out_of_memory) + e);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("PackingVideo Exception",e.getMessage());
@@ -162,7 +172,7 @@ public class FileServices {
 
             for (int i = 0; i <= packNumbers;) {
 
-                String tempData = new String();
+                String tempData = "";
 
                 if ((i == packNumbers) && (specialItem)) {
 

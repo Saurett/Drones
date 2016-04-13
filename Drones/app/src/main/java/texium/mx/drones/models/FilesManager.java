@@ -22,9 +22,8 @@ public class FilesManager {
         encodeVideoFiles = new ArrayList<>();
     }
 
-    public FilesManager(List<String> fmEncodePictureFiles, List<String> fmEncodeVideoFiles) {
+    public FilesManager(List<String> fmEncodePictureFiles) {
         encodePictureFiles = fmEncodePictureFiles;
-        encodeVideoFiles = fmEncodeVideoFiles;
     }
 
     public List<Uri> getFilesPicture() {

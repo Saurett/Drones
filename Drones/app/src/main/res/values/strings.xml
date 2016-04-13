@@ -62,6 +62,7 @@
     <string name="cancel_restore_label">cancel</string>
     <string name="default_restore_window_title">¿Do you want to restore server tasks?</string>
     <string name="default_restore_window_content">Restoration tasks erase stored locally.</string>
+    <string name="default_out_of_memory">Memoria insuficiente</string>
 
 
 </resources>

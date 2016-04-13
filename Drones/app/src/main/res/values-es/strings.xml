@@ -63,6 +63,7 @@
     <string name="cancel_restore_label">Cancelar</string>
     <string name="default_restore_window_title">¿Quieres restaurar las tareas?</string>
     <string name="default_restore_window_content">La restauración borrara las tareas almacenadas localmente.</string>
+    <string name="default_out_of_memory">Memoria insuficiente. Comprima su archivo o consulte con su administrador.</string>
 
 
 </resources>

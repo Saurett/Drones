@@ -18,7 +18,7 @@ public class TasksDecode {
     private Integer task_team_id;
     private Integer origin_button;
     private List<String> sendImgFiles;
-    private List<String> sendVideoFiles;
+    private List<FilesManager> sendVideoFiles;
 
     public TasksDecode() {
         sendImgFiles = new ArrayList<>();
@@ -110,11 +110,11 @@ public class TasksDecode {
         this.sendImgFiles = sendImgFiles;
     }
 
-    public List<String> getSendVideoFiles() {
+    public List<FilesManager> getSendVideoFiles() {
         return sendVideoFiles;
     }
 
-    public void setSendVideoFiles(List<String> sendVideoFiles) {
+    public void setSendVideoFiles(List<FilesManager> sendVideoFiles) {
         this.sendVideoFiles = sendVideoFiles;
     }
 }

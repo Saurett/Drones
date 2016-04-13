@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -889,24 +890,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getSendImgFiles());
                         validOperation = (soapPrimitive != null);
 
-                        for (String encodedVideoFile : webServiceTaskDecode.getSendVideoFiles()) {
+                        for (FilesManager encodedVideoFile : webServiceTaskDecode.getSendVideoFiles()) {
 
-                            List<String> packageList = FileServices.getPackageList(getApplicationContext(),encodedVideoFile);
+                            //List<String> packageList = FileServices.getPackageList(getApplicationContext(),encodedVideoFile);
+                            List<String> packageList= encodedVideoFile.getEncodeVideoFiles();
 
                             int totalPack = packageList.size();
                             int numItem = 1;
 
-                            try {
-                                SoapServices.updateVideoFiles(getApplicationContext()
-                                        , webServiceTask.getTask_id()
-                                        , webServiceTaskDecode.getTask_user_id()
-                                        , packageList);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
-                            }
-
-                            /*for (String tempPack : packageList) {
+                            for (String tempPack : packageList) {
 
                                try {
                                    SoapServices.updateVideoFiles(getApplicationContext()
@@ -919,7 +911,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                                 numItem++;
                             }
-                            */
                         }
 
                         break;
@@ -1025,8 +1016,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         try {
 
-                            FilesManager filesManager = new FilesManager(webServiceTaskDecode.getSendImgFiles()
-                                    , webServiceTaskDecode.getSendVideoFiles());
+                            FilesManager filesManager = new FilesManager(webServiceTaskDecode.getSendImgFiles());
 
                             BDTasksManagerQuery.updateCommonTask(getApplicationContext(), webServiceTask.getTask_id()
                                     , webServiceTaskDecode.getTask_comment()

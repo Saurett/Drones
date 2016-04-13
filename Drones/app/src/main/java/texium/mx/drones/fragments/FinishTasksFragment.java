@@ -294,8 +294,9 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 List<Uri> uriFilesPicture = sendFile.getFilesPicture();
                 List<Uri> uriFileVideo = sendFile.getFilesVideo();
 
-                tasksDecode.setSendImgFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
                 tasksDecode.setSendVideoFiles(FileServices.attachVideo(getActivity(), uriFileVideo));
+                tasksDecode.setSendImgFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
+
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.CloseTasksFragment;
@@ -893,7 +894,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         for (FilesManager encodedVideoFile : webServiceTaskDecode.getSendVideoFiles()) {
 
                             //List<String> packageList = FileServices.getPackageList(getApplicationContext(),encodedVideoFile);
-                            List<String> packageList= encodedVideoFile.getEncodeVideoFiles();
+                            //List<String> packageList= encodedVideoFile.getEncodeVideoFiles();
+                            List<String> packageList = BDTasksManagerQuery.getVideoFiles(getApplicationContext(),1001);
 
                             int totalPack = packageList.size();
                             int numItem = 1;

@@ -18,7 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.utils.Constants;
 
 /**
  * Created by texiumuser on 11/03/2016.
@@ -77,7 +79,7 @@ public class FileServices {
                     byteBuffer.write(buffer, 0, len);
                 }
                 // and then we can return your byte array.
-                encodeVideo =  getPackageBase64(context, byteBuffer.toByteArray());
+                encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
 
                 encodeVideos.add(encodeVideo);
             }
@@ -100,7 +102,7 @@ public class FileServices {
         FilesManager data = new FilesManager();
 
         int minBitPackage = 100000;
-        int maxBitPackage = 2500000;
+        int maxBitPackage = 1000000;
 
         List<String> fmEncodeVideo = new ArrayList<>();
 
@@ -134,7 +136,7 @@ public class FileServices {
 
                 i++;
 
-                fmEncodeVideo.add(tempData);
+                BDTasksManagerQuery.addTaskFiles(context,1002,tempData, Constants.VIDEO_FILE_TYPE);
 
             }
 

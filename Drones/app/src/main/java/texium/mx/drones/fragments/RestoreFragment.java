@@ -3,11 +3,9 @@ package texium.mx.drones.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,20 +15,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
-import texium.mx.drones.services.FileServices;
+import texium.mx.drones.models.Users;
+import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -38,81 +38,42 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
 
     static FragmentTaskListener activityListener;
 
-    private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
-    private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
-    private ImageView task_window_icon;
+    private static Button agree_restore_button, cancel_restore_button, close_restore_window_button;
+    private ImageView restore_window_icon;
 
-    static Map<Long,Object> taskToken = new HashMap<>();
-
-    static private int _ACTUAL_POSITION;
-    static private int _ACTUAL_COUNT;
-
-    static Map<Integer,FilesManager> TASK_FILES = new HashMap<>();
-
+    private static Users SESSION_DATA;
     private ProgressDialog pDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_finish_tasks, container, false);
+        View view = inflater.inflate(R.layout.fragment_restore, container, false);
 
-        close_window_button = (Button) view.findViewById(R.id.close_window_button);
-        send_task_button = (Button) view.findViewById(R.id.send_task_button);
-        next_task_button = (Button) view.findViewById(R.id.next_task_button);
-        back_task_button = (Button) view.findViewById(R.id.back_task_button);
-        picture_task_button = (Button) view.findViewById(R.id.picture_task_button);
-        video_task_button = (Button) view.findViewById(R.id.video_task_button);
+        close_restore_window_button = (Button) view.findViewById(R.id.close_restore_window_button);
+        agree_restore_button = (Button) view.findViewById(R.id.agree_restore_button);
+        cancel_restore_button = (Button) view.findViewById(R.id.cancel_restore_button);
 
-        title_task_window = (TextView) view.findViewById(R.id.title_task_window);
-        content_task_window = (TextView) view.findViewById(R.id.content_task_window);
-        comment_task_window = (TextView) view.findViewById(R.id.comment_task_window);
-        number_photos = (TextView) view.findViewById(R.id.number_photos);
-        number_videos = (TextView) view.findViewById(R.id.number_videos);
+        restore_window_icon = (ImageView) view.findViewById(R.id.restore_window_icon);
 
-        task_window_icon = (ImageView) view.findViewById(R.id.task_window_icon);
+        agree_restore_button.setOnClickListener(this);
+        close_restore_window_button.setOnClickListener(this);
+        cancel_restore_button.setOnClickListener(this);
 
 
-        back_task_button.setOnClickListener(this);
-        send_task_button.setOnClickListener(this);
-        close_window_button.setOnClickListener(this);
-        next_task_button.setOnClickListener(this);
-        picture_task_button.setOnClickListener(this);
-        video_task_button.setOnClickListener(this);
+        TextView title = (TextView) view.findViewById(R.id.title_restore_window);
+        TextView content = (TextView) view.findViewById(R.id.content_restore_window);
 
-        View tokenView = (View) taskToken.get(1L);
-        TaskListAdapter tokenAdapter = (TaskListAdapter) taskToken.get(2L);
-        Tasks tokenTask = (Tasks) taskToken.get(3L);
-        TasksDecode tokenTaskDecode = (TasksDecode) taskToken.get(4L);
+        title.setText(R.string.default_restore_window_title);
+        content.setText(R.string.default_restore_window_content);
 
-        title_task_window.setText(tokenTask.getTask_tittle());
-        content_task_window.setText(tokenTask.getTask_content());
-
+        /* SET ACTUAL ICON
         int actualIcon = (tokenTaskDecode.getOrigin_button() == R.id.finish_task_button)
                 ? R.drawable.icon_progress : R.drawable.icon_pending;
 
-        task_window_icon.setBackground(getResources().getDrawable(actualIcon));
+        restore_window_icon.setBackground(getResources().getDrawable(actualIcon));
+        */
 
-        if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
-            next_task_button.setEnabled(false);
-            next_task_button.setVisibility(View.INVISIBLE);
-        }
-
-        if ((_ACTUAL_POSITION > 0) && (_ACTUAL_POSITION < _ACTUAL_COUNT)) {
-            next_task_button.setEnabled(true);
-            next_task_button.setVisibility(View.VISIBLE);
-
-            back_task_button.setEnabled(true);
-            back_task_button.setVisibility(View.VISIBLE);
-
-        }
-
-        if (_ACTUAL_POSITION <= 0) {
-            back_task_button.setEnabled(false);
-            back_task_button.setVisibility(View.INVISIBLE);
-        }
-
-        setCountFiles();
 
         return view;
     }
@@ -121,19 +82,9 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
 
-        if (taskToken.isEmpty()) {
-            taskToken = activityListener.getToken();
+        activityListener.addTasksListMarkers(new ArrayList<Tasks>());
+        SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
-            TaskListAdapter backAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
-            TasksDecode taskDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
-
-            _ACTUAL_POSITION = taskDecode.getTask_position();
-            _ACTUAL_COUNT = backAdapter.getItemCount() - 1;
-
-
-        }
-
-        TASK_FILES = activityListener.getTaskFiles();
     }
 
     @Override
@@ -149,184 +100,36 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.picture_task_button:
-
-                TaskListAdapter pictureAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
-                Tasks pictureTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
-                TasksDecode pictureDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
-
-                activityListener.taskActions(v, pictureAdapter, pictureTask, pictureDecode);
-
-                break;
-            case R.id.video_task_button:
-
-                TaskListAdapter videoAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
-                Tasks videoTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
-                TasksDecode videoDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
-
-                activityListener.taskActions(v, videoAdapter, videoTask, videoDecode);
-
-                break;
-            case R.id.send_task_button:
-
-                SpannableStringBuilder ssb = (SpannableStringBuilder) comment_task_window.getText();
-
-                View tokenView = (View) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_VIEW);
-                TaskListAdapter sendAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
-                Tasks sendTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
-                TasksDecode sendDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
-
-                sendDecode.setTask_comment(ssb.toString());
-                sendDecode.setOrigin_button(tokenView.getId());
-
-                AsyncSendTask wsSendTask = new AsyncSendTask(Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE
-                        ,v,sendAdapter,sendTask,sendDecode);
-                wsSendTask.execute();
-
-                break;
-            case R.id.close_window_button:
-
-                taskToken = new HashMap<>();
-
+            case R.id.close_restore_window_button: case R.id.cancel_restore_button:
                 activityListener.closeActiveTaskFragment(v);
-                activityListener.clearTaskToken();
                 break;
-            case R.id.back_task_button:
+            case R.id.agree_restore_button:
 
-                TaskListAdapter backAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
-                TasksDecode backDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
+                TasksDecode tasksDecode = new TasksDecode();
+                tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
+                tasksDecode.setTask_status(Constants.ALL_TASK);
 
-                _ACTUAL_POSITION--;
+                AsyncRestoreDevice wsRestore = new AsyncRestoreDevice(Constants.WS_KEY_ALL_TASKS,v,tasksDecode);
+                wsRestore.execute();
 
-                if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
-                    next_task_button.setEnabled(false);
-                    next_task_button.setVisibility(View.INVISIBLE);
-                } else {
-                    next_task_button.setEnabled(true);
-                    next_task_button.setVisibility(View.VISIBLE);
-                }
-
-                if (_ACTUAL_POSITION == 0) {
-                    back_task_button.setEnabled(false);
-                    back_task_button.setVisibility(View.INVISIBLE);
-                } else {
-                    back_task_button.setEnabled(true);
-                    back_task_button.setVisibility(View.VISIBLE);
-                }
-
-                Tasks actualBackTask = backAdapter.getItemByPosition(_ACTUAL_POSITION);
-                backDecode.setTask_position(_ACTUAL_POSITION);
-
-                title_task_window.setText(actualBackTask.getTask_tittle());
-                content_task_window.setText(actualBackTask.getTask_content());
-                setCountFiles();
-
-                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualBackTask);
-                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,backDecode);
-                break;
-            case R.id.next_task_button:
-
-                TaskListAdapter nextAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
-                TasksDecode nextDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
-
-                _ACTUAL_POSITION++;
-
-                if (_ACTUAL_POSITION == _ACTUAL_COUNT) {
-                    next_task_button.setEnabled(false);
-                    next_task_button.setVisibility(View.INVISIBLE);
-                } else {
-                    next_task_button.setEnabled(true);
-                    next_task_button.setVisibility(View.VISIBLE);
-                }
-
-                if (_ACTUAL_POSITION == 0) {
-                    back_task_button.setEnabled(false);
-                    back_task_button.setVisibility(View.INVISIBLE);
-                } else {
-                    back_task_button.setEnabled(true);
-                    back_task_button.setVisibility(View.VISIBLE);
-                }
-
-                Tasks actualNextTask = nextAdapter.getItemByPosition(_ACTUAL_POSITION);
-                nextDecode.setTask_position(_ACTUAL_POSITION);
-
-                title_task_window.setText(actualNextTask.getTask_tittle());
-                content_task_window.setText(actualNextTask.getTask_content());
-                setCountFiles();
-
-                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualNextTask);
-                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,nextDecode);
                 break;
             default:
                 break;
         }
     }
 
-    private void setCountFiles() {
+    private class AsyncRestoreDevice extends AsyncTask<Void, Void, Boolean> {
 
-        number_photos.setText(Constants.NUMBER_ZERO);
-        number_videos.setText(Constants.NUMBER_ZERO);
-
-        if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
-            FilesManager filesManager = TASK_FILES.get(_ACTUAL_POSITION);
-            number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
-            number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
-        }
-    }
-
-    private void clearActualFiles() {
-        if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
-
-            FilesManager filesManager = TASK_FILES.get(_ACTUAL_POSITION);
-            filesManager.setFilesPicture(new ArrayList<Uri>());
-            filesManager.setFilesVideo(new ArrayList<Uri>());
-            TASK_FILES.put(_ACTUAL_POSITION, filesManager);
-
-            number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
-            number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
-        }
-    }
-
-    private TasksDecode attachFiles(TasksDecode tasksDecode) throws Exception {
-        try {
-            FilesManager sendFile;
-
-            if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
-                sendFile = TASK_FILES.get(_ACTUAL_POSITION);
-
-                List<Uri> uriFilesPicture = sendFile.getFilesPicture();
-                List<Uri> uriFileVideo = sendFile.getFilesVideo();
-
-                tasksDecode.setSendFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
-                //tasksDecode.setSendFiles(FileServices.attachVideo(getActivity(), uriFileVideo));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("File Exception:",e.getMessage());
-            throw  new Exception(e.getMessage());
-        }
-
-        return tasksDecode;
-    }
-
-    private class AsyncSendTask extends AsyncTask<Void, Void, Boolean> {
-
-        private SoapPrimitive soapPrimitive;
-
-        private Integer webServiceOperation;
+        private SoapObject soapObject;
         private View webServiceView;
-        private TaskListAdapter webServiceAdapter;
-        private Tasks webServiceTask;
+        private Integer webServiceOperation;
         private TasksDecode webServiceTaskDecode;
 
         private String textError;
 
-        private AsyncSendTask(Integer wsOperation,View wsView,TaskListAdapter wsAdapter,Tasks wsTask
-                ,TasksDecode wsServiceTaskDecode) {
-            webServiceOperation = wsOperation;
+        private AsyncRestoreDevice(Integer wsOperation,View wsView,TasksDecode wsServiceTaskDecode) {
             webServiceView = wsView;
-            webServiceAdapter = wsAdapter;
-            webServiceTask = wsTask;
+            webServiceOperation = wsOperation;
             webServiceTaskDecode = wsServiceTaskDecode;
             textError = "";
         }
@@ -334,7 +137,7 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(getContext());
-            pDialog.setMessage(getString(R.string.default_attaching_img));
+            pDialog.setMessage(getString(R.string.server_sync));
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -347,9 +150,12 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
 
             try{
                 switch (webServiceOperation) {
-                    case Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE:
-                        webServiceTaskDecode = attachFiles(webServiceTaskDecode);
-                        validOperation = (webServiceTaskDecode != null);
+                    case Constants.WS_KEY_ALL_TASKS:
+                        soapObject = SoapServices.getServerAllTasks(getContext(), webServiceTaskDecode.getTask_team_id()
+                                , webServiceTaskDecode.getTask_status());
+                        validOperation = (soapObject.getPropertyCount() > 0);
+
+                        if (validOperation) BDTasksManagerQuery.cleanTables(getContext());
                         break;
                 }
             } catch (Exception e) {
@@ -366,16 +172,45 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
             pDialog.dismiss();
             if(success) {
 
-                taskToken = new HashMap<>();
-                activityListener.taskActions(webServiceView, webServiceAdapter
-                        , webServiceTask, webServiceTaskDecode);
+                if (soapObject.getPropertyCount() > 0)
+                {
+                    for (int i = 0; i < soapObject.getPropertyCount(); i++) {
+                        Tasks t = new Tasks();
+
+                        SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                        SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+
+                        t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                        t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                        t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                        t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                        t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                        t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                        t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                        t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                        t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                        t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+
+                        try {
+                            Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
+
+                            if (tempTask.getTask_id() == null) BDTasksManagerQuery.addTask(getContext(), t);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("GeneralException", "Unknown error : " + e.getMessage());
+                        }
+                    }
+
+                    Toast.makeText(getContext(),soapObject.getPropertyCount() + " Tareas restauradas"  , Toast.LENGTH_LONG).show();
+                }
 
             } else {
-                String tempText = (textError.isEmpty() ? "Se excedio el limite de imagenes" : textError);
+                String tempText = (textError.isEmpty() ? "El procedimiento ha finalizado" : textError);
                 Toast.makeText(getContext(), tempText, Toast.LENGTH_LONG).show();
-
-               clearActualFiles();
             }
+
+            activityListener.closeActiveTaskFragment(webServiceView);
         }
     }
 

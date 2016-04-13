@@ -18,6 +18,8 @@ public final class Constants {
     public static final String NUMBER_ZERO = "0";
     public static final Integer SERVER_SYNC_FALSE = 0;
     public static final Integer SERVER_SYNC_TRUE = 1;
+    public static final Integer PICTURE_FILE_TYPE = 1;
+    public static final Integer VIDEO_FILE_TYPE = 2;
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -49,6 +51,7 @@ public final class Constants {
     @Deprecated public static final String FRAGMENT_REVISION_TAG = "fragment_revision_task";
     public static final String FRAGMENT_CLOSE_TAG = "fragment_close_task";
     public static final String FRAGMENT_FINISH_TAG = "fragment_finish_task";
+    public static final String FRAGMENT_RESTORE_TAG = "fragment_restore";
     //endregion FRAGMENT TAGS//
 
     //region WEB SERVICE ID //
@@ -93,9 +96,10 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_LOCATION = "192.168.12.10/SincronizarCoordenadas";
     public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
+    public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
-    //public static final String WEB_SERVICE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "http://192.168.43.173/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    //public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
     //endregion SOAP CONFIGURATION//
 
     //region SOAP OPERATION//
@@ -105,6 +109,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_LOCATION = "SincronizarCoordenadas";
     public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
+    public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//

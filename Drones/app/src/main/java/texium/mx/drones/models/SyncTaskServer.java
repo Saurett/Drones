@@ -13,7 +13,8 @@ public class SyncTaskServer {
     private Integer task_user_id;
     private Integer server_sync;
     private String task_comment;
-    private List<String> sendFiles;
+    private List<String> sendPictureFiles;
+    private List<String> sendVideoFiles;
 
     public SyncTaskServer() {
 
@@ -67,11 +68,19 @@ public class SyncTaskServer {
         this.task_comment = task_comment;
     }
 
-    public List<String> getSendFiles() {
-        return sendFiles;
+    public List<String> getSendPictureFiles() {
+        return sendPictureFiles;
     }
 
-    public void setSendFiles(List<String> sendFiles) {
-        this.sendFiles = sendFiles;
+    public void setSendPictureFiles(List<String> sendPictureFiles) {
+        this.sendPictureFiles = sendPictureFiles;
+    }
+
+    public List<String> getSendVideoFiles() {
+        return sendVideoFiles;
+    }
+
+    public void setSendVideoFiles(List<String> sendVideoFiles) {
+        this.sendVideoFiles = sendVideoFiles;
     }
 }

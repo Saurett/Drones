@@ -51,13 +51,18 @@
     <string name="default_save_img_msg">Imagen guardada correctamente.</string>
     <string name="default_save_video_msg">Video guardado correctamente.</string>
 
-    <string name="default_attaching_img">Comprimiendo imágenes. Por favor espere…</string>
+    <string name="default_attaching_img">Encriptando. Por favor espere…</string>
     <string name="default_update_task">Actualizando tarea. Por favor espere…</string>
     <string name="tasks_loading">Buscando Tareas…</string>
 
     <string name="server_sync">Sincronizando con el servidor</string>
     <string name="default_server_sync_error">Error intentando sincronizar con el servidor</string>
     <string name="default_no_synchronized_task">Tareas Sincronizadas</string>
+
+    <string name="agree_restore_label">Aceptar</string>
+    <string name="cancel_restore_label">Cancelar</string>
+    <string name="default_restore_window_title">¿Quieres restaurar las tareas?</string>
+    <string name="default_restore_window_content">La restauración borrara las tareas almacenadas localmente.</string>
 
 
 </resources>

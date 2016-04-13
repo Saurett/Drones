@@ -1,6 +1,7 @@
 package texium.mx.drones.services;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
@@ -14,6 +15,7 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.io.EOFException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
@@ -223,6 +225,61 @@ public class SoapServices {
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+
+            SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
+
+            for (String encode: encodedFile) {
+                soapFiles.addProperty(Constants.WEB_SERVICE_PARAM_OBJECT_STRING,encode);
+            }
+
+            Request.addSoapObject(soapFiles);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Soap Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_exception_error));
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapPrimitive updateVideoFiles(Context context,Integer task,Integer user,List<String> encodedFile) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = Constants.WEB_SERVICE_URL;
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
 
             SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);

@@ -9,6 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
@@ -20,7 +21,7 @@ import texium.mx.drones.utils.Constants;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 17;
+    static Integer BDVersion = 18;
 
     public static void addTask(Context context, Tasks t) throws Exception {
         try{
@@ -52,7 +53,7 @@ public class BDTasksManagerQuery {
     }
 
     public static void addTaskDetail(Context context, Integer task, String comment
-            ,Integer status,Integer user,List<String> encodedFile,Boolean serverSync) throws Exception {
+            ,Integer status,Integer user,FilesManager encodedFile,Boolean serverSync) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -73,8 +74,16 @@ public class BDTasksManagerQuery {
 
             Integer task_detail_cve = getLastTaskDetailCve(context,task);
 
-            for (String encode : encodedFile) {
-                addTaskFiles(context, task_detail_cve, encode);
+            List<String> encodedVideoFiles = encodedFile.getEncodeVideoFiles();
+            List<String> encodedPictureFiles = encodedFile.getEncodePictureFiles();
+
+
+            for (String encode : encodedPictureFiles) {
+                addTaskFiles(context, task_detail_cve, encode,Constants.PICTURE_FILE_TYPE);
+            }
+
+            for (String encode : encodedVideoFiles) {
+                addTaskFiles(context, task_detail_cve, encode,Constants.VIDEO_FILE_TYPE);
             }
 
             bd.close();
@@ -86,7 +95,8 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static void addTaskFiles(Context context, Integer detail_cve,String encodedFile)
+    public static void addTaskFiles(Context context, Integer detail_cve,String encodedFile
+            , Integer fileType)
             throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
@@ -96,6 +106,7 @@ public class BDTasksManagerQuery {
 
             cv.put(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE, detail_cve);
             cv.put(BDTasksManager.ColumnTasksFiles.BASE_FILE,encodedFile);
+            cv.put(BDTasksManager.ColumnTasksFiles.FILE_TYPE,fileType);
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
 
@@ -222,7 +233,8 @@ public class BDTasksManagerQuery {
                     sync.setTask_status(result.getInt(2));
                     sync.setTask_user_id(result.getInt(3));
                     sync.setServer_sync(result.getInt(4));
-                    sync.setSendFiles(getAllFiles(context,sync.getTask_detail_cve()));
+                    sync.setSendPictureFiles(getPictureFiles(context, sync.getTask_detail_cve()));
+                    sync.setSendVideoFiles(getVideoFiles(context, sync.getTask_detail_cve()));
 
                     data.add(sync);
 
@@ -240,7 +252,7 @@ public class BDTasksManagerQuery {
         return data;
     }
 
-    public static  List<String> getAllFiles(Context context, Integer task_detail_cve) throws Exception {
+    public static  List<String> getPictureFiles(Context context, Integer task_detail_cve) throws Exception {
         List<String> data = new ArrayList<>();
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
@@ -248,6 +260,38 @@ public class BDTasksManagerQuery {
 
             Cursor result = bd.rawQuery("select * from " + BDTasksManager.TASKS_FILES_TABLE_NAME
                     + " where " + BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE + " = " + task_detail_cve
+                    + " and " + BDTasksManager.ColumnTasksFiles.FILE_TYPE + " = " + Constants.PICTURE_FILE_TYPE
+                    + " order by 1 asc", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    String file = result.getString(2);
+                    data.add(file);
+
+                    Log.i("SQLite: ", "Get task_file in the bd with task_detail_cve :" + task_detail_cve);
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static  List<String> getVideoFiles(Context context, Integer task_detail_cve) throws Exception {
+        List<String> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from " + BDTasksManager.TASKS_FILES_TABLE_NAME
+                    + " where " + BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE + " = " + task_detail_cve
+                    + " and " + BDTasksManager.ColumnTasksFiles.FILE_TYPE + " = " + Constants.VIDEO_FILE_TYPE
                     + " order by 1 asc", null);
 
             if (result.moveToFirst()) {
@@ -390,7 +434,7 @@ public class BDTasksManagerQuery {
     }
 
     public static void updateCommonTask(Context context, Integer task, String comment
-            ,Integer status,Integer user,List<String> encodedFile,Boolean serverSync) throws Exception {
+            ,Integer status,Integer user,FilesManager encodedFile,Boolean serverSync) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -455,6 +499,27 @@ public class BDTasksManagerQuery {
             bd.close();
 
             Log.i("SQLite: ", "Update task_detail in the bd with task_detail_cve : " + task_detail_cve);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
+
+    public static void cleanTables(Context context) throws  Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_TABLE_NAME);
+            bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASK_DETAILS_TABLE_NAME);
+            bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_FILES_TABLE_NAME);
+
+            bd.execSQL(BDTasksManager.CREATE_TASKS_TABLE_SCRIPT);
+            bd.execSQL(BDTasksManager.CREATE_TASK_DETAILS_TABLE_SCRIPT);
+            bd.execSQL(BDTasksManager.CREATE_TASKS_FILES_TABLE_SCRIPT);
+
+            bd.close();
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("SQLite Exception", "Database error: " + e.getMessage());

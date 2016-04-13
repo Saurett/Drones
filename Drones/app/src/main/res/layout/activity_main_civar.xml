@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="texium.mx.drones.MainActivity"
+    android:background="@color/colorPrimaryWhite">
+
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:scrollbarSize="100dp"
+        />
+
+    <LinearLayout
+        android:id="@+id/login_form"
+        android:layout_width="1000dp"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="483dp"
+                android:layout_height="291dp"
+                android:background="@drawable/login_back">
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SISTEMA DE MONITOREO \n DE CUADRILLAS"
+                android:textSize="20sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="50dp"
+                android:textStyle="normal"
+                android:textAlignment="center" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="70dp">
+                <TextView
+                    android:id="@+id/user_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Iniciar Sesión"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimaryWhite"
+                    android:textAlignment="center"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="10dp"
+                    />
+                <EditText
+                    android:id="@+id/username_login"
+                    android:layout_width="325dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Ingrese su nombre de usuario"
+                    android:textAlignment="center"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:editable="true"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/colorPrimaryWhite"
+                    android:textColorHint="@color/colorPrimaryWhite"
+                    />
+                <EditText
+                    android:id="@+id/password_login"
+                    android:layout_width="325dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:textAlignment="center"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:editable="true"
+                    android:elegantTextHeight="false"
+                    android:password="true"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/colorPrimaryWhite"
+                    android:textColorHint="@color/colorPrimaryWhite" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                >
+                <Button
+                    android:id="@+id/login_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="      ENTRAR      "
+                    android:background="@color/colorPrimaryWhite"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    />
+                <Button
+                    android:id="@+id/clean_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="      BORRAR      "
+                    android:textColor="@color/colorPrimaryWhite"
+                    android:background="@null"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginLeft="30dp"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="50dp">
+                <Button
+                    android:id="@+id/forget_my_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Olvide mi nombre de usuario"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorPrimaryWhite"
+                    android:background="@null"/>
+                <Button
+                    android:id="@+id/reset_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Restablecer contraseña"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorPrimaryWhite"
+                    android:layout_marginLeft="30dp"
+                    android:background="@null"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

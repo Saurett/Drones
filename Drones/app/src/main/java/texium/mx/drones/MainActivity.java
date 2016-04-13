@@ -1,8 +1,11 @@
 package texium.mx.drones;
 
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -29,7 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_civar);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mProgressView = findViewById(R.id.login_progress);
         mLoginFormView = findViewById(R.id.login_form);
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //Login action
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void attemptLogin() {
 
         boolean cancel = false;
@@ -59,12 +65,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String password = passwordLogin.getText().toString();
 
         if (TextUtils.isEmpty(password)) {
-            passwordLogin.setError(getString(R.string.password_login_error));
+            passwordLogin.setError(getString(R.string.password_login_error),null);
             cancel = true;
         }
 
         if (TextUtils.isEmpty(username)) {
-            usernameLogin.setError(getString(R.string.username_login_error));
+            usernameLogin.setError(getString(R.string.username_login_error),null);
             cancel = true;
         }
 

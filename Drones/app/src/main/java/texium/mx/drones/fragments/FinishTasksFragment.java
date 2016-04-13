@@ -72,7 +72,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
         task_window_icon = (ImageView) view.findViewById(R.id.task_window_icon);
 
-
         back_task_button.setOnClickListener(this);
         send_task_button.setOnClickListener(this);
         close_window_button.setOnClickListener(this);
@@ -129,8 +128,6 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
             _ACTUAL_POSITION = taskDecode.getTask_position();
             _ACTUAL_COUNT = backAdapter.getItemCount() - 1;
-
-
         }
 
         TASK_FILES = activityListener.getTaskFiles();
@@ -297,8 +294,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 List<Uri> uriFilesPicture = sendFile.getFilesPicture();
                 List<Uri> uriFileVideo = sendFile.getFilesVideo();
 
-                tasksDecode.setSendFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
-                //tasksDecode.setSendFiles(FileServices.attachVideo(getActivity(), uriFileVideo));
+                tasksDecode.setSendImgFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
+                tasksDecode.setSendVideoFiles(FileServices.attachVideo(getActivity(), uriFileVideo));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -335,6 +332,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         protected void onPreExecute() {
             pDialog = new ProgressDialog(getContext());
             pDialog.setMessage(getString(R.string.default_attaching_img));
+            pDialog.setTitle("Adjuntanto archivos");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();

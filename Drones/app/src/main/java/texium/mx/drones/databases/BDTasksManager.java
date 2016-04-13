@@ -65,6 +65,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String TASK_FILE_CVE = "task_file_cve";
         public static final String TASK_DETAIL_CVE = "task_detail_cve";
         public static final String BASE_FILE = "base_file";
+        public static final String FILE_TYPE = "file_type";
     }
 
     public static final String CREATE_TASKS_TABLE_SCRIPT =
@@ -103,7 +104,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
             "create table " + TASKS_FILES_TABLE_NAME + "(" +
                     ColumnTasksFiles.TASK_FILE_CVE + " " + INT_TYPE + " primary key autoincrement, " +
                     ColumnTasksFiles.TASK_DETAIL_CVE + " " + INT_TYPE + "," +
-                    ColumnTasksFiles.BASE_FILE + " " + STRING_TYPE +
+                    ColumnTasksFiles.BASE_FILE + " " + STRING_TYPE + "," +
+                    ColumnTasksFiles.FILE_TYPE + " " + INT_TYPE +
             ")";
 
     public static final  String CREATE_TASK_DETAILS_TABLE_SCRIPT =
@@ -116,7 +118,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTaskDetails.TASK_COMMENT + " " + STRING_TYPE + " " +
             ")";
 
-    //TODO insert user script for backdoor?
+    public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -132,10 +134,10 @@ public class BDTasksManager extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.TASKS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.USERS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.TASK_DETAILS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + BDTasksManager.TASKS_FILES_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.USERS_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASK_DETAILS_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_FILES_TABLE_NAME);
 
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);

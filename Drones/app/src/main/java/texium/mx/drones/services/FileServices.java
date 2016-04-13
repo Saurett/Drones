@@ -9,8 +9,11 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
@@ -63,7 +66,7 @@ public class FileServices {
                 ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
                 // this is storage overwritten on each iteration with bytes
-                int bufferSize = 4096;
+                int bufferSize = 1024;
                 byte[] buffer = new byte[bufferSize];
 
                 // we need to know how may bytes were read to write them to the byteBuffer
@@ -72,17 +75,117 @@ public class FileServices {
                     byteBuffer.write(buffer, 0, len);
                 }
                 // and then we can return your byte array.
-                videoEncoded = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+                videoEncoded += getPackageBase64(context, byteBuffer.toByteArray());
 
                 stringsVideo.add(videoEncoded);
             }
 
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            Log.e("OutOfMemoryVideo Exception",e.getMessage());
+            throw  new Exception("Memoria insuficiente");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("AttachImg Exception",e.getMessage());
-            throw  new Exception(context.getString(R.string.default_attaching_video_error));
+            Log.e("AttachVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_video_error));
         }
 
         return stringsVideo;
+    }
+
+    public static String getPackageBase64(Context context, byte[] dataPackage) throws Exception {
+
+        String data = new String();
+        int minBitPackage = 100000;
+        int maxBitPackage = 150000;
+        //int midBitPackage = 1000000;
+
+        try {
+            int  packSize = dataPackage.length;
+            int pack = (packSize > maxBitPackage) ? maxBitPackage : minBitPackage;
+            int packNumbers = packSize / pack;
+            int packSpecial = packSize - (packNumbers * pack);
+            boolean specialItem = (packSpecial > 0);
+
+            int endCount = pack;
+            int starCount = 0;
+
+            for (int i = 0; i <= packNumbers;) {
+
+                String tempData = new String();
+
+                if ((i == packNumbers) && (specialItem)) {
+
+                    tempData = Base64.encodeToString(Arrays.copyOfRange(dataPackage, starCount
+                            , packSize) , Base64.DEFAULT);
+                } else {
+
+                    tempData = Base64.encodeToString(Arrays.copyOfRange(dataPackage, starCount
+                            , endCount) , Base64.DEFAULT);
+
+                    starCount = endCount;
+                    endCount += pack;
+                }
+
+                i++;
+
+                data = data + tempData;
+            }
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            Log.e("OutOfMemoryVideo Exception",e.getMessage());
+            throw  new OutOfMemoryError("Memoria insuficiente" + e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("PackingVideo Exception",e.getMessage());
+            throw  new Exception(context.getString(R.string.default_attaching_video_error));
+        }
+
+        return  data;
+    }
+
+    public static List<String> getPackageList(Context context, String dataPackage) throws Exception {
+
+        List<String> data = new ArrayList<>();
+        int minBitPackage = 1000;
+        int maxBitPackage = 500000;
+
+        try {
+            int  packSize = dataPackage.length();
+            int pack = (packSize > maxBitPackage) ? maxBitPackage : minBitPackage;
+            int packNumbers = packSize / pack;
+            int packSpecial = packSize - (packNumbers * pack);
+            boolean specialItem = (packSpecial > 0);
+
+            int endCount = pack;
+            int starCount = 0;
+
+            for (int i = 0; i <= packNumbers;) {
+
+                String tempData = new String();
+
+                if ((i == packNumbers) && (specialItem)) {
+
+                    tempData = dataPackage.substring(starCount,packSize);
+
+                } else {
+
+                    tempData = dataPackage.substring(starCount,endCount);
+
+                    starCount = endCount;
+                    endCount += pack;
+                }
+
+                data.add(tempData);
+
+                i++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("PackingVideo Exception",e.getMessage());
+            throw  new Exception(context.getString(R.string.default_attaching_video_error));
+        }
+
+        return  data;
     }
 }

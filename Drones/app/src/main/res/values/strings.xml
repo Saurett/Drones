@@ -58,5 +58,10 @@
     <string name="default_server_sync_error">Server Synchronized Error</string>
     <string name="default_no_synchronized_task">Synchronized Tasks</string>
 
+    <string name="agree_restore_label">agree</string>
+    <string name="cancel_restore_label">cancel</string>
+    <string name="default_restore_window_title">¿Do you want to restore server tasks?</string>
+    <string name="default_restore_window_content">Restoration tasks erase stored locally.</string>
+
 
 </resources>

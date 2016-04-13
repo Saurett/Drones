@@ -17,10 +17,12 @@ public class TasksDecode {
     private Integer task_update_to;
     private Integer task_team_id;
     private Integer origin_button;
-    private List<String> sendFiles;
+    private List<String> sendImgFiles;
+    private List<String> sendVideoFiles;
 
     public TasksDecode() {
-        sendFiles = new ArrayList<>();
+        sendImgFiles = new ArrayList<>();
+        sendVideoFiles = new ArrayList<>();
     }
 
     public TasksDecode(Integer tk_user_id, Integer tk_origin_button) {
@@ -100,11 +102,19 @@ public class TasksDecode {
         this.origin_button = origin_button;
     }
 
-    public List<String> getSendFiles() {
-        return sendFiles;
+    public List<String> getSendImgFiles() {
+        return sendImgFiles;
     }
 
-    public void setSendFiles(List<String> sendFiles) {
-        this.sendFiles = sendFiles;
+    public void setSendImgFiles(List<String> sendImgFiles) {
+        this.sendImgFiles = sendImgFiles;
+    }
+
+    public List<String> getSendVideoFiles() {
+        return sendVideoFiles;
+    }
+
+    public void setSendVideoFiles(List<String> sendVideoFiles) {
+        this.sendVideoFiles = sendVideoFiles;
     }
 }

@@ -58,11 +58,13 @@ import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.FinishTasksFragment;
 import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
+import texium.mx.drones.fragments.RestoreFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
@@ -70,6 +72,7 @@ import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -535,6 +538,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         } else if (id == R.id.restore_device) {
 
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.tasks_fragment_container, new RestoreFragment(), Constants.FRAGMENT_RESTORE_TAG);
+            fragmentTransaction.commit();
+
+            taskToken.clear();
+
         } else if (id == R.id.nav_logout) {
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
@@ -578,6 +587,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         Fragment finish = fragmentManager.findFragmentByTag(Constants.FRAGMENT_FINISH_TAG);
         if (null != finish) {
             fragmentManager.beginTransaction().remove(finish).commit();
+        }
+
+        //ONLY RESTORE DEVICE
+        Fragment restore = fragmentManager.findFragmentByTag(Constants.FRAGMENT_RESTORE_TAG);
+        if (null != restore) {
+            fragmentManager.beginTransaction().remove(restore).commit();
         }
     }
 
@@ -855,7 +870,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , syncTaskServer.getTask_comment()
                                     , syncTaskServer.getTask_status()
                                     , syncTaskServer.getTask_user_id()
-                                    , syncTaskServer.getSendFiles());
+                                    , syncTaskServer.getSendPictureFiles());
 
                             validOperation = (soapPrimitive != null);
 
@@ -871,12 +886,46 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getTask_comment()
                                 , webServiceTaskDecode.getTask_update_to()
                                 , webServiceTaskDecode.getTask_user_id()
-                                , webServiceTaskDecode.getSendFiles());
+                                , webServiceTaskDecode.getSendImgFiles());
                         validOperation = (soapPrimitive != null);
+
+                        for (String encodedVideoFile : webServiceTaskDecode.getSendVideoFiles()) {
+
+                            List<String> packageList = FileServices.getPackageList(getApplicationContext(),encodedVideoFile);
+
+                            int totalPack = packageList.size();
+                            int numItem = 1;
+
+                            try {
+                                SoapServices.updateVideoFiles(getApplicationContext()
+                                        , webServiceTask.getTask_id()
+                                        , webServiceTaskDecode.getTask_user_id()
+                                        , packageList);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
+                            }
+
+                            /*for (String tempPack : packageList) {
+
+                               try {
+                                   SoapServices.updateVideoFiles(getApplicationContext()
+                                           , webServiceTask.getTask_id()
+                                           , webServiceTaskDecode.getTask_user_id()
+                                           , webServiceTaskDecode.getSendImgFiles());
+                               } catch (Exception e) {
+                                   throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
+                               }
+
+                                numItem++;
+                            }
+                            */
+                        }
+
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
                         soapPrimitive = SoapServices.sendFile(getApplicationContext(), webServiceTask.getTask_id()
-                                , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendFiles());
+                                , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendImgFiles());
                         validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
@@ -909,7 +958,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , syncTaskServer.getTask_comment()
                                     , syncTaskServer.getTask_status()
                                     , syncTaskServer.getTask_user_id()
-                                    , syncTaskServer.getSendFiles());
+                                    , syncTaskServer.getSendPictureFiles());
 
                             validOperation = (soapPrimitive != null);
 
@@ -975,11 +1024,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         removeAllFragment(fragmentManager);
 
                         try {
+
+                            FilesManager filesManager = new FilesManager(webServiceTaskDecode.getSendImgFiles()
+                                    , webServiceTaskDecode.getSendVideoFiles());
+
                             BDTasksManagerQuery.updateCommonTask(getApplicationContext(), webServiceTask.getTask_id()
                                     , webServiceTaskDecode.getTask_comment()
                                     , webServiceTaskDecode.getTask_update_to()
                                     , webServiceTaskDecode.getTask_user_id()
-                                    , webServiceTaskDecode.getSendFiles()
+                                    , filesManager
                                     , textError.length() == 0); //if textError is > 0, update is not server sync
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -989,7 +1042,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         switch (webServiceTask.getTask_status()) {
                             //Actual Status
                             case Constants.NEWS_TASK:
-
                                 FragmentTransaction ftNews = fragmentManager.beginTransaction();
                                 ftNews.add(R.id.tasks_fragment_container, new NewsTasksFragment(), Constants.FRAGMENT_NEWS_TAG);
                                 ftNews.commit();

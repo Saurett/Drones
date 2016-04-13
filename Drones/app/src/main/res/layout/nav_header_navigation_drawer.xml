@@ -9,7 +9,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="@dimen/activity_horizontal_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <!--
@@ -36,7 +36,7 @@
     <TextView
         android:id="@+id/task_force_name"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="90dp"
         android:background="@color/colorAccent"
         android:paddingTop="0dp"
         android:text="Task force name"

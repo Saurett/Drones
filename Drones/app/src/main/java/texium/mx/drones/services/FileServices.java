@@ -79,7 +79,16 @@ public class FileServices {
                     byteBuffer.write(buffer, 0, len);
                 }
                 // and then we can return your byte array.
-                encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
+                //encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
+
+                String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+
+                //BDTasksManagerQuery.addTaskFiles(context,2008,tempData, Constants.VIDEO_FILE_TYPE);
+                //TODO GUARDAR EN LOCAL
+                //TODO GUARDAR SOLO EL STRING
+                List<String> x = new ArrayList<>();
+                x.add(tempData);
+                encodeVideo.setEncodeVideoFiles(x);
 
                 encodeVideos.add(encodeVideo);
             }
@@ -101,7 +110,7 @@ public class FileServices {
 
         FilesManager data = new FilesManager();
 
-        int minBitPackage = 100000;
+        int minBitPackage = 10000;
         int maxBitPackage = 1000000;
 
         List<String> fmEncodeVideo = new ArrayList<>();
@@ -136,7 +145,7 @@ public class FileServices {
 
                 i++;
 
-                BDTasksManagerQuery.addTaskFiles(context,1002,tempData, Constants.VIDEO_FILE_TYPE);
+                BDTasksManagerQuery.addTaskFiles(context,2010,tempData, Constants.VIDEO_FILE_TYPE);
 
             }
 
@@ -160,7 +169,7 @@ public class FileServices {
 
         List<String> data = new ArrayList<>();
         int minBitPackage = 1000;
-        int maxBitPackage = 500000;
+        int maxBitPackage = 3000000;
 
         try {
             int  packSize = dataPackage.length();

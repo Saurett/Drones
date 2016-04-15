@@ -14,6 +14,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static final String TASKS_TABLE_NAME = "Tasks";
     public static final String USERS_TABLE_NAME = "Users";
     public static final String TASKS_FILES_TABLE_NAME = "Tasks_Files";
+    public static final String FILES_PACKAGES_TABLE_NAME = "Files_Packages";
 
     public static final String STRING_TYPE = "text";
     public static final String INT_TYPE = "integer";
@@ -68,6 +69,13 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String FILE_TYPE = "file_type";
     }
 
+    public static class ColumnFilePackages {
+        public static final String FILE_PACKAGE_CVE = "file_package_cve";
+        public static final String BASE_PACKAGE = "base_package";
+        public static final String FILE_TYPE = "file_type";
+        public static final String TEMP_KEY_ID = "temp_key_id";
+    }
+
     public static final String CREATE_TASKS_TABLE_SCRIPT =
             "create table " + TASKS_TABLE_NAME + "(" +
                     ColumnTasks.TASK_CVE + " " + INT_TYPE + " primary key autoincrement," +
@@ -118,6 +126,14 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTaskDetails.TASK_COMMENT + " " + STRING_TYPE + " " +
             ")";
 
+    public static final String CREATE_FILES_PACKAGE_TABLE_SCRIPT =
+            "create table " + FILES_PACKAGES_TABLE_NAME + "(" +
+                    ColumnFilePackages.FILE_PACKAGE_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnFilePackages.BASE_PACKAGE + " " + STRING_TYPE + "," +
+                    ColumnFilePackages.FILE_TYPE + " " + INT_TYPE +
+                    ColumnFilePackages.TEMP_KEY_ID + " " + INT_TYPE +
+                    ")";
+
     public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -138,10 +154,13 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.USERS_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASK_DETAILS_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_FILES_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.FILES_PACKAGES_TABLE_NAME);
+
 
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);
         db.execSQL(CREATE_TASK_DETAILS_TABLE_SCRIPT);
         db.execSQL(CREATE_TASKS_FILES_TABLE_SCRIPT);
+        db.execSQL(CREATE_FILES_PACKAGE_TABLE_SCRIPT);
     }
 }

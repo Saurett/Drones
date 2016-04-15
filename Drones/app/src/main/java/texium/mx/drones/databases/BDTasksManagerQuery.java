@@ -82,9 +82,9 @@ public class BDTasksManagerQuery {
                 addTaskFiles(context, task_detail_cve, encode,Constants.PICTURE_FILE_TYPE);
             }
 
-            for (String encode : encodedVideoFiles) {
+            /*for (String encode : encodedVideoFiles) {
                 addTaskFiles(context, task_detail_cve, encode,Constants.VIDEO_FILE_TYPE);
-            }
+            }*/
 
             bd.close();
 

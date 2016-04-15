@@ -49,7 +49,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.adapters.TaskListAdapter;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.CloseTasksFragment;
@@ -256,7 +254,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         TasksDecode tasksDecode = new TasksDecode();
         tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
 
-        SESSION_DATA.getLatitude();
 
         tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
         tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
@@ -269,6 +266,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
     //Save media content
     private void mediaContent(String mediaType, int requestType) {
         cameraIntent = new Intent(mediaType);
+
+        if (requestType == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
+            //cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 87864320 );//X MB*1048*1048= X MB
+        }
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(cameraIntent, requestType);
@@ -858,6 +860,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK:
+
                         List<SyncTaskServer> NoSyncTasksActual = BDTasksManagerQuery.getAllSyncTaskServer(
                                 getApplicationContext()
                                 , webServiceTaskDecode.getTask_user_id()
@@ -891,28 +894,38 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getSendImgFiles());
                         validOperation = (soapPrimitive != null);
 
-                        for (FilesManager encodedVideoFile : webServiceTaskDecode.getSendVideoFiles()) {
 
-                            //List<String> packageList = FileServices.getPackageList(getApplicationContext(),encodedVideoFile);
-                            //List<String> packageList= encodedVideoFile.getEncodeVideoFiles();
-                            List<String> packageList = BDTasksManagerQuery.getVideoFiles(getApplicationContext(),1001);
+                        List<FilesManager> filesManager = webServiceTaskDecode.getSendVideoFiles();
 
-                            int totalPack = packageList.size();
-                            int numItem = 1;
+                        int video = 1;
 
-                            for (String tempPack : packageList) {
+                        for (FilesManager fm : filesManager ) {
 
-                               try {
-                                   SoapServices.updateVideoFiles(getApplicationContext()
-                                           , webServiceTask.getTask_id()
-                                           , webServiceTaskDecode.getTask_user_id()
-                                           , webServiceTaskDecode.getSendImgFiles());
-                               } catch (Exception e) {
-                                   throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
-                               }
+                            if (null != fm.getEncodeVideoFiles().get(0) ) {
 
-                                numItem++;
+                                List<String> fmPack = FileServices.getPackageList(getApplicationContext(), fm.getEncodeVideoFiles().get(0));
+
+                                int item = 1;
+
+                                Log.i("Send TO Main Server", "Video file " + item + " to " + filesManager.size());
+
+                                for (String pack : fmPack) {
+
+                                    try {
+                                        SoapServices.updateVideoFiles(getApplicationContext()
+                                                , webServiceTask.getTask_id()
+                                                , webServiceTaskDecode.getTask_user_id()
+                                                , pack , item ,  (item == fmPack.size()));
+
+                                        Log.i("Send TO Main Server", "Pack item " + item + " to " + fmPack.size());
+
+                                        item++;
+                                    } catch (Exception e) {
+                                        throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
+                                    }
+                                }
                             }
+                            video++;
                         }
 
                         break;

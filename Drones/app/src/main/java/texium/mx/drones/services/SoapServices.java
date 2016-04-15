@@ -269,7 +269,7 @@ public class SoapServices {
         return soapPrimitive;
     }
 
-    public static SoapPrimitive updateVideoFiles(Context context,Integer task,Integer user,List<String> encodedFile) throws Exception {
+    public static SoapPrimitive updateVideoFiles(Context context,Integer task,Integer user, String encodeFile, Integer partNumber, Boolean lastOne ) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO;
@@ -281,7 +281,11 @@ public class SoapServices {
 
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_CODE_FILE, encodeFile);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_VIDEO_PART_NUMBER, partNumber);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_VIDEO_LAST_ONE, lastOne);
 
+            /*
             SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
 
             for (String encode: encodedFile) {
@@ -289,6 +293,7 @@ public class SoapServices {
             }
 
             Request.addSoapObject(soapFiles);
+            */
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;

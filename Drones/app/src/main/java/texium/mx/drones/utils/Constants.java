@@ -123,7 +123,10 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_TASK_LATITUDE = "Latitud";
     public static final String WEB_SERVICE_PARAM_TASK_LONGITUDE = "Longitud";
     public static final String WEB_SERVICE_PARAM_TASK_FILE = "Archivo";
+    public static final String WEB_SERVICE_PARAM_CODE_FILE = "Codigo";
     public static final String WEB_SERVICE_PARAM_OBJECT_STRING = "string";
+    public static final String WEB_SERVICE_PARAM_VIDEO_PART_NUMBER = "NumeroParte";
+    public static final String WEB_SERVICE_PARAM_VIDEO_LAST_ONE = "Ultimo";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//

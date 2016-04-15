@@ -74,7 +74,7 @@ public class BDTasksManagerQuery {
 
             Integer task_detail_cve = getLastTaskDetailCve(context,task);
 
-            List<String> encodedVideoFiles = encodedFile.getEncodeVideoFiles();
+            //List<String> encodedVideoFiles = encodedFile.getEncodeVideoFiles();
             List<String> encodedPictureFiles = encodedFile.getEncodePictureFiles();
 
 

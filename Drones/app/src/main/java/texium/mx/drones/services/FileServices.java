@@ -85,10 +85,7 @@ public class FileServices {
 
                 //BDTasksManagerQuery.addTaskFiles(context,2008,tempData, Constants.VIDEO_FILE_TYPE);
                 //TODO GUARDAR EN LOCAL
-                //TODO GUARDAR SOLO EL STRING
-                List<String> x = new ArrayList<>();
-                x.add(tempData);
-                encodeVideo.setEncodeVideoFiles(x);
+                encodeVideo.setEncodeVideoFiles(tempData);
 
                 encodeVideos.add(encodeVideo);
             }
@@ -106,6 +103,7 @@ public class FileServices {
         return encodeVideos;
     }
 
+    @Deprecated
     public static FilesManager getPackageBase64(Context context, byte[] dataPackage) throws Exception {
 
         FilesManager data = new FilesManager();
@@ -113,7 +111,7 @@ public class FileServices {
         int minBitPackage = 10000;
         int maxBitPackage = 1000000;
 
-        List<String> fmEncodeVideo = new ArrayList<>();
+        String fmEncodeVideo = "";
 
         try {
             int packSize = dataPackage.length;

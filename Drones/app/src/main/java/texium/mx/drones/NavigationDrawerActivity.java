@@ -326,7 +326,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 tasksDecode.setOrigin_button(v.getId());
                 tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-                setToken(v, taskListAdapter, task, tasksDecode);
+                setToken(v, taskListAdapter, task, tasksDecode, null);
 
                 closeActiveTaskFragment(v);
 
@@ -339,7 +339,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 tasksDecode.setOrigin_button(v.getId());
                 tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-                setToken(v, taskListAdapter, task, tasksDecode);
+                setToken(v, taskListAdapter, task, tasksDecode, null);
 
                 closeActiveTaskFragment(v);
 
@@ -701,7 +701,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
 
-    public Map<Long, Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task, TasksDecode tasksDecode) {
+    public Map<Long, Object> setToken(View v, TaskListAdapter taskListAdapter, Tasks task
+            , TasksDecode tasksDecode, List<FilesManager> filesManager) {
 
         clearTaskToken();
 
@@ -709,6 +710,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER, taskListAdapter);
         taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, task);
         taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, tasksDecode);
+        taskToken.put(Constants.TOKEN_KEY_ACCESS_FILE_MANAGER_CLASS, filesManager);
 
         return taskToken;
     }
@@ -803,7 +805,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     //WEB SERVICE CLASS CALL//
-    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
+    private class AsyncCallWS extends AsyncTask<Void, String, Boolean> {
 
         private SoapPrimitive soapPrimitive;
         private SoapObject soapObject;
@@ -811,11 +813,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
         private Integer webServiceOperation;
         private Tasks webServiceTask;
         private TasksDecode webServiceTaskDecode;
+        private FilesManager webServiceFilesManager;
 
         private String textError;
 
         private AsyncCallWS(Integer wsOperation, TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
+            webServiceTaskDecode = wsServiceTaskDecode;
+            textError = "";
+        }
+
+        private AsyncCallWS(Integer wsOperation,  FilesManager wsFm, Tasks wsTask, TasksDecode wsServiceTaskDecode) {
+            webServiceOperation = wsOperation;
+            webServiceFilesManager = wsFm;
+            webServiceTask = wsTask;
             webServiceTaskDecode = wsServiceTaskDecode;
             textError = "";
         }
@@ -837,6 +848,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
                         pDialog = new ProgressDialog(NavigationDrawerActivity.this);
+                        pDialog.setTitle("Actualizando");
+                        //pDialog.setProgressStyle(pDialog.STYLE_HORIZONTAL);
                         pDialog.setMessage(getString(R.string.default_update_task));
                         pDialog.setIndeterminate(false);
                         pDialog.setCancelable(false);
@@ -849,6 +862,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         pDialog.setCancelable(false);
                         pDialog.show();
                     }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -894,38 +910,44 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getSendImgFiles());
                         validOperation = (soapPrimitive != null);
 
-
                         List<FilesManager> filesManager = webServiceTaskDecode.getSendVideoFiles();
 
-                        int video = 1;
+                        int videoNumber = 1;
 
                         for (FilesManager fm : filesManager ) {
 
-                            if (null != fm.getEncodeVideoFiles().get(0) ) {
+                            if (fm.getEncodeVideoFiles().length() > 0) {
 
-                                List<String> fmPack = FileServices.getPackageList(getApplicationContext(), fm.getEncodeVideoFiles().get(0));
+                                List<String> fmPack = FileServices.getPackageList(getApplicationContext()
+                                        , fm.getEncodeVideoFiles());
 
-                                int item = 1;
+                                int packNumber = 1;
 
-                                Log.i("Send TO Main Server", "Video file " + item + " to " + filesManager.size());
+                                Log.i("Send TO Main Server", "Video file " + videoNumber + " to " + filesManager.size());
 
                                 for (String pack : fmPack) {
+
+                                    String title = "Transfiriendo al servidor video " + videoNumber + " de " + filesManager.size();
+                                    String msg = "Subiendo paquete " + packNumber + " de " + fmPack.size();
+
+                                    publishProgress(title,msg,String.valueOf(packNumber),String.valueOf(fmPack.size()));
+                                    //pDialog.incrementProgressBy(1); //if needs see progress
 
                                     try {
                                         SoapServices.updateVideoFiles(getApplicationContext()
                                                 , webServiceTask.getTask_id()
                                                 , webServiceTaskDecode.getTask_user_id()
-                                                , pack , item ,  (item == fmPack.size()));
+                                                , pack , packNumber ,  (packNumber == fmPack.size()));
 
-                                        Log.i("Send TO Main Server", "Pack item " + item + " to " + fmPack.size());
+                                        Log.i("Send TO Main Server", "Pack item " + packNumber + " to " + fmPack.size());
 
-                                        item++;
+                                        packNumber++;
                                     } catch (Exception e) {
                                         throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
                                     }
                                 }
                             }
-                            video++;
+                            videoNumber++;
                         }
 
                         break;
@@ -1008,6 +1030,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
 
         @Override
+        protected void onProgressUpdate(String... progress) {
+            pDialog.setTitle(progress[0]);
+            pDialog.setMessage(progress[1]);
+
+            if (null != progress[3]) {
+
+                pDialog.setProgress(Integer.valueOf(progress[2]));
+                pDialog.setMax(Integer.valueOf(progress[3]));
+            }
+
+        }
+
+        @Override
         protected void onPostExecute(final Boolean success) {
 
             if (success) {
@@ -1067,9 +1102,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 ftClose.commit();
                                 break;
                         }
+
                         taskToken.clear();
                         String tempMsg = (textError.length() > 0) ? "Tarea actualizada correctamente" : soapPrimitive.toString();
                         Toast.makeText(NavigationDrawerActivity.this, tempMsg, Toast.LENGTH_LONG).show();
+
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
                         onMapReady(mMap);

@@ -42,6 +42,7 @@ public final class Constants {
     public static final Long TOKEN_KEY_ACCESS_TASK_ADAPTER = 2L;
     public static final Long TOKEN_KEY_ACCESS_TASK_CLASS = 3L;
     public static final Long TOKEN_KEY_ACCESS_TASK_CLASS_DECODE = 4L;
+    public static final Long TOKEN_KEY_ACCESS_FILE_MANAGER_CLASS = 5L;
     //endregion TOKEN ACCESS//
 
     //region FRAGMENT TAGS//
@@ -52,6 +53,7 @@ public final class Constants {
     public static final String FRAGMENT_CLOSE_TAG = "fragment_close_task";
     public static final String FRAGMENT_FINISH_TAG = "fragment_finish_task";
     public static final String FRAGMENT_RESTORE_TAG = "fragment_restore";
+    public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
     //endregion FRAGMENT TAGS//
 
     //region WEB SERVICE ID //
@@ -71,6 +73,7 @@ public final class Constants {
     public static final int WS_KEY_ALL_TASKS = 14;
     public static final int WS_KEY_ALL_USERS = 15;
     public static final int WS_KEY_SERVER_SYNC = 16;
+    public static final int WS_KEY_UPDATE_VIDEO = 17;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//

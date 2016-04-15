@@ -13,13 +13,17 @@ public class FilesManager {
     private List<Uri> filesPicture;
     private List<Uri> filesVideo;
     private List<String> encodePictureFiles;
-    private List<String> encodeVideoFiles;
+    private String encodeVideoFiles;
+    private Integer totalFiles;
+    private Integer actualFile;
+    private String message;
+    private String title;
 
     public FilesManager() {
         filesPicture = new ArrayList<>();
         filesVideo = new ArrayList<>();
         encodePictureFiles = new ArrayList<>();
-        encodeVideoFiles = new ArrayList<>();
+        encodeVideoFiles = "";
     }
 
     public FilesManager(List<String> fmEncodePictureFiles) {
@@ -50,11 +54,43 @@ public class FilesManager {
         this.encodePictureFiles = encodePictureFiles;
     }
 
-    public List<String> getEncodeVideoFiles() {
+    public String getEncodeVideoFiles() {
         return encodeVideoFiles;
     }
 
-    public void setEncodeVideoFiles(List<String> encodeVideoFiles) {
+    public void setEncodeVideoFiles(String encodeVideoFiles) {
         this.encodeVideoFiles = encodeVideoFiles;
+    }
+
+    public void setTotalFiles(Integer totalFiles) {
+        this.totalFiles = totalFiles;
+    }
+
+    public void setActualFile(Integer actualFile) {
+        this.actualFile = actualFile;
+    }
+
+    public Integer getTotalFiles() {
+        return totalFiles;
+    }
+
+    public Integer getActualFile() {
+        return actualFile;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

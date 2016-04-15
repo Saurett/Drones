@@ -285,16 +285,6 @@ public class SoapServices {
             Request.addProperty(Constants.WEB_SERVICE_PARAM_VIDEO_PART_NUMBER, partNumber);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_VIDEO_LAST_ONE, lastOne);
 
-            /*
-            SoapObject soapFiles = new SoapObject(NAMESPACE, Constants.WEB_SERVICE_PARAM_TASK_FILE);
-
-            for (String encode: encodedFile) {
-                soapFiles.addProperty(Constants.WEB_SERVICE_PARAM_OBJECT_STRING,encode);
-            }
-
-            Request.addSoapObject(soapFiles);
-            */
-
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;
             soapEnvelope.setOutputSoapObject(Request);

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 
 import java.net.ConnectException;
 
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean>  {
 
         private SoapObject soapObject;
+        private SoapPrimitive soapPrimitive;
         private Integer webServiceOperation;
         private String username;
         private String password;
@@ -218,6 +220,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         soapObject = SoapServices.getServerAllUsers(getApplicationContext());
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
+                    case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
+                        soapPrimitive = SoapServices.forgetUsername(getApplicationContext(),username);
+                        validOperation = (soapPrimitive != null);
+                        break;
+
                     default:
                         validOperation = false;
                         break;
@@ -366,6 +373,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
 
+                        break;
+                    case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
+                        Toast.makeText(MainActivity.this,soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                     default:
                         Toast.makeText(MainActivity.this, "TEST", Toast.LENGTH_LONG).show();

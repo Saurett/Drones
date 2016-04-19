@@ -104,7 +104,7 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
-    public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/LoginMovil";
+    public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/RecuperarContrasena";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_URL = "http://192.168.43.173/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     //public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
@@ -118,7 +118,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
-    public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "AgregarVideo";
+    public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "RecuperarContrasena";
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//
@@ -136,7 +136,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_OBJECT_STRING = "string";
     public static final String WEB_SERVICE_PARAM_VIDEO_PART_NUMBER = "NumeroParte";
     public static final String WEB_SERVICE_PARAM_VIDEO_LAST_ONE = "Ultimo";
-    public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "NombreUsuario";
+    public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "CorreoElectronico";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//

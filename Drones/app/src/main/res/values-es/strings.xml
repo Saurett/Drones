@@ -64,6 +64,9 @@
     <string name="default_restore_window_title">¿Quieres restaurar las tareas?</string>
     <string name="default_restore_window_content">La restauración borrara las tareas almacenadas localmente.</string>
     <string name="default_out_of_memory">Memoria insuficiente. Comprima su archivo o consulte con su administrador.</string>
+    <string name="default_enter_username">Ingrese su nombre de usuario</string>
+    <string name="default_enter_password">Ingrese su contraseña</string>
+    <string name="default_entrer_email">Ingrese su correo electronico</string>
 
 
 </resources>

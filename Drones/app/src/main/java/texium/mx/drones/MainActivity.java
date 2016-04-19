@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText usernameLogin, passwordLogin;
     private View mLoginFormView,mProgressView;
+    private Button loginButton, cleanButton, forgetUsername, resetPassword;
+
+    private int actionFlag = Constants.LOGIN_FORM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +42,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mProgressView = findViewById(R.id.login_progress);
         mLoginFormView = findViewById(R.id.login_form);
 
-        Button loginButton = (Button) findViewById(R.id.login_button);
-        Button cleanButton = (Button) findViewById(R.id.clean_button);
+        loginButton = (Button) findViewById(R.id.login_button);
+        cleanButton = (Button) findViewById(R.id.clean_button);
+        forgetUsername = (Button) findViewById(R.id.forget_my_username);
+        resetPassword = (Button) findViewById(R.id.reset_password);
+
+        resetPassword.setVisibility(View.INVISIBLE);
 
         usernameLogin = (EditText) findViewById(R.id.username_login);
         passwordLogin = (EditText) findViewById(R.id.password_login);
 
         loginButton.setOnClickListener(this);
         cleanButton.setOnClickListener(this);
+        forgetUsername.setOnClickListener(this);
+        resetPassword.setOnClickListener(this);
 
         AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
         wsAllTask.execute();
@@ -64,20 +73,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String username = usernameLogin.getText().toString();
         String password = passwordLogin.getText().toString();
 
-        if (TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(password) && (actionFlag == Constants.LOGIN_FORM)) {
             passwordLogin.setError(getString(R.string.password_login_error),null);
+            passwordLogin.requestFocus();
             cancel = true;
         }
 
         if (TextUtils.isEmpty(username)) {
             usernameLogin.setError(getString(R.string.username_login_error),null);
+            usernameLogin.requestFocus();
             cancel = true;
         }
 
         if (!cancel) {
 
-            AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE,username,password);
-            wsLogin.execute();
+            switch (actionFlag) {
+                case Constants.LOGIN_FORM:
+                    AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE,username,password);
+                    wsLogin.execute();
+                    break;
+                case Constants.FORGET_USERNAME_FORM:
+                    AsyncCallWS wsForget = new AsyncCallWS(Constants.WS_KEY_FORGET_USERNAME_SERVICE,username,null);
+                    wsForget.execute();
+                    break;
+                default:
+                    break;
+            }
         }
 
     }
@@ -85,8 +106,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //Clean all login values
     private void cleanAllLogin() {
 
+        actionFlag = Constants.LOGIN_FORM;
+
+        usernameLogin.setError(null);
+        passwordLogin.setError(null);
+
         usernameLogin.setText(null);
         passwordLogin.setText(null);
+
+        usernameLogin.setHint(R.string.default_enter_username);
+
+        cleanButton.setText("BORRAR");
+        loginButton.setText("ENTRAR");
+
+        passwordLogin.setVisibility(View.VISIBLE);
     }
 
 
@@ -99,6 +132,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.clean_button:
                 cleanAllLogin();
+                break;
+            case R.id.forget_my_username:
+                actionFlag = Constants.FORGET_USERNAME_FORM;
+
+                usernameLogin.setHint(R.string.default_entrer_email);
+
+                usernameLogin.setText(null);
+                passwordLogin.setText(null);
+
+                cleanButton.setText("CANCELAR");
+                loginButton.setText("ENVIAR");
+
+                passwordLogin.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.reset_password:
+
+                actionFlag = Constants.RESET_PASSWORD_FORM;
+
+                usernameLogin.setHint(R.string.default_enter_username);
+
+                usernameLogin.setText(null);
+                passwordLogin.setText(null);
+
+                cleanButton.setText("CANCELAR");
+                loginButton.setText("ENVIAR");
+
+                passwordLogin.setVisibility(View.INVISIBLE);
+                break;
+            default:
                 break;
         }
     }
@@ -157,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                     default:
-                        Toast.makeText(MainActivity.this, getString(R.string.default_ws_operation), Toast.LENGTH_LONG).show();
                         validOperation = false;
                         break;
                 }

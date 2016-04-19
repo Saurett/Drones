@@ -20,6 +20,9 @@ public final class Constants {
     public static final Integer SERVER_SYNC_TRUE = 1;
     public static final Integer PICTURE_FILE_TYPE = 1;
     public static final Integer VIDEO_FILE_TYPE = 2;
+    public static final int LOGIN_FORM = 1;
+    public static final int FORGET_USERNAME_FORM = 2;
+    public static final int RESET_PASSWORD_FORM = 3;
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -74,6 +77,7 @@ public final class Constants {
     public static final int WS_KEY_ALL_USERS = 15;
     public static final int WS_KEY_SERVER_SYNC = 16;
     public static final int WS_KEY_UPDATE_VIDEO = 17;
+    public static final int WS_KEY_FORGET_USERNAME_SERVICE = 18;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -100,6 +104,7 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
+    public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/LoginMovil";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_URL = "http://192.168.43.173/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     //public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
@@ -113,6 +118,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
+    public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "AgregarVideo";
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//
@@ -130,6 +136,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_OBJECT_STRING = "string";
     public static final String WEB_SERVICE_PARAM_VIDEO_PART_NUMBER = "NumeroParte";
     public static final String WEB_SERVICE_PARAM_VIDEO_LAST_ONE = "Ultimo";
+    public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "NombreUsuario";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//

@@ -78,7 +78,7 @@
         android:layout_marginTop="340dp"
         android:layout_marginRight="10dp"
         android:src="@drawable/icon_chat"
-        android:visibility="gone"/>
+        android:visibility="invisible"/>
 
 
 </android.support.design.widget.CoordinatorLayout>

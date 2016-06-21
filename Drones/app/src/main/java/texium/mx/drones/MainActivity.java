@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -27,9 +28,9 @@ import texium.mx.drones.utils.Constants;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText usernameLogin, passwordLogin;
+    private EditText usernameLogin, passwordLogin, linkLogin;
     private View mLoginFormView,mProgressView;
-    private Button loginButton, cleanButton, forgetUsername, resetPassword;
+    private Button loginButton, cleanButton, forgetUsername, connectivity;
 
     private int actionFlag = Constants.LOGIN_FORM;
 
@@ -46,17 +47,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginButton = (Button) findViewById(R.id.login_button);
         cleanButton = (Button) findViewById(R.id.clean_button);
         forgetUsername = (Button) findViewById(R.id.forget_my_username);
-        resetPassword = (Button) findViewById(R.id.reset_password);
-
-        resetPassword.setVisibility(View.INVISIBLE);
+        connectivity = (Button) findViewById(R.id.connectivity);
 
         usernameLogin = (EditText) findViewById(R.id.username_login);
         passwordLogin = (EditText) findViewById(R.id.password_login);
+        linkLogin = (EditText) findViewById(R.id.link);
+
+        linkLogin.setVisibility(View.INVISIBLE);
 
         loginButton.setOnClickListener(this);
         cleanButton.setOnClickListener(this);
         forgetUsername.setOnClickListener(this);
-        resetPassword.setOnClickListener(this);
+        connectivity.setOnClickListener(this);
 
         AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
         wsAllTask.execute();
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginButton.setText("ENTRAR");
 
         passwordLogin.setVisibility(View.VISIBLE);
+        linkLogin.setVisibility(View.INVISIBLE);
     }
 
 
@@ -146,8 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 loginButton.setText("ENVIAR");
 
                 passwordLogin.setVisibility(View.INVISIBLE);
+                linkLogin.setVisibility(View.INVISIBLE);
                 break;
-            case R.id.reset_password:
+            case R.id.connectivity:
 
                 actionFlag = Constants.RESET_PASSWORD_FORM;
 
@@ -157,9 +161,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 passwordLogin.setText(null);
 
                 cleanButton.setText("CANCELAR");
-                loginButton.setText("ENVIAR");
+                loginButton.setText("ENTRAR");
 
-                passwordLogin.setVisibility(View.INVISIBLE);
+                linkLogin.setVisibility(View.VISIBLE);
+                passwordLogin.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;

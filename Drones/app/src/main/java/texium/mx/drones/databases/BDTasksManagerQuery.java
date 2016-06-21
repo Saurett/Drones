@@ -14,6 +14,7 @@ import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.utils.Constants;
+import texium.mx.drones.utils.DateTimeUtils;
 
 /**
  * Created by texiumuser on 17/03/2016.
@@ -21,7 +22,150 @@ import texium.mx.drones.utils.Constants;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 19;
+    static Integer BDVersion = 24;
+
+    public static String getServer(Context context) throws Exception {
+        String data = "";
+        String tempURI = Constants.WEB_SERVICE_URL;
+
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from links where link_status = " + Constants.ACTIVE, null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    data = result.getString(result.getColumnIndex(BDTasksManager.ColumnLinks.LINK));
+
+                    Log.i("SQLite: ", "Get link in the bd :" + data);
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+
+            if (data.isEmpty()) {
+                data = Constants.WEB_SERVICE_COMPLETE_URL;
+            } else {
+                data += tempURI;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static Integer getCveLink(Context context) throws Exception {
+        Integer data = null;
+
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from links where link_status = " + Constants.ACTIVE, null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    data = result.getInt(result.getColumnIndex(BDTasksManager.ColumnLinks.LINKS_CVE));
+
+                    Log.i("SQLite: ", "Get link in the bd :" + data);
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static String getPartialServer(Context context) throws Exception {
+        String data = "";
+
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from Links where link_status = " + Constants.ACTIVE, null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    data = result.getString(result.getColumnIndex(BDTasksManager.ColumnLinks.LINK));
+
+                    Log.i("SQLite: ", "Get link in the bd :" + data);
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+
+            if (data.isEmpty()) {
+                data = Constants.WEB_SERVICE_PARTIAL_URL;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static void addLink(Context context, String tempLink, Users user) throws Exception {
+        try{
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnLinks.LINK, tempLink);
+            cv.put(BDTasksManager.ColumnLinks.USER_ID, user.getIdUser());
+            cv.put(BDTasksManager.ColumnLinks.CREATION_DATE, DateTimeUtils.getActualTime());
+            cv.put(BDTasksManager.ColumnLinks.LINK_STATUS, Constants.ACTIVE);
+
+            bd.insert(BDTasksManager.LINKS_TABLE_NAME, null, cv);
+            bd.close();
+
+            Log.i("SQLite: ", "Add link in the bd with link name :" + tempLink);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
+
+    public static void updateLink(Context context, int cveLink, Users user) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnLinks.LINK_STATUS,Constants.INACTIVE);
+            cv.put(BDTasksManager.ColumnLinks.USER_ID,user.getIdUser());
+            cv.put(BDTasksManager.ColumnLinks.UPDATE_DATE, DateTimeUtils.getActualTime());
+
+
+            bd.update(BDTasksManager.LINKS_TABLE_NAME, cv, BDTasksManager.ColumnLinks.LINKS_CVE + " = " + cveLink, null);
+
+            Log.i("SQLite: ", "Update link in the bd with link : " + cveLink);
+
+            bd.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
 
     public static void addTask(Context context, Tasks t) throws Exception {
         try{

@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -21,6 +20,7 @@ import org.ksoap2.serialization.SoapPrimitive;
 
 import java.net.ConnectException;
 
+import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.SoapServices;
@@ -75,8 +75,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String username = usernameLogin.getText().toString();
         String password = passwordLogin.getText().toString();
+        String link = linkLogin.getText().toString();
 
-        if (TextUtils.isEmpty(password) && (actionFlag == Constants.LOGIN_FORM)) {
+        if (TextUtils.isEmpty(password) && ((actionFlag == Constants.LOGIN_FORM)
+            || (actionFlag == Constants.CONNECTIVITY_FORM))) {
             passwordLogin.setError(getString(R.string.password_login_error),null);
             passwordLogin.requestFocus();
             cancel = true;
@@ -85,6 +87,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (TextUtils.isEmpty(username)) {
             usernameLogin.setError(getString(R.string.username_login_error),null);
             usernameLogin.requestFocus();
+            cancel = true;
+        }
+
+
+        if ((TextUtils.isEmpty(link)) && (actionFlag == Constants.CONNECTIVITY_FORM)) {
+            linkLogin.setError("Ingrese cadena de conecxión",null);
+            linkLogin.requestFocus();
             cancel = true;
         }
 
@@ -99,7 +108,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     AsyncCallWS wsForget = new AsyncCallWS(Constants.WS_KEY_FORGET_USERNAME_SERVICE,username,null);
                     wsForget.execute();
                     break;
+                case Constants.CONNECTIVITY_FORM:
+                    AsyncCallWS wsConnection = new AsyncCallWS(Constants.WS_KEY_CONNECTION,username,password,link.trim());
+                    wsConnection.execute();
+                    break;
                 default:
+                    Toast.makeText(MainActivity.this, "Hola mundo", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -113,9 +127,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         usernameLogin.setError(null);
         passwordLogin.setError(null);
+        linkLogin.setError(null);
 
         usernameLogin.setText(null);
         passwordLogin.setText(null);
+        linkLogin.setText(null);
 
         usernameLogin.setHint(R.string.default_enter_username);
 
@@ -153,12 +169,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.connectivity:
 
-                actionFlag = Constants.RESET_PASSWORD_FORM;
+                actionFlag = Constants.CONNECTIVITY_FORM;
 
                 usernameLogin.setHint(R.string.default_enter_username);
 
                 usernameLogin.setText(null);
                 passwordLogin.setText(null);
+
+                try {
+                    linkLogin.setText(BDTasksManagerQuery.getPartialServer(getApplicationContext()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 cleanButton.setText("CANCELAR");
                 loginButton.setText("ENTRAR");
@@ -183,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private Integer webServiceOperation;
         private String username;
         private String password;
+        private String webServiceLink;
         private String textError;
         private Boolean localAccess;
 
@@ -195,6 +218,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             webServiceOperation = wsOperation;
             username = wsUsername;
             password = wsPassword;
+            textError = "";
+            localAccess = false;
+        }
+
+        private AsyncCallWS(Integer wsOperation,String wsUsername, String wsPassword, String wsTempLink) {
+            webServiceOperation = wsOperation;
+            username = wsUsername;
+            password = wsPassword;
+            webServiceLink = wsTempLink;
             textError = "";
             localAccess = false;
         }
@@ -229,13 +261,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         soapPrimitive = SoapServices.forgetUsername(getApplicationContext(),username);
                         validOperation = (soapPrimitive != null);
                         break;
+                    case Constants.WS_KEY_CONNECTION:
+                        validOperation = false;
+                        String tempPartialServer = BDTasksManagerQuery.getPartialServer(getApplicationContext());
 
+                        if (tempPartialServer.equals(webServiceLink)) {
+                            textError = "La cadena de conexión no ha sido modificada";
+                            return validOperation;
+                        }
+
+                        Users u = new Users();
+
+                        u.setUserName("admin");
+                        u.setPassword("Sedema#2016");
+                        u.setIdActor(-1);
+
+                        if (!(u.getUserName().equals(username.trim()))
+                                && !(u.getPassword().equals(password.trim()))) {
+                            u.setUserName(username.trim());
+                            u.setPassword(password.trim());
+
+                            Users tempUser = BDTasksManagerQuery.getUserByCredentials(getApplicationContext(), u);
+                            validOperation = (tempUser.getIdUser() != null);
+                            localAccess = (tempUser.getIdUser() != null);
+                            textError = (tempUser.getIdUser() != null) ? "" : getString(R.string.default_user_unregister);
+
+                            Log.i("INFO MSG", textError);
+
+                            if (!validOperation) return validOperation;
+                            u.setIdUser(tempUser.getIdUser());
+                        }
+
+                        //Create a new string
+                        Integer cveLink = BDTasksManagerQuery.getCveLink(getApplicationContext());
+                        validOperation = true;
+
+                        if (null == cveLink) {
+                            BDTasksManagerQuery.addLink(getApplicationContext(),webServiceLink,u);
+                        } else {
+                            BDTasksManagerQuery.updateLink(getApplicationContext(),cveLink,u);
+                            BDTasksManagerQuery.addLink(getApplicationContext(),webServiceLink,u);
+                        }
+
+                        break;
                     default:
                         validOperation = false;
                         break;
                 }
             } catch (ConnectException e){
-
 
                 textError = (e != null) ? e.getMessage() : "Unknown error";
                 validOperation = false;
@@ -381,6 +454,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
                         Toast.makeText(MainActivity.this,soapPrimitive.toString(), Toast.LENGTH_LONG).show();
+                        break;
+                    case Constants.WS_KEY_CONNECTION:
+                        Toast.makeText(MainActivity.this, "Cadena de conexión actualizada correctamente", Toast.LENGTH_LONG).show();
+                        cleanAllLogin();
                         break;
                     default:
                         Toast.makeText(MainActivity.this, "TEST", Toast.LENGTH_LONG).show();

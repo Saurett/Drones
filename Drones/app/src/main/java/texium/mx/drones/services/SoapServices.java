@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
+import texium.mx.drones.databases.BDTasksManager;
+import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -62,7 +64,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_TASKS;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ALL_TASKS;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -113,7 +115,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_LOGIN;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -166,7 +168,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_FORGET_USERNAME;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -218,7 +220,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_USERS;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ALL_USERS;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -270,7 +272,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_TASK;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_TASK;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -327,7 +329,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -377,7 +379,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SEND_FILE;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SEND_FILE;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
@@ -432,7 +434,7 @@ public class SoapServices {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_LOCATION;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_LOCATION;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
-            String URL = Constants.WEB_SERVICE_URL;
+            String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 

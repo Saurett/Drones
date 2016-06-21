@@ -22,7 +22,7 @@ public final class Constants {
     public static final Integer VIDEO_FILE_TYPE = 2;
     public static final int LOGIN_FORM = 1;
     public static final int FORGET_USERNAME_FORM = 2;
-    public static final int RESET_PASSWORD_FORM = 3;
+    public static final int CONNECTIVITY_FORM = 3;
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -78,6 +78,7 @@ public final class Constants {
     public static final int WS_KEY_SERVER_SYNC = 16;
     public static final int WS_KEY_UPDATE_VIDEO = 17;
     public static final int WS_KEY_FORGET_USERNAME_SERVICE = 18;
+    public static final int WS_KEY_CONNECTION = 19;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -106,7 +107,10 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
     public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/RecuperarContrasena";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
-    public static final String WEB_SERVICE_URL = "http://192.168.43.173/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_PARTIAL_URL = "http://187.216.220.51";
+    //public static final String WEB_SERVICE_URL = "http://192.168.43.173/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     //public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
     //endregion SOAP CONFIGURATION//
 

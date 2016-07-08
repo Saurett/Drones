@@ -90,7 +90,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
 
     //GPS Manager//
-    private static final String provider = LocationManager.GPS_PROVIDER; //GPS Provider
+    private static final String provider = LocationManager.PASSIVE_PROVIDER; //GPS Provider
     private LocationManager locationManagerGPS;
     private Location locationGPS;
     private Context ctx;
@@ -269,7 +269,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (requestType == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             //cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 87864320 );//X MB*1048*1048= X MB
+            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 87864320);//X MB*1048*1048= X MB
         }
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
@@ -292,7 +292,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 startActivityForResult(imgGalleryIntent, GALLERY_IMAGE_ACTIVITY_REQUEST_CODE);
 
                 Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
-                        + getString(R.string.default_file_multiple_selection)
+                                + getString(R.string.default_file_multiple_selection)
                         , Toast.LENGTH_LONG).show();
 
                 ACTUAL_POSITION = tasksDecode.getTask_position();
@@ -305,7 +305,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 startActivityForResult(videoGalleryIntent, GALLERY_VIDEO_ACTIVITY_REQUEST_CODE);
 
                 Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
-                        + getString(R.string.default_file_multiple_selection)
+                                + getString(R.string.default_file_multiple_selection)
                         , Toast.LENGTH_LONG).show();
 
                 ACTUAL_POSITION = tasksDecode.getTask_position();
@@ -603,19 +603,34 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
 
-        mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
+
+            mMap = googleMap;
+            mMap.setMyLocationEnabled(true);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
+            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
+        } else {
+
+            LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
+
+            mMap = googleMap;
+            mMap.setMyLocationEnabled(true);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
+            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
+            mMap.setMyLocationEnabled(true);
+
         }
 
-        mMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -823,7 +838,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             textError = "";
         }
 
-        private AsyncCallWS(Integer wsOperation,  FilesManager wsFm, Tasks wsTask, TasksDecode wsServiceTaskDecode) {
+        private AsyncCallWS(Integer wsOperation, FilesManager wsFm, Tasks wsTask, TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceFilesManager = wsFm;
             webServiceTask = wsTask;
@@ -914,7 +929,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         int videoNumber = 1;
 
-                        for (FilesManager fm : filesManager ) {
+                        for (FilesManager fm : filesManager) {
 
                             if (fm.getEncodeVideoFiles().length() > 0) {
 
@@ -930,14 +945,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     String title = "Transfiriendo al servidor video " + videoNumber + " de " + filesManager.size();
                                     String msg = "Subiendo paquete " + packNumber + " de " + fmPack.size();
 
-                                    publishProgress(title,msg,String.valueOf(packNumber),String.valueOf(fmPack.size()));
+                                    publishProgress(title, msg, String.valueOf(packNumber), String.valueOf(fmPack.size()));
                                     //pDialog.incrementProgressBy(1); //if needs see progress
 
                                     try {
                                         SoapServices.updateVideoFiles(getApplicationContext()
                                                 , webServiceTask.getTask_id()
                                                 , webServiceTaskDecode.getTask_user_id()
-                                                , pack , packNumber ,  (packNumber == fmPack.size()));
+                                                , pack, packNumber, (packNumber == fmPack.size()));
 
                                         Log.i("Send TO Main Server", "Pack item " + packNumber + " to " + fmPack.size());
 
@@ -1049,7 +1064,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
 
-                if (webServiceTaskDecode.getOrigin_button() != null ) {
+                if (webServiceTaskDecode.getOrigin_button() != null) {
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)

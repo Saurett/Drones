@@ -16,17 +16,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import texium.mx.drones.R;
-import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
-import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
@@ -155,7 +150,7 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
                                 , webServiceTaskDecode.getTask_status());
                         validOperation = (soapObject.getPropertyCount() > 0);
 
-                        if (validOperation) BDTasksManagerQuery.cleanTables(getContext());
+                        BDTasksManagerQuery.cleanTables(getContext());
                         break;
                 }
             } catch (Exception e) {

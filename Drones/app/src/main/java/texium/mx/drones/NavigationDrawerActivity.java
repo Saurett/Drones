@@ -547,6 +547,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
             fragmentTransaction.commit();
 
             taskToken.clear();
+        } else if (id == R.id.nav_sync) {
+
+            TasksDecode td = new TasksDecode(SESSION_DATA.getIdUser(), id);
+            AsyncCallWS wsServerSync = new AsyncCallWS(Constants.WS_KEY_SERVER_SYNC, td);
+            wsServerSync.execute();
 
         } else if (id == R.id.nav_logout) {
 
@@ -870,7 +875,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         pDialog.setCancelable(false);
                         pDialog.show();
                     } else if ((webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
-                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)) {
                         pDialog = new ProgressDialog(NavigationDrawerActivity.this);
                         pDialog.setMessage(getString(R.string.server_sync));
                         pDialog.setIndeterminate(false);
@@ -1182,6 +1188,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
                         pDialog.dismiss();
                     }
@@ -1201,7 +1208,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_SERVER_SYNC:
-                        if (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync) {
+                        if (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync
+                                || webServiceTaskDecode.getOrigin_button() == R.id.nav_sync) {
                             tempText = (textError.isEmpty() ? getString(R.string.default_server_sync_error) : textError);
                             Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
                         }

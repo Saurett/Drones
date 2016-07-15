@@ -615,6 +615,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case Constants.WS_KEY_CONNECTION:
                         Toast.makeText(MainActivity.this, "Cadena de conexión actualizada correctamente", Toast.LENGTH_LONG).show();
                         cleanAllLogin();
+
+                        try {
+                            BDTasksManagerQuery.cleanTables(getApplicationContext());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         break;
                     default:
                         Toast.makeText(MainActivity.this, "TEST", Toast.LENGTH_LONG).show();

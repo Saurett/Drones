@@ -34,6 +34,10 @@
             android:icon="@drawable/ic_setting_dark"
             android:title="Restaurar Dispositivo" />
         <item
+            android:id="@+id/nav_sync"
+            android:icon="@mipmap/ic_cloud_white"
+            android:title="Sincronizar" />
+        <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/common_full_open_on_phone"
             android:title="Cerrar Sesión" />

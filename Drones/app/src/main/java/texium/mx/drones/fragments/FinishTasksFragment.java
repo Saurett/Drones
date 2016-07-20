@@ -88,7 +88,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         content_task_window.setText(tokenTask.getTask_content());
 
         int actualIcon = (tokenTaskDecode.getOrigin_button() == R.id.finish_task_button)
-                ? R.drawable.icon_progress : R.drawable.icon_pending;
+                ? R.mipmap.ic_assignment_turned_in_white : R.mipmap.ic_assignment_late_white;
 
         task_window_icon.setBackground(getResources().getDrawable(actualIcon));
 

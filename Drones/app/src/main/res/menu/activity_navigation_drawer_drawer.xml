@@ -9,11 +9,11 @@
             android:icon="@drawable/icon_news" />
         <item
             android:id="@+id/nav_progress_task"
-            android:icon="@drawable/icon_progress"
+            android:icon="@mipmap/ic_assignment_white"
             android:title="Tareas en Proceso"/>
         <item
             android:id="@+id/nav_pending_task"
-            android:icon="@drawable/icon_pending"
+            android:icon="@mipmap/ic_assignment_late_white"
             android:title="Tareas Pendientes" />
         <item
             android:id="@+id/nav_revision_task"
@@ -23,7 +23,7 @@
             />
         <item
             android:id="@+id/nav_close_task"
-            android:icon="@drawable/icon_complete"
+            android:icon="@mipmap/ic_assignment_turned_in_white"
             android:title="Tareas Cerradas"
             />
     </group>

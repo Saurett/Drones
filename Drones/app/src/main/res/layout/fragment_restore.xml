@@ -25,7 +25,7 @@
                   android:id="@+id/restore_window_icon"
                   android:layout_width="40dp"
                   android:layout_height="40dp"
-                  android:background="@drawable/icon_progress"
+                  android:background="@drawable/ic_setting_dark"
                   android:backgroundTint="@color/colorAccent"
                   />
               <TextView

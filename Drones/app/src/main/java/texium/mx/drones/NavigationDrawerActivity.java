@@ -128,8 +128,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
 
         setTitle(""); //Set activity tittle
 
@@ -269,7 +270,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (requestType == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             //cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 87864320);//X MB*1048*1048= X MB
+            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 65898240);//X MB*1048*1048= X MB
         }
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {

@@ -1075,7 +1075,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
-                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)) {
                         pDialog.dismiss();
                     }
                 }

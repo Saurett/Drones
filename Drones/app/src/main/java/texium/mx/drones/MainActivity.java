@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
@@ -31,17 +33,19 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.models.AppVersion;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener  {
 
     private EditText usernameLogin, passwordLogin, linkLogin;
     private View mLoginFormView,mProgressView;
     private Button loginButton, cleanButton, forgetUsername, connectivity;
 
     private int actionFlag = Constants.LOGIN_FORM;
+    private String _URL_ACTUAL_VERSION = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main_civar);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        TextView appVersion = (TextView) findViewById(R.id.app_version);
+        appVersion.setText(Constants.APP_VERSION);
 
         mProgressView = findViewById(R.id.login_progress);
         mLoginFormView = findViewById(R.id.login_form);
@@ -69,10 +76,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         forgetUsername.setOnClickListener(this);
         connectivity.setOnClickListener(this);
 
-        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
+        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_CHECK_VERSION);
         wsAllTask.execute();
 
         checkAndRequestPermissions();
+    }
+
+    @Override
+    protected void onStart() {
+
+        try {
+            AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+            if (localVersion.getVersion_msg().equals("Si")) {
+                AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
+                wsAllTask.execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        super.onStart();
+    }
+
+    public void showQuestion() {
+        AlertDialog.Builder ad = new AlertDialog.Builder(this);
+
+        ad.setTitle(getString(R.string.default_title_alert_dialog));
+        ad.setMessage(getString(R.string.default_update_version));
+        ad.setCancelable(false);
+        ad.setPositiveButton(getString(R.string.default_positive_button),this);
+
+        ad.show();
+
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        switch (which) {
+            case DialogInterface.BUTTON_POSITIVE:
+
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(_URL_ACTUAL_VERSION));
+                startActivity(i);
+
+                break;
+        }
     }
 
     private boolean checkAndRequestPermissions() {
@@ -110,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return true;
     }
-
 
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
@@ -355,6 +406,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
+
+
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean>  {
 
         private SoapObject soapObject;
@@ -410,6 +463,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         validOperation = (id > 0);
                         break;
+                    case Constants.WS_KEY_CHECK_VERSION:
+
+                        soapObject = SoapServices.checkAppVersion(getApplicationContext());
+
+                        String serverAppVersion = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
+
+                        AppVersion localAV = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                        if (!localAV.getApp_version().equals(serverAppVersion)) {
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(),localAV.getApp_version(),"No");
+                        } else {
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(),localAV.getApp_version(),"Si");
+                        }
+
+                        validOperation = true;
+
+                        break;
                     case Constants.WS_KEY_ALL_USERS:
                         soapObject = SoapServices.getServerAllUsers(getApplicationContext());
                         validOperation = (soapObject.getPropertyCount() > 0);
@@ -458,6 +528,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
                             BDTasksManagerQuery.updateLink(getApplicationContext(),cveLink,u);
                             BDTasksManagerQuery.addLink(getApplicationContext(),webServiceLink,u);
+                        }
+
+                        if (validOperation) {
+                            soapObject = SoapServices.checkAppVersion(getApplicationContext());
+
+                            String sav = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
+
+                            AppVersion lav = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                            if (!lav.getApp_version().equals(sav)) {
+                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(),lav.getApp_version(),"No");
+                            } else {
+                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(),lav.getApp_version(),"Si");
+                            }
+
                         }
 
                         break;
@@ -618,6 +703,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         try {
                             BDTasksManagerQuery.cleanTables(getApplicationContext());
+
+                            AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                            if (appVersion.getVersion_msg().equals("No")) {
+                                _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
+                                showQuestion();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+
+
+                        break;
+                    case Constants.WS_KEY_CHECK_VERSION:
+
+                        try {
+                            AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                            if (appVersion.getVersion_msg().equals("No")) {
+                                _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
+                                showQuestion();
+                            }
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

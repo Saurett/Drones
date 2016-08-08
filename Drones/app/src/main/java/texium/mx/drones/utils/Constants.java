@@ -12,7 +12,7 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-
+    public static final String APP_VERSION = "1.0.4";
 
     //region SYS CONSTANTS//
     public static final String NUMBER_ZERO = "0";
@@ -79,6 +79,7 @@ public final class Constants {
     public static final int WS_KEY_UPDATE_VIDEO = 17;
     public static final int WS_KEY_FORGET_USERNAME_SERVICE = 18;
     public static final int WS_KEY_CONNECTION = 19;
+    public static final int WS_KEY_CHECK_VERSION = 20;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -88,7 +89,7 @@ public final class Constants {
      * TEXIUM MANAGER
      * *********************************
      *
-     * WEB_SERVICE_URL = "http://192.168.12.111/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+     * WEB_SERVICE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
      *
      * **********************************
      * SEDEMA MANAGER
@@ -106,12 +107,15 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
     public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/RecuperarContrasena";
+    public static final String WEB_SERVICE_SOAP_ACTION_APP_VERSION = "192.168.12.10/ObtenerVersionMovil";
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
-    public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
+
+    //public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_COMPLETE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
+    //public static final String WEB_SERVICE_COMPLETE_URL = "http://187.216.220.51/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://187.216.220.51";
-    //public static final String WEB_SERVICE_URL = "http://192.168.43.173/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    //public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
+    //public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
     //endregion SOAP CONFIGURATION//
 
     //region SOAP OPERATION//
@@ -123,6 +127,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
     public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "RecuperarContrasena";
+    public static final String WEB_SERVICE_METHOD_NAME_APP_VERSION= "ObtenerVersionMovil";
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//
@@ -141,6 +146,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_VIDEO_PART_NUMBER = "NumeroParte";
     public static final String WEB_SERVICE_PARAM_VIDEO_LAST_ONE = "Ultimo";
     public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "CorreoElectronico";
+    public static final String WEB_SERVICE_PARAM_APP_VERSION = "CorreoElectronico";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//
@@ -174,6 +180,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_TASK_END_DATE = "FechaFin";
     public static final String SOAP_OBJECT_KEY_TASK_STATUS = "IDEstatus";
     public static final String SOAP_OBJECT_KEY_TASK_USER_ID = "IDUsuario";
+    public static final String SOAP_OBJECT_KEY_TASK_URL = "Ruta";
     //endregion SOAP KEYS//
 
     //region ACTIVITY PARAMS//

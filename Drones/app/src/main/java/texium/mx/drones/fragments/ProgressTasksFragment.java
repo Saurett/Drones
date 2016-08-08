@@ -44,7 +44,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
     static {
         progressTaskTitle = new ArrayList<>();
-        progressTaskTitle.add(new TasksTitle("TAREAS EN PROGRESO", "CUADRILLA"));
+        progressTaskTitle.add(new TasksTitle("TAREAS EN PROCESO", "CUADRILLA"));
     }
 
     RecyclerView tasks_list, tasks_list_tittle;

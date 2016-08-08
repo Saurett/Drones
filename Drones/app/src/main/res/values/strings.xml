@@ -66,6 +66,9 @@
     <string name="default_enter_username">Enter username</string>
     <string name="default_enter_password">Enter password</string>
     <string name="default_entrer_email">Ingrese su correo electronico</string>
+    <string name="default_title_alert_dialog">Importante</string>
+    <string name="default_update_version">Se ha detectado una versión actualizada, se procedera a descargarla</string>
+    <string name="default_positive_button">Confirmar</string>
 
 
 </resources>

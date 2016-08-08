@@ -9,6 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import texium.mx.drones.models.AppVersion;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
@@ -22,7 +23,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 24;
+    static Integer BDVersion = 30;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -57,6 +58,102 @@ public class BDTasksManagerQuery {
         }
 
         return data;
+    }
+
+    public static AppVersion getAppVersion(Context context) throws Exception {
+        AppVersion appVersion = new AppVersion();
+        String data = "";
+
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from app_version where app_version_cve = 1", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    appVersion.setApp_version_cve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnAppVersion.APP_VERSION_CVE)));
+                    appVersion.setApp_version(result.getString(result.getColumnIndex(BDTasksManager.ColumnAppVersion.APP_VERSION)));
+                    appVersion.setVersion_msg(result.getString(result.getColumnIndex(BDTasksManager.ColumnAppVersion.VERSION_MSG)));
+
+                    Log.i("SQLite: ", "Get link in the bd :" + data);
+
+                    Log.i("SQLite: ", "cve :" + appVersion.getApp_version_cve());
+                    Log.i("SQLite: ", "app version :" + appVersion.getApp_version());
+                    Log.i("SQLite: ", "msg :" + appVersion.getVersion_msg());
+
+                    updateAppVersion(context,Constants.APP_VERSION,appVersion.getVersion_msg());
+
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+
+            if (appVersion.getApp_version_cve() == null) {
+                addAppVersion(context,Constants.APP_VERSION,"Si");
+
+                appVersion.setApp_version_cve(1);
+                appVersion.setApp_version(Constants.APP_VERSION);
+                appVersion.setVersion_msg("Si");
+            }
+
+            Log.i("SQLite: ", "cve 2:" + appVersion.getApp_version_cve());
+            Log.i("SQLite: ", "app version 2 :" + appVersion.getApp_version());
+            Log.i("SQLite: ", "msg 2 :" + appVersion.getVersion_msg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return appVersion;
+    }
+
+    public static void addAppVersion(Context context, String appVersion, String msg) throws Exception {
+        try{
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnAppVersion.APP_VERSION,appVersion);
+            cv.put(BDTasksManager.ColumnAppVersion.VERSION_MSG,msg);
+
+            bd.insert(BDTasksManager.APP_VERSION_TABLE_NAME, null, cv);
+            bd.close();
+
+            Log.i("SQLite: ", "Add app_version in the bd with");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
+
+
+
+    public static void updateAppVersion(Context context, String appVersion, String msg ) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnAppVersion.APP_VERSION,appVersion);
+            cv.put(BDTasksManager.ColumnAppVersion.VERSION_MSG,msg);
+
+            bd.update(BDTasksManager.APP_VERSION_TABLE_NAME, cv, BDTasksManager.ColumnAppVersion.APP_VERSION_CVE + " = " + 1, null);
+
+            Log.i("SQLite: ", "Update app_version in the bd with link : " + 1);
+
+            bd.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
     }
 
     public static Integer getCveLink(Context context) throws Exception {

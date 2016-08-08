@@ -1,7 +1,6 @@
 package texium.mx.drones.services;
 
 import android.content.Context;
-import android.util.Base64;
 import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
@@ -15,11 +14,9 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.io.EOFException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.utils.Constants;
 
@@ -475,5 +472,56 @@ public class SoapServices {
         }
 
         return soapPrimitive;
+    }
+
+    public static SoapObject checkAppVersion(Context context) throws Exception {
+        SoapObject soapObject;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_APP_VERSION;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_APP_VERSION;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapObject = (SoapObject) soapEnvelope.getResponse();
+
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (java.net.SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new ConnectException(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapObject;
     }
 }

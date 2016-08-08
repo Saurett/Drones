@@ -5,7 +5,7 @@
         android:id="@+id/task_group">
         <item
             android:id="@+id/nav_news_task"
-            android:title="Nuevas Tareas"
+            android:title="Tareas Nuevas"
             android:icon="@drawable/icon_news" />
         <item
             android:id="@+id/nav_progress_task"
@@ -32,7 +32,7 @@
         <item
             android:id="@+id/restore_device"
             android:icon="@drawable/ic_setting_dark"
-            android:title="Restaurar Dispositivo" />
+            android:title="Restaurar Tareas" />
         <item
             android:id="@+id/nav_sync"
             android:icon="@mipmap/ic_cloud_white"

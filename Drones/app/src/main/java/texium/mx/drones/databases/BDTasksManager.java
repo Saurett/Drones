@@ -16,6 +16,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static final String TASKS_FILES_TABLE_NAME = "Tasks_Files";
     public static final String FILES_PACKAGES_TABLE_NAME = "Files_Packages";
     public static final String LINKS_TABLE_NAME = "Links";
+    public static final String APP_VERSION_TABLE_NAME = "App_Version";
 
     public static final String STRING_TYPE = "text";
     public static final String INT_TYPE = "integer";
@@ -86,6 +87,12 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String LINK_STATUS = "link_status";
     }
 
+    public static class ColumnAppVersion {
+        public static final String APP_VERSION_CVE = "app_version_cve";
+        public static final String APP_VERSION = "app_version";
+        public static final String VERSION_MSG = "version_msg";
+    }
+
     public static final String CREATE_TASKS_TABLE_SCRIPT =
             "create table " + TASKS_TABLE_NAME + "(" +
                     ColumnTasks.TASK_CVE + " " + INT_TYPE + " primary key autoincrement," +
@@ -154,6 +161,13 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnLinks.LINK_STATUS + " " + INT_TYPE +
                     ")";
 
+    public static final String CREATE_APP_VERSION_TABLE_SCRIPT =
+            "create table " + APP_VERSION_TABLE_NAME + "(" +
+                    ColumnAppVersion.APP_VERSION_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnAppVersion.APP_VERSION + " " + STRING_TYPE + "," +
+                    ColumnAppVersion.VERSION_MSG + " " + STRING_TYPE +
+                            ")";
+
     public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -164,8 +178,11 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);
+        db.execSQL(CREATE_TASK_DETAILS_TABLE_SCRIPT);
+        db.execSQL(CREATE_TASKS_FILES_TABLE_SCRIPT);
+        db.execSQL(CREATE_FILES_PACKAGE_TABLE_SCRIPT);
         db.execSQL(CREATE_LINKS_TABLE_SCRIPT);
-
+        db.execSQL(CREATE_APP_VERSION_TABLE_SCRIPT);
     }
 
     @Override
@@ -177,6 +194,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_FILES_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.FILES_PACKAGES_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.LINKS_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.APP_VERSION_TABLE_NAME);
 
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);
@@ -184,5 +202,6 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_TASKS_FILES_TABLE_SCRIPT);
         db.execSQL(CREATE_FILES_PACKAGE_TABLE_SCRIPT);
         db.execSQL(CREATE_LINKS_TABLE_SCRIPT);
+        db.execSQL(CREATE_APP_VERSION_TABLE_SCRIPT);
     }
 }

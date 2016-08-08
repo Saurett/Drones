@@ -309,8 +309,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             switch (actionFlag) {
                 case Constants.LOGIN_FORM:
-                    AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE,username,password);
-                    wsLogin.execute();
+                    try {
+                        AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                        if (localVersion.getVersion_msg().equals("Si")) {
+                            AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE,username,password);
+                            wsLogin.execute();
+                        } else {
+                            AsyncCallWS wsVersion = new AsyncCallWS(Constants.WS_KEY_CHECK_VERSION);
+                            wsVersion.execute();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     break;
                 case Constants.FORGET_USERNAME_FORM:
                     AsyncCallWS wsForget = new AsyncCallWS(Constants.WS_KEY_FORGET_USERNAME_SERVICE,username,null);

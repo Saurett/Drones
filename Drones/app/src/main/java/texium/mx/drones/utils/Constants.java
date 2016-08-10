@@ -12,7 +12,7 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-    public static final String APP_VERSION = "1.0.4";
+    public static final String APP_VERSION = "1.0.5";
 
     //region SYS CONSTANTS//
     public static final String NUMBER_ZERO = "0";
@@ -23,6 +23,11 @@ public final class Constants {
     public static final int LOGIN_FORM = 1;
     public static final int FORGET_USERNAME_FORM = 2;
     public static final int CONNECTIVITY_FORM = 3;
+
+    public static final String IMAGE_SECTION = "Imagenes";
+    public static final String VIDEO_SECTION = "Videos";
+    public static final String DOCUMENT_SECTION = "Documentos";
+
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -56,7 +61,10 @@ public final class Constants {
     public static final String FRAGMENT_CLOSE_TAG = "fragment_close_task";
     public static final String FRAGMENT_FINISH_TAG = "fragment_finish_task";
     public static final String FRAGMENT_RESTORE_TAG = "fragment_restore";
-    public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
+    @Deprecated  public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
+    public static final String FRAGMENT_PHOTO_GALLERY_TAG = "fragment_photo_gallery";
+    public static final String FRAGMENT_VIDEO_GALLERY_TAG = "fragment_video_gallery";
+    public static final String FRAGMENT_DOCUMENT_GALLERY_TAG = "fragment_document_gallery";
     //endregion FRAGMENT TAGS//
 
     //region WEB SERVICE ID //
@@ -117,7 +125,7 @@ public final class Constants {
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     */
     public static final String WEB_SERVICE_COMPLETE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
-    public static final String WEB_SERVICE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
 
 
     //endregion SOAP CONFIGURATION//

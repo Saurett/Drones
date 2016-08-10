@@ -105,6 +105,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     //Sessions control//
     private static Users SESSION_DATA;
+    private static String ACTUAL_FRAGMENT;
 
     //Collections Controls//
     public Map<Long, Object> taskToken = new HashMap<>();
@@ -126,7 +127,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
+        try {
+            SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            getIntent().putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, SESSION_DATA);
+        }
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -178,6 +184,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        //showFragment(getActualFragment());
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -358,6 +366,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
                 wsClose.execute();
                 break;
+            case R.id.gallery_task_button:
+
+                //setActualFragment(fragmentManager);
+
+                Intent intentTab = new Intent(NavigationDrawerActivity.this,TabActivity.class);
+                //intentTab.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, SESSION_DATA);
+                startActivity(intentTab);
+
+                break;
             default:
                 Snackbar.make(v, "Acción no registrada ", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -368,6 +385,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
             closeActiveTaskFragment(v);
             Toast.makeText(this, getString(R.string.default_empty_task_list), Toast.LENGTH_SHORT).show();
         }
+    }
+
+
+    private void setActualFragment(FragmentManager fragmentManager) {
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if (fragments.size() > 0) {
+            ACTUAL_FRAGMENT = fragments.get(0).getTag();
+        }
+    }
+
+    private String getActualFragment() {
+        return ACTUAL_FRAGMENT;
     }
 
     @Override
@@ -565,6 +594,49 @@ public class NavigationDrawerActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showFragment(String fragmentTag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (fragmentTag == Constants.FRAGMENT_NEWS_TAG) {
+
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.tasks_fragment_container, new NewsTasksFragment(), Constants.FRAGMENT_NEWS_TAG);
+            fragmentTransaction.commit();
+
+            taskToken.clear();
+
+        } else if (fragmentTag == Constants.FRAGMENT_PROGRESS_TAG) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
+            fragmentTransaction.commit();
+
+            taskToken.clear();
+
+        } else if (fragmentTag == Constants.FRAGMENT_PENDING_TAG) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), Constants.FRAGMENT_PENDING_TAG);
+            fragmentTransaction.commit();
+
+            taskToken.clear();
+
+        } else if (fragmentTag == Constants.FRAGMENT_REVISION_TAG) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), Constants.FRAGMENT_REVISION_TAG);
+            fragmentTransaction.commit();
+
+            taskToken.clear();
+
+        } else if (fragmentTag == Constants.FRAGMENT_CLOSE_TAG) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), Constants.FRAGMENT_CLOSE_TAG);
+            fragmentTransaction.commit();
+
+            taskToken.clear();
+        }
+
+        ACTUAL_FRAGMENT = null;
     }
 
     public void removeAllFragment(FragmentManager fragmentManager) {

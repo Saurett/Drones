@@ -9,10 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -153,7 +150,7 @@ public class FileServices {
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
             Log.e("OutOfMemoryVideo Exception",e.getMessage());
-            throw  new OutOfMemoryError(context.getString(R.string.default_out_of_memory) + e);
+            throw  new OutOfMemoryError(context.getString(R.string.default_out_of_memory));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("PackingVideo Exception",e.getMessage());

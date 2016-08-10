@@ -298,6 +298,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 tasksDecode.setSendImgFiles(FileServices.attachImg(getActivity(), uriFilesPicture));
 
             }
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            Log.e("OutOfMemoryVideo Exception",e.getMessage());
+            throw  new Exception(getString(R.string.default_out_of_memory));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("File Exception:",e.getMessage());

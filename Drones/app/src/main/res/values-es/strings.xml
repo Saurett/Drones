@@ -70,6 +70,7 @@
     <string name="default_title_alert_dialog">Importante</string>
     <string name="default_update_version">Se ha detectado una versión de la aplicación, Es necesario actualizar.</string>
     <string name="default_positive_button">Confirmar</string>
+    <string name="gallery_task_label">Galeria Adjunta</string>
 
 
 </resources>

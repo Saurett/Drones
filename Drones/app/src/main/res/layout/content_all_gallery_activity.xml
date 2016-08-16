@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AllGalleryActivity"
+    tools:showIn="@layout/activity_all_gallery">
+
+    <LinearLayout
+        android:id="@+id/menu_gallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <Button
+            android:id="@+id/photos_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:text="Fotos"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <Button
+            android:id="@+id/video_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:text="Videos"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <Button
+            android:id="@+id/document_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:text="Documentos"
+            android:textColor="@color/colorPrimaryDark" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/list_gallery_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/detail_gallery_container"
+        android:layout_below="@+id/menu_gallery"></FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/detail_gallery_container"
+        android:layout_width="640dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/menu_gallery"></FrameLayout>
+
+
+</RelativeLayout>

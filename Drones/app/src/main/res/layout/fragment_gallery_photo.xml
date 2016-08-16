@@ -4,14 +4,15 @@
     android:layout_height="match_parent"
     tools:context="texium.mx.drones.fragments.PhotoGalleryFragment">
 
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical">
-       <android.support.v7.widget.RecyclerView
-           android:id="@+id/photo_gallery_list"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
-   </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/photo_gallery_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+    </LinearLayout>
 
 </FrameLayout>

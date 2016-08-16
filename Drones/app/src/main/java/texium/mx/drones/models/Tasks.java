@@ -1,9 +1,11 @@
 package texium.mx.drones.models;
 
+import java.io.Serializable;
+
 /**
  * Created by saurett on 14/01/2016.
  */
-public class Tasks {
+public class Tasks implements Serializable{
 
     private Integer task_cve;
     private String task_tittle;

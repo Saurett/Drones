@@ -185,7 +185,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        //showFragment(getActualFragment());
+        showFragment(getActualFragment());
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -228,6 +228,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
         } else {
+            ACTUAL_FRAGMENT = null;
             Toast.makeText(this, getString(R.string.default_gps_error), Toast.LENGTH_LONG).show();
             taskToken.clear();
             finish();
@@ -368,11 +369,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
             case R.id.gallery_task_button:
 
-                //setActualFragment(fragmentManager);
+                setActualFragment(fragmentManager);
 
-                Intent intentTab = new Intent(NavigationDrawerActivity.this,TabActivity.class);
-                //intentTab.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, SESSION_DATA);
-                startActivity(intentTab);
+                Intent intentAG = new Intent(NavigationDrawerActivity.this,AllGalleryActivity.class);
+                intentAG.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY, task);
+                startActivity(intentAG);
 
                 break;
             default:
@@ -585,6 +586,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
 
+            ACTUAL_FRAGMENT = null;
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
 
             taskToken.clear();

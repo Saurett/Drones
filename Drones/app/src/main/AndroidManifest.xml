@@ -42,13 +42,7 @@
             android:name=".NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer"
             android:largeHeap="true"
-            android:theme="@style/AppTheme.NoActionBar"
-            ></activity>
-        <activity
-            android:name=".TabActivity"
-            android:label="@string/title_activity_tab"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".NavigationDrawerActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -62,6 +56,10 @@
             android:value="@integer/google_play_services_version" />
         <!-- Fred AIzaSyDqoRaX3UBDPaCoE5thJ7TbMT7Kgvgv4sE -->
 
+        <activity android:name=".AllGalleryActivity"
+            android:label="@string/title_activity_tab"
+            android:parentActivityName=".NavigationDrawerActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -5,40 +5,34 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import texium.mx.drones.R;
 import texium.mx.drones.models.PhotoGallery;
+import texium.mx.drones.utils.Constants;
 
 /**
  * Created by saurett on 14/01/2016.
  */
 public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapter.ViewHolder>{
 
-    /* En caso de llamar una actividad desde el adapter
-    Context context = v.getContext();
-    Intent intent = new Intent(context, MainActivity.class);
-    context.startActivity(intent);
-    */
-
     View.OnClickListener onClickListener;
     List<PhotoGallery> photo_gallery_list = new ArrayList<>();
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        EditText description_picture;
-        Button cloud_picture_button;
-        Button delete_picture_button;
+        Button sync_button;
+        Button description_button;
+        Button delete_button;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            description_picture = (EditText) itemView.findViewById(R.id.photoDescription);
-            cloud_picture_button = (Button) itemView.findViewById(R.id.cloudPhoto);
-            delete_picture_button = (Button) itemView.findViewById(R.id.deletePhoto);
+            sync_button = (Button) itemView.findViewById(R.id.item_photo_sync);
+            description_button = (Button) itemView.findViewById(R.id.item_photo_description);
+            delete_button = (Button) itemView.findViewById(R.id.item_photo_delete);
         }
     }
 
@@ -59,20 +53,37 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         final PhotoGallery item = photo_gallery_list.get(position);
 
-        holder.description_picture.setText(item.getDescription());
+        int syncType = item.getSync_type().intValue();
 
-        /*
+        int resource;
+        switch (syncType) {
+            case Constants.ITEM_SYNC_SERVER_DEFAULT:
+                resource = R.mipmap.ic_computer_black;
+                break;
+            case Constants.ITEM_SYNC_LOCAL_TABLET:
+                resource = R.mipmap.ic_tablet_android_black;
+                break;
+            case Constants.ITEM_SYNC_SERVER_CLOUD:
+                resource = R.mipmap.ic_cloud_black;
+                break;
+            default:
+                resource = R.drawable.logo_df_civar;
+                break;
 
-        holder.agree_task_button.setOnClickListener(new View.OnClickListener() {
+        }
+
+        holder.sync_button.setBackgroundResource(resource);
+        holder.delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentJumper(v,task,taskDecode);
+                removeItem(position);
             }
         });
 
+        /*
         holder.finish_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +113,12 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
     @Override
     public int getItemCount() {
         return photo_gallery_list == null ? 0 : photo_gallery_list.size();
+    }
+
+    public void removeItem(int position) {
+        this.photo_gallery_list.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, getItemCount() - position);
     }
 
 }

@@ -13,4 +13,14 @@
         <item name="android:colorControlNormal">@color/colorPrimaryDark</item>
 
     </style>
+    <style name="AppThemeMyGallery" parent="android:Theme.Material">
+        <!-- Main theme colors -->
+        <!--   your app branding color for the app bar -->
+        <item name="android:colorPrimary">@color/colorPrimaryWhite</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="android:colorPrimaryDark">@color/colorAccent</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="android:colorAccent">@color/colorPrimaryDark</item>
+
+    </style>
 </resources>

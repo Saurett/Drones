@@ -27,7 +27,6 @@ public final class Constants {
     public static final String IMAGE_SECTION = "Imagenes";
     public static final String VIDEO_SECTION = "Videos";
     public static final String DOCUMENT_SECTION = "Documentos";
-
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -62,6 +61,7 @@ public final class Constants {
     public static final String FRAGMENT_FINISH_TAG = "fragment_finish_task";
     public static final String FRAGMENT_RESTORE_TAG = "fragment_restore";
     @Deprecated  public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
+    public static final String FRAGMENT_PHOTO_GALLERY_LIST_TAG = "fragment_photo_gallery_list";
     public static final String FRAGMENT_PHOTO_GALLERY_TAG = "fragment_photo_gallery";
     public static final String FRAGMENT_VIDEO_GALLERY_TAG = "fragment_video_gallery";
     public static final String FRAGMENT_DOCUMENT_GALLERY_TAG = "fragment_document_gallery";
@@ -197,6 +197,7 @@ public final class Constants {
 
     //region ACTIVITY PARAMS//
     public static final String ACTIVITY_EXTRA_PARAMS_LOGIN = "data";
+    public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY = "task_gallery_info";
     //endregion ACTIVITY PARAMS//
 
     //region ACCESS TO MAP TASK PRIORITY//
@@ -238,4 +239,11 @@ public final class Constants {
     }
 
     //endregion ACCESS TO MAP PRIORITY//
+
+    //region SYNC BUTTON//
+    public static final int ITEM_SYNC_SERVER_DEFAULT = 1;
+    public static final int ITEM_SYNC_LOCAL_TABLET = 2;
+    public static final int ITEM_SYNC_SERVER_CLOUD = 3;
+
+    //endregion//
 }

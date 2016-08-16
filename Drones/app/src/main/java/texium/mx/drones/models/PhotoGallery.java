@@ -10,13 +10,14 @@ public class PhotoGallery {
     private String base_package;
     private Integer file_type;
     private String description;
-    private Integer photoCloud;
+    private Integer sync_type;
 
     public PhotoGallery() {
     }
 
-    public PhotoGallery(String description) {
+    public PhotoGallery(String description, Integer sync_type) {
         this.description = description;
+        this.sync_type = sync_type;
     }
 
     public Integer getCve() {
@@ -59,11 +60,11 @@ public class PhotoGallery {
         this.description = description;
     }
 
-    public Integer getPhotoCloud() {
-        return photoCloud;
+    public Integer getSync_type() {
+        return sync_type;
     }
 
-    public void setPhotoCloud(Integer photoCloud) {
-        this.photoCloud = photoCloud;
+    public void setSync_type(Integer sync_type) {
+        this.sync_type = sync_type;
     }
 }

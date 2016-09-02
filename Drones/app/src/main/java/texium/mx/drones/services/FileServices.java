@@ -9,15 +9,18 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
-import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.models.FilesManager;
-import texium.mx.drones.utils.Constants;
 
 /**
  * Created by texiumuser on 11/03/2016.
@@ -140,7 +143,7 @@ public class FileServices {
 
                 i++;
 
-                BDTasksManagerQuery.addTaskFiles(context,2010,tempData, Constants.VIDEO_FILE_TYPE);
+                //BDTasksManagerQuery.addTaskFiles(context,2010,tempData, Constants.VIDEO_FILE_TYPE);
 
             }
 
@@ -203,5 +206,45 @@ public class FileServices {
         }
 
         return  data;
+    }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        Bitmap myBitmap = null;
+        try {
+
+            URL url = new URL(src);
+            //Quit blank space
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            url = uri.toURL();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            myBitmap = BitmapFactory.decodeStream(input);
+        } catch (java.net.MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return myBitmap;
+    }
+
+    public static String attachImgFromBitmap(Bitmap bitmap) throws Exception {
+        String imageEncoded = null;
+        try {
+            ByteArrayOutputStream convert = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, convert);
+            byte[] b = convert.toByteArray();
+            imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("AttachImg Exception",e.getMessage());
+        }
+
+        return imageEncoded;
     }
 }

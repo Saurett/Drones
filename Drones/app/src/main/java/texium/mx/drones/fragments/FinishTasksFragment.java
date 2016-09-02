@@ -305,7 +305,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("File Exception:",e.getMessage());
-            throw  new Exception(e.getMessage());
+            throw  new Exception("No es posible adjuntar archivos intente mas tarde...");
         }
 
         return tasksDecode;

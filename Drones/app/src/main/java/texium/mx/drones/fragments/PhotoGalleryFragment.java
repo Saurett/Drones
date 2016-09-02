@@ -3,12 +3,16 @@ package texium.mx.drones.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,21 +27,24 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.PhotoGalleryAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
-import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
+import texium.mx.drones.models.DecodeGallery;
+import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.PhotoGallery;
 import texium.mx.drones.models.Tasks;
-import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
-public class PhotoGalleryFragment extends Fragment implements View.OnClickListener{
+public class PhotoGalleryFragment extends Fragment implements View.OnClickListener {
 
+    private Tasks _TASK_INFO;
     private SoapObject soapObject;
     private static Users SESSION_DATA;
 
-    static FragmentTaskListener activityListener;
+    static FragmentGalleryListener activityListener;
     static List<PhotoGallery> photoGallery;
 
     RecyclerView photos_list;
@@ -45,39 +52,20 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
     static PhotoGalleryAdapter photo_gallery_adapter;
 
     private ProgressDialog pDialog;
-
-    static {
-        photoGallery = new ArrayList<>();
-        photoGallery.add(new PhotoGallery("Sin Descripción",1));
-        photoGallery.add(new PhotoGallery("",1));
-        photoGallery.add(new PhotoGallery("",1));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",1));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",1));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",2));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",3));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",2));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",3));
-        photoGallery.add(new PhotoGallery("1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS 1. NUEVA TAREA. Haga clic en esta opción para desplegar el formulario utilizado para la creación de una nueva tarea. 2. TAREAS EN PROCESO. Seleccione esta opción para mostrar el listado de las tareas que se encuentran realizando las cuadrillas. 3. TAREAS FINALIZADAS. Haga clic en esta opción para desplegar el listado de las tareas que las cuadrillas han finalizado. 4. CUADRILLA EN LINEA. Indicador de cuadrilla en línea. La cuadrilla mostrará este ícono cuando se encuentre en línea. La ubicación de esta imagen será la misma que la posición actual de la cuadrilla. 5. CUADRILLA FUERA DE LINEA. Indicador de cuadrilla fuera de línea. La cuadrilla mostrará este ícono cuando se encuentre fuera de línea. La ubicación de esta imagen será la misma que la última posición en la que la cuadrilla se encontraba en línea. 6. COORDENADAS ACTUALES. Coordenadas que el mapa se encuentra mostrando. Estas coordenadas cambiarán si el usuario se desplaza a través del mapa. 7. ULTIMAS CONEXIONES. Haga clic en esta opción para mostrar el listado de las últimas conexiones de las cuadrillas. 8. DRONES. Haga clic en esta opción para mostrar el listado de los drones disponibles. 9. PROCESOS. Seleccione un proceso para poder ver en el mapa las imágenes que se han adjuntado para el mismo. Para más detalle consulte el módulo MAPAS",1));
-
-    }
-
+    static FragmentManager fragmentManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         final View view = inflater.inflate(R.layout.fragment_gallery_photo, container, false);
+        fragmentManager = getActivity().getSupportFragmentManager();
+
 
         photos_list = (RecyclerView) view.findViewById(R.id.photo_gallery_list);
 
         photo_gallery_adapter = new PhotoGalleryAdapter();
         photo_gallery_adapter.setOnClickListener(this);
-
-        photo_gallery_adapter.addAll(photoGallery);
-        photos_list.setAdapter(photo_gallery_adapter);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        photos_list.setLayoutManager(linearLayoutManager);
 
         return view;
     }
@@ -86,17 +74,17 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
 
-        //SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
+        _TASK_INFO = (Tasks) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY);
 
-        //AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_NEWS,Integer.valueOf(SESSION_DATA.getIdTeam().toString()),Constants.NEWS_TASK);
-        //wsTaskList.execute();
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_ITEM_PHOTO_GALLERY);
+        wsTaskList.execute();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            //activityListener = (FragmentTaskListener) getActivity();
+            activityListener = (FragmentGalleryListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() + " debe implementar ");
         }
@@ -111,34 +99,39 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    public static void fragmentJump(View view,Tasks task,TasksDecode tasksDecode) {
-        //activityListener.taskActions(view, photo_gallery_adapter, task,tasksDecode);
+    public static void showQuestion(DecodeGallery decodeGallery) {
+        activityListener.updateDecodeGallery(decodeGallery);
+        activityListener.showQuestion(decodeGallery.getIdView());
     }
 
-    public void fragmentJump2(View view,Tasks task,TasksDecode tasksDecode) {
-        //activityListener.taskActions(view, photo_gallery_adapter, task,tasksDecode);
+
+    public static void removeAt(int position) {
+        photoGallery.remove(position);
+        photo_gallery_adapter.removeItem(position);
+
+        //Move to preview list
+        activityListener.getDecodeGallery().setPhotoGallery(photoGallery.get(position - 1));
+        activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+        //setEmptyView(Constants.SEARCH);
     }
+
 
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private Integer webServiceOperation;
-        private Integer idTeam;
-        private Integer idStatus;
-        private List<PhotoGallery> tempTaskList;
+        private List<PhotoGallery> tempGalleryList;
         private String textError;
 
-        private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
+        private AsyncCallWS(Integer wsOperation) {
             webServiceOperation = wsOperation;
-            idTeam = wsIdTeam;
-            idStatus = wsIdStatus;
             textError = "";
-            tempTaskList = new ArrayList<>();
+            tempGalleryList = new ArrayList<>();
         }
 
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(getContext());
-            pDialog.setMessage(getString(R.string.tasks_loading));
+            pDialog.setMessage(getString(R.string.default_load_pictures));
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -149,18 +142,84 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
             Boolean validOperation = false;
 
-            try{
+            try {
                 switch (webServiceOperation) {
-                    case Constants.WS_KEY_TASK_SERVICE_NEWS:
+                    case Constants.WS_KEY_ITEM_PHOTO_GALLERY:
 
-                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
-                        validOperation = (soapObject.getPropertyCount() > 0);
+                        tempGalleryList = new ArrayList<>();
+                        List<PhotoGallery> photoGalleries = new ArrayList<>();
 
-                        if (!validOperation) {
-                            Tasks t = new Tasks(idStatus);
-                            //tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
-                            if (tempTaskList.size() > 0) validOperation = true;
+                        soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0);
+
+                        if (soapObject.hasProperty(Constants.SOAP_PROPERTY_DIFFGRAM)) {
+                            SoapObject soDiffGram = (SoapObject) soapObject.getProperty(Constants.SOAP_PROPERTY_DIFFGRAM);
+                            if (soDiffGram.hasProperty(Constants.SOAP_PROPERTY_NEW_DATA_SET)) {
+                                SoapObject soNewDataSet = (SoapObject) soDiffGram.getProperty(Constants.SOAP_PROPERTY_NEW_DATA_SET);
+
+                                for (int i = 0; i < soNewDataSet.getPropertyCount(); i++) {
+                                    SoapObject soItem = (SoapObject) soNewDataSet.getProperty(i);
+
+                                    PhotoGallery photoServer = new PhotoGallery();
+
+                                    Integer systemType = (Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SYSTEM_ID).toString()).
+                                            equals(Constants.ITEM_SYNC_SERVER_DEFAULT)
+                                            ? Constants.ITEM_SYNC_SERVER_DEFAULT : Constants.ITEM_SYNC_SERVER_CLOUD);
+
+                                    photoServer.setId(Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                                    photoServer.setSync_type(systemType);
+
+                                    if (soItem.hasProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT)) {
+                                        photoServer.setDescription(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                                    }
+
+                                    photoServer.setFile_type(Constants.PICTURE_FILE_TYPE);
+
+                                    PhotoGallery photoLocal = BDTasksManagerQuery.getPhotoByServerId(getContext(),photoServer);
+
+                                    Boolean exist = (photoLocal.getCve() != null);
+
+                                    if (!exist) {
+                                        Bitmap serverPhoto = FileServices.getBitmapFromURL(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
+
+                                        if (serverPhoto == null) continue;
+
+                                        photoServer.setPhoto_bitmap(serverPhoto);
+                                        photoServer.setBase_package(FileServices.attachImgFromBitmap(photoServer.getPhoto_bitmap()));
+                                        photoGalleries.add(photoServer);
+                                    }
+                                }
+                            }
                         }
+
+                        if (!photoGalleries.isEmpty()) {
+
+                            FilesManager filesManager = new FilesManager();
+                            filesManager.setPhotoGalleries(photoGalleries);
+
+                            BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(),_TASK_INFO.getTask_id(),
+                                    "Se agregan imagenes por ws", _TASK_INFO.getTask_status(),_TASK_INFO.getTask_user_id(),
+                                    filesManager,true);
+                        }
+
+                        List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
+
+                        if (!taskGallery.isEmpty()) {
+                            List<PhotoGallery> allPhotos = BDTasksManagerQuery.getGalleryFiles(
+                                    getContext(), taskGallery, Constants.PICTURE_FILE_TYPE, null, Constants.ACTIVE);
+
+                            for (PhotoGallery photo : allPhotos) {
+
+                                if (photo.getBase_package() == null) continue;
+
+                                byte[] decodedString = Base64.decode(photo.getBase_package(), Base64.DEFAULT);
+                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                photo.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+
+                                tempGalleryList.add(photo);
+                            }
+                        }
+
+                        validOperation = true;
 
                         break;
                 }
@@ -169,18 +228,30 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                 textError = e.getMessage();
                 validOperation = false;
 
-                Tasks t = new Tasks(idStatus);
-
                 try {
-                    //tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
-                    validOperation = (tempTaskList.size() > 0);
-                    textError =  (tempTaskList.size() > 0) ? textError
+
+                    List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
+
+                    if (!taskGallery.isEmpty()) {
+                        List<PhotoGallery> allPhotos = BDTasksManagerQuery.getGalleryFiles(getContext(), taskGallery, Constants.PICTURE_FILE_TYPE, null, Constants.ACTIVE);
+
+                        for (PhotoGallery photo : allPhotos) {
+
+                            if (photo.getBase_package() == null) continue;
+
+                            byte[] decodedString = Base64.decode(photo.getBase_package(), Base64.DEFAULT);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            photo.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+
+                            tempGalleryList.add(photo);
+                        }
+                    }
+                    validOperation = (tempGalleryList.size() > 0);
+                    textError =  (tempGalleryList.size() > 0) ? textError
                             : getString(R.string.default_empty_task_list);
                 } catch (Exception ex) {
                     textError = ex.getMessage();
-
                     ex.printStackTrace();
-                    Log.e("NewsTasksException: ", "Unknown error");
                 }
 
             } catch (Exception e) {
@@ -193,80 +264,13 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
         @Override
         protected void onPostExecute(final Boolean success) {
-
             try {
                 photoGallery = new ArrayList<>();
                 pDialog.dismiss();
-                if(success) {
+                if (success) {
 
-                    if (tempTaskList.size() == 0) {
-
-                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
-                            Tasks t = new Tasks();
-
-                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                            SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
-
-                            /*
-                            t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                            t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
-                            t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                            t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                            t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                            t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                            t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                            t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                            t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                            t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
-                            */
-
-                            //photoGallery.add(t);
-
-                            try {
-                                Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
-
-                                Integer tempTaskStatus = (tempTask.getTask_id() != null)
-                                        ? tempTask.getTask_status() : Constants.INACTIVE;
-
-                                switch (tempTaskStatus) {
-                                    case Constants.INACTIVE:
-                                        BDTasksManagerQuery.addTask(getContext(), t);
-                                        break;
-                                    case Constants.PENDING_TASK:
-                                        case Constants.PROGRESS_TASK:
-                                            case Constants.CLOSE_TASK:
-                                                photoGallery.remove(t);
-                                        break;
-                                    default:
-                                        Log.i("NewsTasks","No remove task");
-                                        break;
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.e("NewsTasksException: ", "Unknown error: " + e.getMessage());
-                            }
-                        }
-
-                        //Tasks t = new Tasks(idStatus);
-                        //tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
-
-                        /*
-                        for (Tasks tempTask : tempTaskList) {
-                            Boolean contain = false;
-
-                            for (Tasks actualTask : photoGallery) {
-                                contain = (actualTask.getTask_id()
-                                        == tempTask.getTask_id());
-                                if (contain) break;
-                            }
-
-                            if (!contain) newsTask.add(tempTask);
-                        }
-                        */
-
-                    } else photoGallery.addAll(tempTaskList);
-
-                    if (photoGallery.size() > 0 ) {
+                    if (tempGalleryList.size() > 0) {
+                        photoGallery.addAll(tempGalleryList);
                         photo_gallery_adapter.addAll(photoGallery);
 
                         photos_list.setAdapter(photo_gallery_adapter);
@@ -274,7 +278,12 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                         photos_list.setLayoutManager(linearLayoutManager);
 
-                        LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
+                        activityListener.setExtraDecodeGallery(photoGallery.get(0));
+
+                        FragmentManager fmDescription = getActivity().getSupportFragmentManager();
+                        FragmentTransaction description = fmDescription.beginTransaction();
+                        description.add(R.id.detail_gallery_container, new PhotoGalleryDescriptionFragment(), Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                        description.commit();
                     } else {
                         Toast.makeText(getActivity(), getString(R.string.default_empty_task_list), Toast.LENGTH_LONG).show();
                     }

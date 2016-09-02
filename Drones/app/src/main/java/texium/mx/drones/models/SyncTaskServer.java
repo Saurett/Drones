@@ -1,5 +1,6 @@
 package texium.mx.drones.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,9 +16,10 @@ public class SyncTaskServer {
     private String task_comment;
     private List<String> sendPictureFiles;
     private List<String> sendVideoFiles;
+    private List<PhotoGallery> photoGallery;
 
     public SyncTaskServer() {
-
+        photoGallery = new ArrayList<>();
     }
 
     public Integer getTask_detail_cve() {
@@ -82,5 +84,13 @@ public class SyncTaskServer {
 
     public void setSendVideoFiles(List<String> sendVideoFiles) {
         this.sendVideoFiles = sendVideoFiles;
+    }
+
+    public List<PhotoGallery> getPhotoGallery() {
+        return photoGallery;
+    }
+
+    public void setPhotoGallery(List<PhotoGallery> photoGallery) {
+        this.photoGallery = photoGallery;
     }
 }

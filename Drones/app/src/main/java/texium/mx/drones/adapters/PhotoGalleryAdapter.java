@@ -5,11 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import texium.mx.drones.R;
+import texium.mx.drones.fragments.PhotoGalleryFragment;
+import texium.mx.drones.models.DecodeGallery;
 import texium.mx.drones.models.PhotoGallery;
 import texium.mx.drones.utils.Constants;
 
@@ -23,6 +26,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        ImageView item_picture;
         Button sync_button;
         Button description_button;
         Button delete_button;
@@ -30,6 +34,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
         public ViewHolder(View itemView) {
             super(itemView);
 
+            item_picture = (ImageView) itemView.findViewById(R.id.item_photo);
             sync_button = (Button) itemView.findViewById(R.id.item_photo_sync);
             description_button = (Button) itemView.findViewById(R.id.item_photo_description);
             delete_button = (Button) itemView.findViewById(R.id.item_photo_delete);
@@ -69,45 +74,48 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
             case Constants.ITEM_SYNC_SERVER_CLOUD:
                 resource = R.mipmap.ic_cloud_black;
                 break;
+            case Constants.ITEM_SYNC_SERVER_CLOUD_OFF:
+                resource = R.mipmap.ic_cloud_off_black;
+                break;
             default:
-                resource = R.drawable.logo_df_civar;
+                resource = android.R.drawable.ic_menu_delete;
                 break;
 
         }
 
+        final DecodeGallery decodeGallery = new DecodeGallery();
+
+        decodeGallery.setPhotoGallery(item);
+
         holder.sync_button.setBackgroundResource(resource);
+        holder.item_picture.setImageBitmap(item.getPhoto_bitmap());
+
+        holder.sync_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decodeGallery.setIdView(v.getId());
+                decodeGallery.setPosition(position);
+                PhotoGalleryFragment.showQuestion(decodeGallery);
+            }
+        });
+
         holder.delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                removeItem(position);
+                decodeGallery.setIdView(v.getId());
+                decodeGallery.setPosition(position);
+                PhotoGalleryFragment.showQuestion(decodeGallery);
             }
         });
 
-        /*
-        holder.finish_task_button.setOnClickListener(new View.OnClickListener() {
+        holder.description_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    fragmentJumper(v,task,taskDecode);
+                decodeGallery.setIdView(v.getId());
+                decodeGallery.setPosition(position);
+                PhotoGalleryFragment.showQuestion(decodeGallery);
             }
         });
-
-
-        holder.decline_task_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentJumper(v,task,taskDecode);
-            }
-        });
-
-        holder.gallery_task_button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                fragmentJumper(v,task,taskDecode);
-            }
-        });
-
-        */
     }
 
     @Override

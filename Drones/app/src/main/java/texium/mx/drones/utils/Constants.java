@@ -1,6 +1,5 @@
 package texium.mx.drones.utils;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,18 +14,19 @@ public final class Constants {
     public static final String APP_VERSION = "1.0.5";
 
     //region SYS CONSTANTS//
+    public static  final String EMPTY_STRING = "";
     public static final String NUMBER_ZERO = "0";
     public static final Integer SERVER_SYNC_FALSE = 0;
     public static final Integer SERVER_SYNC_TRUE = 1;
-    public static final Integer PICTURE_FILE_TYPE = 1;
-    public static final Integer VIDEO_FILE_TYPE = 2;
+
     public static final int LOGIN_FORM = 1;
     public static final int FORGET_USERNAME_FORM = 2;
     public static final int CONNECTIVITY_FORM = 3;
 
-    public static final String IMAGE_SECTION = "Imagenes";
-    public static final String VIDEO_SECTION = "Videos";
-    public static final String DOCUMENT_SECTION = "Documentos";
+    public static final int PICTURE_FILE_TYPE = 1;
+    public static final int VIDEO_FILE_TYPE = 2;
+    public static final int DOCUMENT_FILE_TYPE = 3;
+
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -88,6 +88,12 @@ public final class Constants {
     public static final int WS_KEY_FORGET_USERNAME_SERVICE = 18;
     public static final int WS_KEY_CONNECTION = 19;
     public static final int WS_KEY_CHECK_VERSION = 20;
+    public static final int WS_KEY_ITEM_PHOTO_GALLERY = 21;
+    public static final int WS_KEY_ITEM_DELETE = 22;
+    public static final int WS_KEY_ITEM_SAVE_DESCRIPTION = 23;
+    public static final int WS_KEY_ITEM_ADD_PHOTO = 24;
+    public static final int WS_KEY_ITEM_SYNC = 25;
+    public static final int WS_KEY_ITEM_SYNC_HOME = 26;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -115,20 +121,31 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
     public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/RecuperarContrasena";
+    public static final String WEB_SERVICE_SOAP_ACTION_DELETE_PHOTO_FILE = "192.168.12.10/EliminarArchivo";
+    public static final String WEB_SERVICE_SOAP_ACTION_SAVE_PHOTO_FILE = "192.168.12.10/AgregarArchivo";
+    public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_PHOTO_FILE = "192.168.12.10/ModificarArchivo";
     public static final String WEB_SERVICE_SOAP_ACTION_APP_VERSION = "192.168.12.10/ObtenerVersionMovil";
+    public static final String WEB_SERVICE_SOAP_TASK_FILES = "192.168.12.10/ArchivosTareas";
+
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://187.216.220.51";
 
 
-    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    */
+
+    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
+    */
 
 
     //endregion SOAP CONFIGURATION//
+
+    //region SOAP PROPERTIES//
+    public static final String SOAP_PROPERTY_DIFFGRAM = "diffgram";
+    public static final String SOAP_PROPERTY_NEW_DATA_SET = "NewDataSet";
+    //endregion SOAP PROPERTIES//
 
     //region SOAP OPERATION//
     public static final String WEB_SERVICE_METHOD_NAME_LOGIN = "LoginMovil";
@@ -139,7 +156,11 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
     public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "RecuperarContrasena";
+    public static final String WEB_SERVICE_METHOD_NAME_DELETE_PHOTO_FILE = "EliminarArchivo";
+    public static final String WEB_SERVICE_METHOD_NAME_SAVE_PHOTO_FILE = "AgregarArchivo";
+    public static final String WEB_SERVICE_METHOD_NAME_UPDATE_PHOTO_FILE = "ModificarArchivo";
     public static final String WEB_SERVICE_METHOD_NAME_APP_VERSION= "ObtenerVersionMovil";
+    public static final String WEB_SERVICE_METHOD_NAME_TASK_FILES= "ArchivosTareas";
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//
@@ -148,6 +169,8 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_TASK_ID_TEAM = "IDCuadrilla";
     public static final String WEB_SERVICE_PARAM_TASK_STATUS = "IDEstatus";
     public static final String WEB_SERVICE_PARAM_TASK_ID = "IDTarea";
+    public static final String WEB_SERVICE_PARAM_ID = "ID";
+    public static final String WEB_SERVICE_PARAM_SYSTEM_ID = "IDSistema";
     public static final String WEB_SERVICE_PARAM_TASK_COMMENT = "Observacion";
     public static final String WEB_SERVICE_PARAM_TASK_ID_USER = "IDUsuario";
     public static final String WEB_SERVICE_PARAM_TASK_LATITUDE = "Latitud";
@@ -181,7 +204,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_LOGIN_LONGITUDE = "Longitud";
     public static final String SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION = "ultimaconexioncuadrilla";
     public static final String SOAP_OBJECT_KEY_LOGIN_PASSWORD = "contrasenausuario";
-    public static final String SOAP_OBJECT_KEY_TASK_ID = "ID";
+    public static final String SOAP_OBJECT_KEY_ID = "ID";
     public static final String SOAP_OBJECT_KEY_TASK_TITTLE = "Nombre";
     public static final String SOAP_OBJECT_KEY_TASK_CONTENT = "Descripcion";
     public static final String SOAP_OBJECT_KEY_TASK_LOCATION = "Coordenadas";
@@ -193,11 +216,18 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_TASK_STATUS = "IDEstatus";
     public static final String SOAP_OBJECT_KEY_TASK_USER_ID = "IDUsuario";
     public static final String SOAP_OBJECT_KEY_TASK_URL = "Ruta";
+    public static final String SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS = "RutaServidor";
+    public static final String SOAP_OBJECT_KEY_TASK_SYSTEM_ID = "IDSistema";
+    public static final String SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID= "IDArchivo";
+    public static final String SOAP_OBJECT_KEY_TASK_ID = "IDTarea";
+    public static final String SOAP_OBJECT_KEY_DECODE_BASE_64 = "Base64";
+    public static final String SOAP_OBJECT_KEY_FILE_DESCRIPTION = "Descripcion";
     //endregion SOAP KEYS//
 
     //region ACTIVITY PARAMS//
     public static final String ACTIVITY_EXTRA_PARAMS_LOGIN = "data";
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY = "task_gallery_info";
+    public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY_DESCRIPTION = "task_gallery_description";
     //endregion ACTIVITY PARAMS//
 
     //region ACCESS TO MAP TASK PRIORITY//
@@ -220,6 +250,7 @@ public final class Constants {
         MAP_STATUS_NAME.put(TASK_PRIORITY_EXPRESS_ID,TASK_PRIORITY_EXPRESS_STR);
     }
 
+    /*
     public static Map<Integer,Float> MAP_STATUS_COLOR;
     static {
         MAP_STATUS_COLOR = new HashMap<>();
@@ -228,6 +259,7 @@ public final class Constants {
         MAP_STATUS_COLOR.put(TASK_PRIORITY_TOP_ID,BitmapDescriptorFactory.HUE_ORANGE);
         MAP_STATUS_COLOR.put(TASK_PRIORITY_EXPRESS_ID,BitmapDescriptorFactory.HUE_RED);
     }
+    */
 
     public static Map<Integer,Integer> MAP_STATUS_ICON;
     static {
@@ -244,6 +276,8 @@ public final class Constants {
     public static final int ITEM_SYNC_SERVER_DEFAULT = 1;
     public static final int ITEM_SYNC_LOCAL_TABLET = 2;
     public static final int ITEM_SYNC_SERVER_CLOUD = 3;
+    public static final int ITEM_SYNC_SERVER_CLOUD_OFF = 4;
+    public static final int ITEM_SYNC_SERVER_DELETE = 5;
 
     //endregion//
 }

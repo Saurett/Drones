@@ -18,6 +18,7 @@ import java.util.List;
 
 import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.models.PhotoGallery;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -98,9 +99,15 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new ConnectException(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
         }
 
         return soapObject;
@@ -201,7 +208,7 @@ public class SoapServices {
             if (e != null) {
                 e.printStackTrace();
                 Log.e("Soap Exception", e.getMessage());
-                throw new ConnectException(context.getString(R.string.default_exception_error));
+                throw new Exception(context.getString(R.string.default_exception_error));
             } else {
                 Log.e("Soap Exception", "FalseNullPointer");
                 throw  new ConnectException(context.getString(R.string.default_connect_error));
@@ -255,9 +262,15 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new Exception(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
         }
 
         return soapObject;
@@ -312,9 +325,15 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new ConnectException(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
         }
 
         return soapPrimitive;
@@ -362,9 +381,15 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new ConnectException(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
         }
 
         return soapPrimitive;
@@ -417,9 +442,15 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new Exception(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
         }
 
         return soapPrimitive;
@@ -466,9 +497,15 @@ public class SoapServices {
             Log.e("Soap Fault",e.getMessage());
             throw new Exception(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("Soap Exception", e.getMessage());
-            throw new Exception(context.getString(R.string.default_exception_error));
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
         }
 
         return soapPrimitive;
@@ -523,5 +560,226 @@ public class SoapServices {
         }
 
         return soapObject;
+    }
+
+    public static SoapObject getTaskFiles(Context context, Integer idTask, Integer idSystem) throws Exception {
+        SoapObject soapObject;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_TASK_FILES;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_TASK_FILES;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, idTask);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_SYSTEM_ID, idSystem);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapObject = (SoapObject) soapEnvelope.getResponse();
+
+        } catch (EOFException e ) {
+            e.printStackTrace();
+            Log.e("Soap EOFException", e.getMessage());
+            throw  new Exception(context.getString(R.string.default_exception_error));
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap SocketTimeoutException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapObject;
+    }
+
+    public static SoapPrimitive deletePhotoFile(Context context,Integer idPhotoFile, Integer idUser) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_DELETE_PHOTO_FILE;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_DELETE_PHOTO_FILE;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID, idPhotoFile);
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID, idUser);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (java.net.SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapPrimitive savePhotoFile(Context context, PhotoGallery photoGallery,Integer idTask, Integer idUser) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SAVE_PHOTO_FILE;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SAVE_PHOTO_FILE;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_ID, idTask);
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_DECODE_BASE_64, photoGallery.getBase_package());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_FILE_DESCRIPTION, photoGallery.getDescription());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID, idUser);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (java.net.SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapPrimitive updatePhotoFile(Context context, PhotoGallery photoGallery, Integer idUser) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_PHOTO_FILE;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_PHOTO_FILE;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID, photoGallery.getId());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_FILE_DESCRIPTION, photoGallery.getDescription());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID, idUser);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            Log.e("Soap ConnectException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (java.net.SocketTimeoutException e ) {
+            e.printStackTrace();
+            Log.e("Soap java.net.SocketTimeoutException", e.getMessage());
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            Log.e("Soap HttpResponseException",e.getMessage());
+            throw new Exception(context.getString(R.string.default_soap_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            Log.e("Soap Fault",e.getMessage());
+            throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                Log.e("Soap Exception", e.getMessage());
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                Log.e("Soap Exception", "FalseNullPointer");
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapPrimitive;
     }
 }

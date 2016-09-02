@@ -1,16 +1,23 @@
 package texium.mx.drones.models;
 
+import android.graphics.Bitmap;
+
+import java.io.Serializable;
+
 /**
  * Created by saurett on 14/01/2016.
  */
-public class PhotoGallery {
+public class PhotoGallery implements Serializable {
 
     private Integer cve;
     private Integer id;
+    private Integer cve_Task_Detail;
     private String base_package;
+    private Bitmap photo_bitmap;
     private Integer file_type;
     private String description;
     private Integer sync_type;
+
 
     public PhotoGallery() {
     }
@@ -66,5 +73,21 @@ public class PhotoGallery {
 
     public void setSync_type(Integer sync_type) {
         this.sync_type = sync_type;
+    }
+
+    public Integer getCve_Task_Detail() {
+        return cve_Task_Detail;
+    }
+
+    public void setCve_Task_Detail(Integer cve_Task_Detail) {
+        this.cve_Task_Detail = cve_Task_Detail;
+    }
+
+    public Bitmap getPhoto_bitmap() {
+        return photo_bitmap;
+    }
+
+    public void setPhoto_bitmap(Bitmap photo_bitmap) {
+        this.photo_bitmap = photo_bitmap;
     }
 }

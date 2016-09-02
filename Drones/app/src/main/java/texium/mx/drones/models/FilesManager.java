@@ -12,12 +12,14 @@ public class FilesManager {
 
     private List<Uri> filesPicture;
     private List<Uri> filesVideo;
+    private List<Uri> filePdf;
     private List<String> encodePictureFiles;
     private String encodeVideoFiles;
     private Integer totalFiles;
     private Integer actualFile;
     private String message;
     private String title;
+    private List<PhotoGallery> photoGalleries;
 
     public FilesManager() {
         filesPicture = new ArrayList<>();
@@ -92,5 +94,21 @@ public class FilesManager {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public List<Uri> getFilePdf() {
+        return filePdf;
+    }
+
+    public void setFilePdf(List<Uri> filePdf) {
+        this.filePdf = filePdf;
+    }
+
+    public List<PhotoGallery> getPhotoGalleries() {
+        return photoGalleries;
+    }
+
+    public void setPhotoGalleries(List<PhotoGallery> photoGalleries) {
+        this.photoGalleries = photoGalleries;
     }
 }

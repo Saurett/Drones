@@ -29,8 +29,7 @@
                     android:layout_width="80dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:background="@drawable/maps" />
+                    android:layout_weight="1"/>
 
                 <android.support.v4.widget.Space
                     android:layout_width="30dp"

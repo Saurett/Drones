@@ -73,6 +73,7 @@ import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.FileServices;
+import texium.mx.drones.services.FileSoapServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -371,7 +372,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 setActualFragment(fragmentManager);
 
-                Intent intentAG = new Intent(NavigationDrawerActivity.this,AllGalleryActivity.class);
+                Intent intentAG = new Intent(NavigationDrawerActivity.this, AllGalleryActivity.class);
                 intentAG.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY, task);
                 startActivity(intentAG);
 
@@ -989,11 +990,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , syncTaskServer.getTask_user_id()
                                     , syncTaskServer.getSendPictureFiles());
 
-                            validOperation = (soapPrimitive != null);
+                            //validOperation = (soapPrimitive != null);
 
                             BDTasksManagerQuery.updateTaskDetail(getApplicationContext()
                                     , syncTaskServer.getTask_detail_cve()
                                     , Constants.SERVER_SYNC_TRUE);
+
+                            //UPDATE ALL PICTURE
+                            FileSoapServices.syncAllFilesWithDetail(getApplicationContext(),
+                                    syncTaskServer.getTask_id(),syncTaskServer.getTask_user_id(),
+                                    syncTaskServer.getTask_detail_cve());
 
                             Log.i("Sync Task", "task_id " + syncTaskServer.getTask_id()
                                     + " comment " + syncTaskServer.getTask_comment());
@@ -1050,6 +1056,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
                         soapPrimitive = SoapServices.sendFile(getApplicationContext(), webServiceTask.getTask_id()
                                 , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendImgFiles());
+
+                        FileSoapServices.syncAllFiles(getApplicationContext(),webServiceTask.getTask_id(),webServiceTask.getTask_user_id());
+
                         validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
@@ -1091,6 +1100,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             BDTasksManagerQuery.updateTaskDetail(getApplicationContext()
                                     , syncTaskServer.getTask_detail_cve()
                                     , Constants.SERVER_SYNC_TRUE);
+
+                            FileSoapServices.syncAllFilesWithDetail(getApplicationContext(),syncTaskServer.getTask_id(),syncTaskServer.getTask_user_id(),syncTaskServer.getTask_detail_cve());
 
                             Log.i("Sync Task", "task_id " + syncTaskServer.getTask_id()
                                     + " comment " + syncTaskServer.getTask_comment());
@@ -1230,7 +1241,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
 
                             t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                            t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+                            t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
                             t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
                             t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
                             t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));

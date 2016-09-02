@@ -67,8 +67,12 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static class ColumnTasksFiles {
         public static final String TASK_FILE_CVE = "task_file_cve";
         public static final String TASK_DETAIL_CVE = "task_detail_cve";
+        public static final String TASK_FILE_ID = "task_file_id";
         public static final String BASE_FILE = "base_file";
         public static final String FILE_TYPE = "file_type";
+        public static final String DESCRIPTION_FILE = "description_file";
+        public static final String SERVER_SYNC = "server_sync";
+        public static final String FILE_STATUS = "file_status";
     }
 
     public static class ColumnFilePackages {
@@ -128,9 +132,13 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static final String CREATE_TASKS_FILES_TABLE_SCRIPT =
             "create table " + TASKS_FILES_TABLE_NAME + "(" +
                     ColumnTasksFiles.TASK_FILE_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnTasksFiles.TASK_FILE_ID + " " + INT_TYPE + "," +
                     ColumnTasksFiles.TASK_DETAIL_CVE + " " + INT_TYPE + "," +
                     ColumnTasksFiles.BASE_FILE + " " + STRING_TYPE + "," +
-                    ColumnTasksFiles.FILE_TYPE + " " + INT_TYPE +
+                    ColumnTasksFiles.FILE_TYPE + " " + INT_TYPE + "," +
+                    ColumnTasksFiles.DESCRIPTION_FILE + " " + STRING_TYPE + "," +
+                    ColumnTasksFiles.SERVER_SYNC + " " + INT_TYPE + "," +
+                    ColumnTasksFiles.FILE_STATUS + " " + INT_TYPE +
             ")";
 
     public static final  String CREATE_TASK_DETAILS_TABLE_SCRIPT =

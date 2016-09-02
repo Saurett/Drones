@@ -11,6 +11,7 @@ import java.util.List;
 
 import texium.mx.drones.models.AppVersion;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.PhotoGallery;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
@@ -23,7 +24,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 30;
+    static Integer BDVersion = 34;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -320,7 +321,15 @@ public class BDTasksManagerQuery {
 
 
             for (String encode : encodedPictureFiles) {
-                addTaskFiles(context, task_detail_cve, encode,Constants.PICTURE_FILE_TYPE);
+                PhotoGallery pg = new PhotoGallery();
+
+                pg.setFile_type(Constants.PICTURE_FILE_TYPE);
+                pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                pg.setBase_package(encode);
+                pg.setDescription(Constants.EMPTY_STRING);
+                pg.setCve_Task_Detail(task_detail_cve);
+
+                addTaskFiles(context, pg);
             }
 
             /*for (String encode : encodedVideoFiles) {
@@ -336,8 +345,91 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static void addTaskFiles(Context context, Integer detail_cve,String encodedFile
-            , Integer fileType)
+    public static void addTaskDetailPhotoGallery(Context context, Integer task, String comment
+            ,Integer status,Integer user,FilesManager encodedFile,Boolean serverSync) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnTaskDetails.TASK_ID, task);
+            cv.put(BDTasksManager.ColumnTaskDetails.TASK_STATUS,status);
+            cv.put(BDTasksManager.ColumnTaskDetails.TASK_USER_ID, user);
+            cv.put(BDTasksManager.ColumnTaskDetails.SERVER_SYNC, (serverSync)
+                    ? Constants.SERVER_SYNC_TRUE : Constants.SERVER_SYNC_FALSE);
+            cv.put(BDTasksManager.ColumnTaskDetails.TASK_COMMENT, comment);
+
+            bd.insert(BDTasksManager.TASK_DETAILS_TABLE_NAME, null, cv);
+
+            Log.i("SQLite: ", "Add task_detail in the bd with task_id :"
+                    + task + " task_comment : " + comment);
+
+            Integer task_detail_cve = getLastTaskDetailCve(context,task);
+
+            List<PhotoGallery> photoGalleries = encodedFile.getPhotoGalleries();
+
+
+            for (PhotoGallery photoGallery : photoGalleries) {
+                PhotoGallery pg = new PhotoGallery();
+
+                Integer syncType = (photoGallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DEFAULT))
+                        ? Constants.ITEM_SYNC_SERVER_DEFAULT : Constants.ITEM_SYNC_SERVER_CLOUD;
+
+                pg.setFile_type(photoGallery.getFile_type());
+                pg.setSync_type(syncType);
+                pg.setBase_package(photoGallery.getBase_package());
+                pg.setDescription(photoGallery.getDescription());
+                pg.setCve_Task_Detail(task_detail_cve);
+                pg.setId(photoGallery.getId());
+
+                addTaskFiles(context, pg);
+            }
+
+            bd.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
+
+    public static PhotoGallery getPhotoByServerId(Context context, PhotoGallery photo) throws Exception {
+        PhotoGallery data = new PhotoGallery();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from " + BDTasksManager.TASKS_FILES_TABLE_NAME +
+                    " where "+ BDTasksManager.ColumnTasksFiles.TASK_FILE_ID + " = " + photo.getId(), null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    data.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE)));
+                    data.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID)));
+                    data.setCve_Task_Detail(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE)));
+                    data.setBase_package(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.BASE_FILE)));
+                    data.setFile_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.FILE_TYPE)));
+                    data.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
+                    data.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
+
+                    Log.i("SQLite: ", "Get photo in the bd ");
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static void addTaskFiles(Context context,PhotoGallery gallery)
             throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
@@ -345,15 +437,72 @@ public class BDTasksManagerQuery {
 
             ContentValues cv = new ContentValues();
 
-            cv.put(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE, detail_cve);
-            cv.put(BDTasksManager.ColumnTasksFiles.BASE_FILE,encodedFile);
-            cv.put(BDTasksManager.ColumnTasksFiles.FILE_TYPE,fileType);
+            Integer fileStatus = (gallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DELETE)
+                    ? Constants.INACTIVE : Constants.ACTIVE);
+
+            cv.put(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID, gallery.getId());
+            cv.put(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE, gallery.getCve_Task_Detail());
+            cv.put(BDTasksManager.ColumnTasksFiles.BASE_FILE, gallery.getBase_package());
+            cv.put(BDTasksManager.ColumnTasksFiles.FILE_TYPE, gallery.getFile_type());
+            cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
+            cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
+            cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
 
-            Log.i("SQLite: ", "Add task_file in the bd with task_id :" + detail_cve);
+            Log.i("SQLite: ", "Add task_file in the bd with task_id ");
 
             bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
+
+    public static void updateTaskFile(Context context, PhotoGallery gallery) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+
+            Integer fileStatus = (gallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DELETE)
+                    ? Constants.INACTIVE : Constants.ACTIVE);
+
+            cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
+            cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
+            cv.put(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID, gallery.getId());
+            cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
+
+            bd.update(BDTasksManager.TASKS_FILES_TABLE_NAME, cv,
+                    BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE + " = " + gallery.getCve(), null);
+            bd.close();
+
+            Log.i("SQLite: ", "Update task_file in the bd ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception", "Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+    }
+
+    public static void deleteTaskFile(Context context, PhotoGallery gallery) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
+            cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
+
+            bd.delete(BDTasksManager.TASKS_FILES_TABLE_NAME,
+                    BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE + " = " + gallery.getCve(), null);
+            bd.close();
+
+            Log.i("SQLite: ", "Update task_file in the bd ");
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("SQLite Exception", "Database error: " + e.getMessage());
@@ -509,6 +658,56 @@ public class BDTasksManagerQuery {
 
                     String file = result.getString(2);
                     data.add(file);
+
+                    Log.i("SQLite: ", "Get task_file in the bd with task_detail_cve :" + task_detail_cve);
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static  List<PhotoGallery> getGalleryFiles(Context context, List<Integer> task_detail_cve, Integer fileType, List<Integer> syncType, Integer fileStatus) throws Exception {
+        List<PhotoGallery> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            String queryCve = " where " + BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE + " in (" + task_detail_cve + " )";
+            queryCve = queryCve.replace("[","");
+            queryCve = queryCve.replace("]","");
+
+            String querySync = (null != syncType ) ?  " and " + BDTasksManager.ColumnTasksFiles.SERVER_SYNC + " in (" + syncType + ")" : "";
+            querySync = querySync.replace("[","");
+            querySync = querySync.replace("]","");
+
+            String queryFS = (null != fileStatus) ?  " and " + BDTasksManager.ColumnTasksFiles.FILE_STATUS + " = " + fileStatus : "";
+
+            Cursor result = bd.rawQuery("select * from " + BDTasksManager.TASKS_FILES_TABLE_NAME
+                    + queryCve + " and " + BDTasksManager.ColumnTasksFiles.FILE_TYPE + " = " + fileType
+                    + queryFS + querySync + " order by 1 asc", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    PhotoGallery photoGallery = new PhotoGallery();
+
+                    photoGallery.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE)));
+                    photoGallery.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID)));
+                    photoGallery.setCve_Task_Detail(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE)));
+                    photoGallery.setBase_package(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.BASE_FILE)));
+                    photoGallery.setFile_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.FILE_TYPE)));
+                    photoGallery.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
+                    photoGallery.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
+
+
+                    data.add(photoGallery);
 
                     Log.i("SQLite: ", "Get task_file in the bd with task_detail_cve :" + task_detail_cve);
                 } while(result.moveToNext());
@@ -766,5 +965,34 @@ public class BDTasksManagerQuery {
             Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
+    }
+
+    public static  List<Integer> getListTaskDetail(Context context,Integer taskID) throws Exception {
+        List<Integer> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from "+ BDTasksManager.TASK_DETAILS_TABLE_NAME
+                    + " where " + BDTasksManager.ColumnTaskDetails.TASK_ID + " = " + taskID
+                    + " order by 1 asc", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    data.add(result.getInt(0));
+
+                    Log.i("SQLite: ", "Get task_details in the bd");
+                } while(result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("SQLite Exception","Database error: " + e.getMessage());
+            throw new Exception("Database error");
+        }
+
+        return data;
     }
 }

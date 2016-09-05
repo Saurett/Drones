@@ -73,6 +73,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String DESCRIPTION_FILE = "description_file";
         public static final String SERVER_SYNC = "server_sync";
         public static final String FILE_STATUS = "file_status";
+        public static final String LOCAL_URI = "local_uri";
     }
 
     public static class ColumnFilePackages {
@@ -139,6 +140,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTasksFiles.DESCRIPTION_FILE + " " + STRING_TYPE + "," +
                     ColumnTasksFiles.SERVER_SYNC + " " + INT_TYPE + "," +
                     ColumnTasksFiles.FILE_STATUS + " " + INT_TYPE +
+                    ColumnTasksFiles.LOCAL_URI + " " + INT_TYPE +
             ")";
 
     public static final  String CREATE_TASK_DETAILS_TABLE_SCRIPT =

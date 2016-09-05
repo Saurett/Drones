@@ -62,6 +62,8 @@ public final class Constants {
     public static final String FRAGMENT_RESTORE_TAG = "fragment_restore";
     @Deprecated  public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
     public static final String FRAGMENT_PHOTO_GALLERY_LIST_TAG = "fragment_photo_gallery_list";
+    public static final String FRAGMENT_VIDEO_GALLERY_LIST_TAG = "fragment_video_gallery_list";
+    public static final String FRAGMENT_DOCUMENT_GALLERY_LIST_TAG = "fragment_document_gallery_list";
     public static final String FRAGMENT_PHOTO_GALLERY_TAG = "fragment_photo_gallery";
     public static final String FRAGMENT_VIDEO_GALLERY_TAG = "fragment_video_gallery";
     public static final String FRAGMENT_DOCUMENT_GALLERY_TAG = "fragment_document_gallery";
@@ -94,6 +96,8 @@ public final class Constants {
     public static final int WS_KEY_ITEM_ADD_PHOTO = 24;
     public static final int WS_KEY_ITEM_SYNC = 25;
     public static final int WS_KEY_ITEM_SYNC_HOME = 26;
+    public static final int WS_KEY_ITEM_VIDEO_GALLERY = 27;
+    public static final int WS_KEY_ITEM_ADD_VIDEO = 28;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -130,13 +134,13 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://187.170.231.115"; //Sin / al final
 
-    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    */
 
+    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://187.170.231.115/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
+    */
 
     //endregion SOAP CONFIGURATION//
 
@@ -169,6 +173,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_TASK_ID = "IDTarea";
     public static final String WEB_SERVICE_PARAM_ID = "ID";
     public static final String WEB_SERVICE_PARAM_SYSTEM_ID = "IDSistema";
+    public static final String WEB_SERVICE_PARAM_SYSTEM_EXTENSION = "IDTipo";
     public static final String WEB_SERVICE_PARAM_TASK_COMMENT = "Observacion";
     public static final String WEB_SERVICE_PARAM_TASK_ID_USER = "IDUsuario";
     public static final String WEB_SERVICE_PARAM_TASK_LATITUDE = "Latitud";

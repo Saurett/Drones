@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import texium.mx.drones.databases.BDTasksManagerQuery;
-import texium.mx.drones.models.PhotoGallery;
+import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -34,11 +34,11 @@ public class FileSoapServices {
             List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(context, idTask);
 
             if (!taskGallery.isEmpty()) {
-                List<PhotoGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
+                List<TaskGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
                         taskGallery, Constants.PICTURE_FILE_TYPE, query, Constants.ACTIVE);
 
                 //All Normal Photo Sync
-                for (PhotoGallery photo :
+                for (TaskGallery photo :
                         galleryBefore) {
 
                     if (photo.getId() > 0) {
@@ -58,7 +58,7 @@ public class FileSoapServices {
                 galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
                         taskGallery, Constants.PICTURE_FILE_TYPE, query, Constants.INACTIVE);
 
-                for (PhotoGallery photo :
+                for (TaskGallery photo :
                         galleryBefore) {
 
                     if (photo.getId() > 0) {
@@ -95,10 +95,10 @@ public class FileSoapServices {
                 BDTasksManagerQuery.updateTaskDetail(context
                         , idTaskDetail, Constants.SERVER_SYNC_FALSE);
 
-                List<PhotoGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
+                List<TaskGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
                         taskGallery, Constants.PICTURE_FILE_TYPE, query, Constants.ACTIVE);
 
-                for (PhotoGallery photo :
+                for (TaskGallery photo :
                         galleryBefore) {
 
                     if (photo.getId() > 0) {
@@ -118,7 +118,7 @@ public class FileSoapServices {
                 galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
                         taskGallery, Constants.PICTURE_FILE_TYPE, query, Constants.INACTIVE);
 
-                for (PhotoGallery photo :
+                for (TaskGallery photo :
                         galleryBefore) {
 
                     if (photo.getId() > 0) {

@@ -86,6 +86,8 @@
     <string name="default_fail_save">No es posible guardar los cambios, intente mas tarde ...</string>
     <string name="default_no_edit_msg">Las imagenes enviadas del servidor no pueden ser modificadas</string>
     <string name="default_save_back_home">¿Desea sincronizar los archivos pendientes por guardar?</string>
+    <string name="default_load_videos">Cargando videos adjuntos</string>
+    <string name="default_msg_sync_server">Archivo agregado por el monitor</string>
 
 
 </resources>

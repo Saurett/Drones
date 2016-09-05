@@ -5,16 +5,16 @@ package texium.mx.drones.models;
  */
 public class DecodeGallery {
 
-    private PhotoGallery photoGallery;
+    private TaskGallery taskGallery;
     private Integer idView;
     private Integer position;
 
-    public PhotoGallery getPhotoGallery() {
-        return photoGallery;
+    public TaskGallery getTaskGallery() {
+        return taskGallery;
     }
 
-    public void setPhotoGallery(PhotoGallery photoGallery) {
-        this.photoGallery = photoGallery;
+    public void setTaskGallery(TaskGallery taskGallery) {
+        this.taskGallery = taskGallery;
     }
 
     public Integer getIdView() {

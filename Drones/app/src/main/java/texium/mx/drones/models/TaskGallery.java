@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created by saurett on 14/01/2016.
  */
-public class PhotoGallery implements Serializable {
+public class TaskGallery implements Serializable {
 
     private Integer cve;
     private Integer id;
@@ -19,10 +19,10 @@ public class PhotoGallery implements Serializable {
     private Integer sync_type;
 
 
-    public PhotoGallery() {
+    public TaskGallery() {
     }
 
-    public PhotoGallery(String description, Integer sync_type) {
+    public TaskGallery(String description, Integer sync_type) {
         this.description = description;
         this.sync_type = sync_type;
     }

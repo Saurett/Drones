@@ -75,16 +75,18 @@
     <string name="default_negative_button">Cancelar</string>
     <string name="default_loading_msg">Espere un momento por favor</string>
     <string name="default_delete_profile_msg">Eliminando elemento ...</string>
-    <string name="default_item_description_msg">¿Deseas guardar los cambios en la descripción de la imagen?</string>
+    <string name="default_item_description_msg">¿Deseas guardar los cambios en la descripción del archivo?</string>
     <string name="default_positive_yes_button">Si</string>
     <string name="default_negative_no_button">No</string>
     <string name="default_negative_cancel_button">Cancelar</string>
     <string name="default_saving_img_msg">Guardando Imagen</string>
-    <string name="default_no_delete_msg">Las imagenes enviadas del servidor no pueden ser eliminadas</string>
+    <string name="default_no_delete_msg">Los archivos enviados del servidor no pueden ser eliminados</string>
     <string name="default_load_pictures">Cargando imagenes adjuntadas</string>
     <string name="default_fail_save">No es posible guardar los cambios, intente mas tarde ...</string>
-    <string name="default_no_edit_msg">Las imagenes enviadas del servidor no pueden ser modificadas</string>
+    <string name="default_no_edit_msg">Los archivos enviados del servidor no pueden ser modificados</string>
     <string name="default_save_back_home">¿Desea sincronizar los archivos pendientes por guardar?</string>
+    <string name="default_load_videos">Cargando videos adjuntos</string>
+    <string name="default_msg_sync_server">Archivo agregado por el monitor</string>
 
 
 </resources>

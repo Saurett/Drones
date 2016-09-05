@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="640dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="end"
+    android:background="@color/colorPrimaryWhite"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/itemVideo"
+            android:layout_width="640dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/taskVideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_weight="1"/>
+
+                    <EditText
+                        android:id="@+id/videoDescription"
+                        android:layout_width="400dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:background="@color/colorPrimary"
+                        android:gravity="top"
+                        android:hint="Ingresa la descripción de la imagen ..."
+                        android:inputType="textMultiLine"
+                        android:paddingBottom="20dp"
+                        android:paddingLeft="20dp"
+                        android:paddingTop="20dp"
+                        android:textColor="@color/colorPrimaryWhite"
+                        android:textColorHint="@color/colorAccent"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="1dp"
+                    android:paddingTop="1dp"
+                    android:layout_marginTop="10dp">
+
+                    <Button
+                        android:id="@+id/cancelVideoDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="100dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:text="Cancelar"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/saveVideoDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:text="Guardar"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+</FrameLayout>

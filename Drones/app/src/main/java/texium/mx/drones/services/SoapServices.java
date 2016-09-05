@@ -18,7 +18,7 @@ import java.util.List;
 
 import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
-import texium.mx.drones.models.PhotoGallery;
+import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -577,7 +577,7 @@ public class SoapServices {
         return soapObject;
     }
 
-    public static SoapObject getTaskFiles(Context context, Integer idTask, Integer idSystem) throws Exception {
+    public static SoapObject getTaskFiles(Context context, Integer idTask, Integer idSystem, Integer extension) throws Exception {
         SoapObject soapObject;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_TASK_FILES;
@@ -589,6 +589,7 @@ public class SoapServices {
 
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, idTask);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_SYSTEM_ID, idSystem);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_SYSTEM_EXTENSION, extension);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;
@@ -689,7 +690,7 @@ public class SoapServices {
         return soapPrimitive;
     }
 
-    public static SoapPrimitive savePhotoFile(Context context, PhotoGallery photoGallery,Integer idTask, Integer idUser) throws Exception {
+    public static SoapPrimitive savePhotoFile(Context context, TaskGallery taskGallery, Integer idTask, Integer idUser) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SAVE_PHOTO_FILE;
@@ -700,8 +701,8 @@ public class SoapServices {
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
             Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_ID, idTask);
-            Request.addProperty(Constants.SOAP_OBJECT_KEY_DECODE_BASE_64, photoGallery.getBase_package());
-            Request.addProperty(Constants.SOAP_OBJECT_KEY_FILE_DESCRIPTION, photoGallery.getDescription());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_DECODE_BASE_64, taskGallery.getBase_package());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_FILE_DESCRIPTION, taskGallery.getDescription());
             Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID, idUser);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -747,7 +748,7 @@ public class SoapServices {
         return soapPrimitive;
     }
 
-    public static SoapPrimitive updatePhotoFile(Context context, PhotoGallery photoGallery, Integer idUser) throws Exception {
+    public static SoapPrimitive updatePhotoFile(Context context, TaskGallery taskGallery, Integer idUser) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_PHOTO_FILE;
@@ -757,8 +758,8 @@ public class SoapServices {
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID, photoGallery.getId());
-            Request.addProperty(Constants.SOAP_OBJECT_KEY_FILE_DESCRIPTION, photoGallery.getDescription());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID, taskGallery.getId());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_FILE_DESCRIPTION, taskGallery.getDescription());
             Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID, idUser);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);

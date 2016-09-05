@@ -19,7 +19,7 @@ public class FilesManager {
     private Integer actualFile;
     private String message;
     private String title;
-    private List<PhotoGallery> photoGalleries;
+    private List<TaskGallery> taskGalleries;
 
     public FilesManager() {
         filesPicture = new ArrayList<>();
@@ -104,11 +104,11 @@ public class FilesManager {
         this.filePdf = filePdf;
     }
 
-    public List<PhotoGallery> getPhotoGalleries() {
-        return photoGalleries;
+    public List<TaskGallery> getTaskGalleries() {
+        return taskGalleries;
     }
 
-    public void setPhotoGalleries(List<PhotoGallery> photoGalleries) {
-        this.photoGalleries = photoGalleries;
+    public void setTaskGalleries(List<TaskGallery> taskGalleries) {
+        this.taskGalleries = taskGalleries;
     }
 }

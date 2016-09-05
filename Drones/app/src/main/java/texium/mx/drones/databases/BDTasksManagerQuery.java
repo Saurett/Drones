@@ -11,7 +11,7 @@ import java.util.List;
 
 import texium.mx.drones.models.AppVersion;
 import texium.mx.drones.models.FilesManager;
-import texium.mx.drones.models.PhotoGallery;
+import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
@@ -321,7 +321,7 @@ public class BDTasksManagerQuery {
 
 
             for (String encode : encodedPictureFiles) {
-                PhotoGallery pg = new PhotoGallery();
+                TaskGallery pg = new TaskGallery();
 
                 pg.setFile_type(Constants.PICTURE_FILE_TYPE);
                 pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
@@ -367,21 +367,21 @@ public class BDTasksManagerQuery {
 
             Integer task_detail_cve = getLastTaskDetailCve(context,task);
 
-            List<PhotoGallery> photoGalleries = encodedFile.getPhotoGalleries();
+            List<TaskGallery> photoGalleries = encodedFile.getTaskGalleries();
 
 
-            for (PhotoGallery photoGallery : photoGalleries) {
-                PhotoGallery pg = new PhotoGallery();
+            for (TaskGallery taskGallery : photoGalleries) {
+                TaskGallery pg = new TaskGallery();
 
-                Integer syncType = (photoGallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DEFAULT))
+                Integer syncType = (taskGallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DEFAULT))
                         ? Constants.ITEM_SYNC_SERVER_DEFAULT : Constants.ITEM_SYNC_SERVER_CLOUD;
 
-                pg.setFile_type(photoGallery.getFile_type());
+                pg.setFile_type(taskGallery.getFile_type());
                 pg.setSync_type(syncType);
-                pg.setBase_package(photoGallery.getBase_package());
-                pg.setDescription(photoGallery.getDescription());
+                pg.setBase_package(taskGallery.getBase_package());
+                pg.setDescription(taskGallery.getDescription());
                 pg.setCve_Task_Detail(task_detail_cve);
-                pg.setId(photoGallery.getId());
+                pg.setId(taskGallery.getId());
 
                 addTaskFiles(context, pg);
             }
@@ -395,8 +395,8 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static PhotoGallery getPhotoByServerId(Context context, PhotoGallery photo) throws Exception {
-        PhotoGallery data = new PhotoGallery();
+    public static TaskGallery getFileByServerId(Context context, TaskGallery photo) throws Exception {
+        TaskGallery data = new TaskGallery();
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -415,7 +415,7 @@ public class BDTasksManagerQuery {
                     data.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
                     data.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
 
-                    Log.i("SQLite: ", "Get photo in the bd ");
+                    Log.i("SQLite: ", "Get file in the bd ");
                 } while(result.moveToNext());
             }
 
@@ -429,7 +429,7 @@ public class BDTasksManagerQuery {
         return data;
     }
 
-    public static void addTaskFiles(Context context,PhotoGallery gallery)
+    public static void addTaskFiles(Context context,TaskGallery gallery)
             throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
@@ -460,7 +460,7 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static void updateTaskFile(Context context, PhotoGallery gallery) throws Exception {
+    public static void updateTaskFile(Context context, TaskGallery gallery) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -488,7 +488,7 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static void deleteTaskFile(Context context, PhotoGallery gallery) throws Exception {
+    public static void deleteTaskFile(Context context, TaskGallery gallery) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -674,8 +674,8 @@ public class BDTasksManagerQuery {
         return data;
     }
 
-    public static  List<PhotoGallery> getGalleryFiles(Context context, List<Integer> task_detail_cve, Integer fileType, List<Integer> syncType, Integer fileStatus) throws Exception {
-        List<PhotoGallery> data = new ArrayList<>();
+    public static  List<TaskGallery> getGalleryFiles(Context context, List<Integer> task_detail_cve, Integer fileType, List<Integer> syncType, Integer fileStatus) throws Exception {
+        List<TaskGallery> data = new ArrayList<>();
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -697,18 +697,18 @@ public class BDTasksManagerQuery {
             if (result.moveToFirst()) {
                 do {
 
-                    PhotoGallery photoGallery = new PhotoGallery();
+                    TaskGallery taskGallery = new TaskGallery();
 
-                    photoGallery.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE)));
-                    photoGallery.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID)));
-                    photoGallery.setCve_Task_Detail(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE)));
-                    photoGallery.setBase_package(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.BASE_FILE)));
-                    photoGallery.setFile_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.FILE_TYPE)));
-                    photoGallery.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
-                    photoGallery.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
+                    taskGallery.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE)));
+                    taskGallery.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID)));
+                    taskGallery.setCve_Task_Detail(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.TASK_DETAIL_CVE)));
+                    taskGallery.setBase_package(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.BASE_FILE)));
+                    taskGallery.setFile_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.FILE_TYPE)));
+                    taskGallery.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
+                    taskGallery.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
 
 
-                    data.add(photoGallery);
+                    data.add(taskGallery);
 
                     Log.i("SQLite: ", "Get task_file in the bd with task_detail_cve :" + task_detail_cve);
                 } while(result.moveToNext());

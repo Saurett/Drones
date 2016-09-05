@@ -16,10 +16,10 @@ public class SyncTaskServer {
     private String task_comment;
     private List<String> sendPictureFiles;
     private List<String> sendVideoFiles;
-    private List<PhotoGallery> photoGallery;
+    private List<TaskGallery> taskGallery;
 
     public SyncTaskServer() {
-        photoGallery = new ArrayList<>();
+        taskGallery = new ArrayList<>();
     }
 
     public Integer getTask_detail_cve() {
@@ -86,11 +86,11 @@ public class SyncTaskServer {
         this.sendVideoFiles = sendVideoFiles;
     }
 
-    public List<PhotoGallery> getPhotoGallery() {
-        return photoGallery;
+    public List<TaskGallery> getTaskGallery() {
+        return taskGallery;
     }
 
-    public void setPhotoGallery(List<PhotoGallery> photoGallery) {
-        this.photoGallery = photoGallery;
+    public void setTaskGallery(List<TaskGallery> taskGallery) {
+        this.taskGallery = taskGallery;
     }
 }

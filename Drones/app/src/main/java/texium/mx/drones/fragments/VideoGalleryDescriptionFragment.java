@@ -28,7 +28,7 @@ import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.utils.Constants;
 
 
-public class PhotoGalleryDescriptionFragment extends Fragment implements View.OnClickListener, DialogInterface.OnClickListener {
+public class VideoGalleryDescriptionFragment extends Fragment implements View.OnClickListener, DialogInterface.OnClickListener {
 
     private SoapObject soapObject;
     private static TaskGallery _DESCRIPTION;
@@ -37,7 +37,7 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
     private ProgressDialog pDialog;
 
     private static EditText description;
-    private static ImageView taskPhoto;
+    private static ImageView taskVideo;
     private Button save, cancel;
 
 
@@ -45,19 +45,19 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.item_picture, container, false);
+        View view = inflater.inflate(R.layout.item_video, container, false);
 
-        description = (EditText) view.findViewById(R.id.photoDescription);
-        taskPhoto = (ImageView) view.findViewById(R.id.taskPhoto);
+        description = (EditText) view.findViewById(R.id.videoDescription);
+        taskVideo = (ImageView) view.findViewById(R.id.taskVideo);
 
-        save = (Button) view.findViewById(R.id.savePhotoDescription);
-        cancel = (Button) view.findViewById(R.id.cancelPhotoDescription);
+        save = (Button) view.findViewById(R.id.saveVideoDescription);
+        cancel = (Button) view.findViewById(R.id.cancelVideoDescription);
 
         save.setOnClickListener(this);
         cancel.setOnClickListener(this);
 
         description.setText(_DESCRIPTION.getDescription());
-        taskPhoto.setImageBitmap(_DESCRIPTION.getPhoto_bitmap());
+        taskVideo.setImageBitmap(_DESCRIPTION.getPhoto_bitmap());
 
         //view.setVisibility(View.VISIBLE);
 
@@ -110,12 +110,12 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.cancelPhotoDescription:
+            case R.id.cancelVideoDescription:
 
                 description.setText(_DESCRIPTION.getDescription());
 
                 break;
-            case R.id.savePhotoDescription:
+            case R.id.saveVideoDescription:
 
                 TaskGallery taskGallery = _DESCRIPTION;
                 taskGallery.setDescription(description.getText().toString());
@@ -140,8 +140,8 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
                             BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
                             Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
                             _DESCRIPTION = taskGallery;
-                            activityListener.closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                            activityListener.replaceFragmentPhotoFragment();
+                            activityListener.closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                            activityListener.replaceFragmentVideoFragment();
                         } catch (Exception e) {
                             e.printStackTrace();
                             Toast.makeText(getActivity(), R.string.default_fail_save, Toast.LENGTH_SHORT).show();
@@ -151,8 +151,8 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
                         try {
                             BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
                             Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
-                            activityListener.closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                            activityListener.replaceFragmentPhotoFragment();
+                            activityListener.closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                            activityListener.replaceFragmentVideoFragment();
                             _DESCRIPTION = taskGallery;
                         } catch (Exception e) {
                             e.printStackTrace();

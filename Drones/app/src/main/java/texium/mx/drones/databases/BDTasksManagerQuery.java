@@ -610,8 +610,9 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context,BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            Cursor result = bd.rawQuery("select * from task_details where task_user_id =" + user_id
-                    + " and server_sync = " + server_sync
+            Cursor result = bd.rawQuery("select * from task_details "
+                    + " where server_sync = " + server_sync
+                    //+ " and task_user_id =" + user_id//
                     + " order by 1 asc", null);
 
             if (result.moveToFirst()) {

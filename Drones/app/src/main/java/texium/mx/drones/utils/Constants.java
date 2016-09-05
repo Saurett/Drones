@@ -11,7 +11,7 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-    public static final String APP_VERSION = "1.0.5";
+    public static final String APP_VERSION = "1.0.6";
 
     //region SYS CONSTANTS//
     public static  final String EMPTY_STRING = "";
@@ -128,17 +128,15 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_TASK_FILES = "192.168.12.10/ArchivosTareas";
 
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
-    public static final String WEB_SERVICE_PARTIAL_URL = "http://187.216.220.51";
-
-
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_PARTIAL_URL = "http://187.170.231.115"; //Sin / al final
 
     /*
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://187.216.220.51/ServicioWeb/Servicio_Android.asmx";
-    public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     */
 
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://187.170.231.115/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
+    public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
 
     //endregion SOAP CONFIGURATION//
 

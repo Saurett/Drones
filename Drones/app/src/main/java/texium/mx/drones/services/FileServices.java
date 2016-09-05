@@ -16,7 +16,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import texium.mx.drones.R;
@@ -82,9 +81,6 @@ public class FileServices {
                 //encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
 
                 String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-
-                //BDTasksManagerQuery.addTaskFiles(context,2008,tempData, Constants.VIDEO_FILE_TYPE);
-                //TODO GUARDAR EN LOCAL
                 encodeVideo.setEncodeVideoFiles(tempData);
 
                 encodeVideos.add(encodeVideo);
@@ -102,6 +98,8 @@ public class FileServices {
 
         return encodeVideos;
     }
+
+    /*
 
     @Deprecated
     public static FilesManager getPackageBase64(Context context, byte[] dataPackage) throws Exception {
@@ -162,6 +160,8 @@ public class FileServices {
 
         return  data;
     }
+
+    */
 
     public static List<String> getPackageList(Context context, String dataPackage) throws Exception {
 

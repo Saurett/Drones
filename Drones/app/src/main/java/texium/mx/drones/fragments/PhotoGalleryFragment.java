@@ -248,7 +248,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                     }
                     validOperation = (tempGalleryList.size() > 0);
                     textError =  (tempGalleryList.size() > 0) ? textError
-                            : getString(R.string.default_empty_task_list);
+                            : "La galeria de imagenes se encuentra vacía";
                 } catch (Exception ex) {
                     textError = ex.getMessage();
                     ex.printStackTrace();
@@ -285,10 +285,10 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                         description.add(R.id.detail_gallery_container, new PhotoGalleryDescriptionFragment(), Constants.FRAGMENT_PHOTO_GALLERY_TAG);
                         description.commit();
                     } else {
-                        Toast.makeText(getActivity(), getString(R.string.default_empty_task_list), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "La galeria de imagenes se encuentra vacía", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    String tempText = (textError.isEmpty() ? getString(R.string.default_empty_task_list) : textError);
+                    String tempText = (textError.isEmpty() ? "La galeria de imagenes se encuentra vacía" : textError);
                     Toast.makeText(getActivity(), tempText, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {

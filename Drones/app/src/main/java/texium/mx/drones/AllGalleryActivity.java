@@ -630,8 +630,23 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_ITEM_DELETE:
 
-                        validOperation = true;
-                        textError = "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
+                        try {
+
+                            validOperation = true;
+                            textError = "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
+
+                            BDTasksManagerQuery.updateCommonTask(getApplicationContext(), _TASK_INFO.getTask_id()
+                                    , "Se elimina foto sin conexión desde la app móvil"
+                                    , _TASK_INFO.getTask_status()
+                                    , _TASK_INFO.getTask_user_id()
+                                    , fileManager
+                                    , textError.length() == 0);
+
+
+
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                         break;
                 }
 
@@ -673,11 +688,14 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             e.printStackTrace();
                         }
 
-                        txtDelete = (null != soapPrimitive) ? soapPrimitive.toString() : "Arhivo borrado correctamente";
+                        txtDelete = (null != soapPrimitive) ? soapPrimitive.toString() : "Archivo borrado correctamente";
                     } else {
 
                         try {
-                            BDTasksManagerQuery.updateTaskFile(getApplicationContext(), _DECODE_GALLERY.getPhotoGallery());
+                            PhotoGallery photoDelete = _DECODE_GALLERY.getPhotoGallery();
+                            photoDelete.setSync_type(Constants.ITEM_SYNC_SERVER_DELETE);
+
+                            BDTasksManagerQuery.updateTaskFile(getApplicationContext(), photoDelete);
                             PhotoGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
 
                             txtDelete = textError;

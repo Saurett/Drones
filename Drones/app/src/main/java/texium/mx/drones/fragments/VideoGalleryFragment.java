@@ -33,6 +33,7 @@ import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -178,13 +179,14 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
                                     Boolean exist = (videoLocal.getCve() != null);
 
                                     if (!exist) {
-                                        //Bitmap serverPhoto = FileServices.getBitmapFromURL(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
+                                        Bitmap serverPhoto = FileServices.reverseVideoFrameFromVideo(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
-                                        //if (serverPhoto == null) continue;
+                                        if (serverPhoto == null) continue;
 
-                                        //videoServer.setPhoto_bitmap(serverPhoto);
-                                        //videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
+                                        videoServer.setPhoto_bitmap(serverPhoto);
+                                        videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
+
                                         taskGalleries.add(videoServer);
                                     }
                                 }
@@ -195,11 +197,12 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                             FilesManager filesManager = new FilesManager();
                             filesManager.setTaskGalleries(taskGalleries);
-                            //TODO AGREGAR VIDEO
 
                             BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(),_TASK_INFO.getTask_id(),
                                     "Se agregan videos por ws", _TASK_INFO.getTask_status(),_TASK_INFO.getTask_user_id(),
                                     filesManager,true);
+
+                            //TODO GUARDAR VIDEO EN EL DISPOSITIVO
                         }
 
                         List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
@@ -210,13 +213,12 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                             for (TaskGallery video : allPhotos) {
 
-                                /*
+
                                 if (video.getBase_package() == null) continue;
 
                                 byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
                                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                 video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
-                                */
 
                                 tempGalleryList.add(video);
                             }

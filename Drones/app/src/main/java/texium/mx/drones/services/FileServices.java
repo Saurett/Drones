@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
@@ -16,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import texium.mx.drones.R;
@@ -47,8 +50,8 @@ public class FileServices {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("AttachImg Exception",e.getMessage());
-            throw  new Exception(context.getString(R.string.default_attaching_img_error));
+            Log.e("AttachImg Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_img_error));
         }
 
         return stringsPicture;
@@ -88,8 +91,8 @@ public class FileServices {
 
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
-            Log.e("OutOfMemoryVideo Exception",e.getMessage());
-            throw  new Exception(context.getString(R.string.default_out_of_memory));
+            Log.e("OutOfMemoryVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_out_of_memory));
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("AttachVideo Exception", e.getMessage());
@@ -170,7 +173,7 @@ public class FileServices {
         int maxBitPackage = 3000000;
 
         try {
-            int  packSize = dataPackage.length();
+            int packSize = dataPackage.length();
             int pack = (packSize > maxBitPackage) ? maxBitPackage : minBitPackage;
             int packNumbers = packSize / pack;
             int packSpecial = packSize - (packNumbers * pack);
@@ -179,17 +182,17 @@ public class FileServices {
             int endCount = pack;
             int starCount = 0;
 
-            for (int i = 0; i <= packNumbers;) {
+            for (int i = 0; i <= packNumbers; ) {
 
                 String tempData = "";
 
                 if ((i == packNumbers) && (specialItem)) {
 
-                    tempData = dataPackage.substring(starCount,packSize);
+                    tempData = dataPackage.substring(starCount, packSize);
 
                 } else {
 
-                    tempData = dataPackage.substring(starCount,endCount);
+                    tempData = dataPackage.substring(starCount, endCount);
 
                     starCount = endCount;
                     endCount += pack;
@@ -201,11 +204,11 @@ public class FileServices {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("PackingVideo Exception",e.getMessage());
-            throw  new Exception(context.getString(R.string.default_attaching_video_error));
+            Log.e("PackingVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_video_error));
         }
 
-        return  data;
+        return data;
     }
 
     public static Bitmap getBitmapFromURL(String src) {
@@ -242,9 +245,38 @@ public class FileServices {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("AttachImg Exception",e.getMessage());
+            Log.e("AttachImg Exception", e.getMessage());
         }
 
         return imageEncoded;
+    }
+
+    public static Bitmap reverseVideoFrameFromVideo(String videoPath)
+            throws Exception {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try {
+            URL url = new URL(videoPath);
+            //Quit blank space
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            videoPath = uri.toURL().toString();
+
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+            //   mediaMetadataRetriever.setDataSource(videoPath);
+            bitmap = mediaMetadataRetriever.getFrameAtTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Exception in retriveVideoFrameFromVideo(String videoPath)" + e.getMessage());
+
+        } finally {
+            if (mediaMetadataRetriever != null) {
+                mediaMetadataRetriever.release();
+            }
+        }
+        return bitmap;
     }
 }

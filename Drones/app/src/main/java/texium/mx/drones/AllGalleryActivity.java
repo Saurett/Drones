@@ -167,7 +167,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                     if (!taskGalleryHome.isEmpty()) {
                         galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
-                                taskGalleryHome, Constants.PICTURE_FILE_TYPE, query,Constants.ACTIVE);
+                                taskGalleryHome, Constants.PICTURE_FILE_TYPE, query, Constants.ACTIVE);
 
                         if (!galleryBefore.isEmpty()) {
                             blockBack = true;
@@ -388,7 +388,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 ad.setNegativeButton(getString(R.string.default_negative_button), this);
 
                 break;
-            case R.id.item_photo_delete: case R.id.item_video_delete:
+            case R.id.item_photo_delete:
+            case R.id.item_video_delete:
 
                 if (syncType.equals(Constants.ITEM_SYNC_SERVER_DEFAULT)) {
                     ad.setTitle(getString(R.string.default_title_alert_dialog));
@@ -405,7 +406,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 }
 
                 break;
-            case R.id.item_photo_description: case R.id.item_video_description:
+            case R.id.item_photo_description:
+            case R.id.item_video_description:
 
                 showQuestion = PhotoGalleryDescriptionFragment.changeDescription();
 
@@ -421,16 +423,17 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 } else {
 
                     Map<Integer, String> mapGallery = new HashMap<>();
-                    mapGallery.put(Constants.PICTURE_FILE_TYPE,Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                    mapGallery.put(Constants.VIDEO_FILE_TYPE,Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                    mapGallery.put(Constants.DOCUMENT_FILE_TYPE,Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                    mapGallery.put(Constants.PICTURE_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                    mapGallery.put(Constants.VIDEO_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                    mapGallery.put(Constants.DOCUMENT_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
 
                     closeFragment(mapGallery.get(ACTUAL_GALLERY));
                     openDescriptionFragment(mapGallery.get(ACTUAL_GALLERY));
                 }
 
                 break;
-            case R.id.item_photo_sync: case R.id.item_video_sync:
+            case R.id.item_photo_sync:
+            case R.id.item_video_sync:
 
                 switch (syncType) {
                     case Constants.ITEM_SYNC_SERVER_DEFAULT:
@@ -570,6 +573,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     pDialog.show();
                     break;
                 case Constants.WS_KEY_ITEM_ADD_PHOTO:
+                case Constants.WS_KEY_ITEM_ADD_VIDEO:
                     pDialog = new ProgressDialog(AllGalleryActivity.this);
                     pDialog.setMessage(getString(R.string.default_attaching_img));
                     pDialog.setTitle(getString(R.string.default_loading_msg));
@@ -612,8 +616,18 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         break;
                     case Constants.WS_KEY_ITEM_SYNC:
 
-                        validOperation = FileSoapServices.syncAllFiles(getApplicationContext(),_TASK_INFO.getTask_id(),_TASK_INFO.getTask_user_id());
 
+                        switch (ACTUAL_GALLERY) {
+                            case Constants.PICTURE_FILE_TYPE:
+                                validOperation = FileSoapServices.syncAllFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
+                                break;
+                            case Constants.VIDEO_FILE_TYPE:
+                                validOperation = FileSoapServices.syncAllVideoFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
+                                break;
+                            case Constants.DOCUMENT_FILE_TYPE:
+                                break;
+
+                        }
                         break;
                     case Constants.WS_KEY_ITEM_SYNC_HOME:
 
@@ -644,6 +658,35 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 , textError.length() == 0);
                         validOperation = true;
                         break;
+                    case Constants.WS_KEY_ITEM_ADD_VIDEO:
+                        //List<String> fileManageVideo = (FileServices.attachVideos(AllGalleryActivity.this, fileManager.getFilesVideo()));
+
+                        List<Uri> uriVideos = fileManager.getFilesVideo();
+
+                        for (Uri uriVideo : uriVideos) {
+
+                            //String mUri = FileServices.getRealPathFromURI(getApplicationContext(),uriVideo,"VIDEO");
+
+                            //Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(
+                            // mUri, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+
+                            //if (thumbnail == null) continue;
+
+                            //TODO guardar thumbail
+
+                            List<FilesManager> videoManager = FileServices.attachVideo(AllGalleryActivity.this, fileManager.getFilesVideo());
+
+                            BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
+                                    , "Se añaden videos"
+                                    , _TASK_INFO.getTask_status()
+                                    , _TASK_INFO.getTask_user_id()
+                                    , videoManager.get(0)
+                                    , textError.length() == 0);
+                        }
+
+
+                        validOperation = true;
+                        break;
 
                 }
             } catch (ConnectException e) {
@@ -662,7 +705,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                     , _TASK_INFO.getTask_user_id()
                                     , fileManager
                                     , textError.length() == 0);
-
 
 
                         } catch (Exception e1) {
@@ -736,14 +778,30 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     finish();
                     break;
                 case Constants.WS_KEY_ITEM_SYNC:
-                    closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                    openListFragment(Constants.FRAGMENT_PHOTO_GALLERY_LIST_TAG);
-                    Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
+
+                    switch (ACTUAL_GALLERY) {
+                        case Constants.PICTURE_FILE_TYPE:
+                            closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                            openListFragment(Constants.FRAGMENT_PHOTO_GALLERY_LIST_TAG);
+                            Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
+                            break;
+                        case Constants.VIDEO_FILE_TYPE:
+                            closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                            openListFragment(Constants.FRAGMENT_VIDEO_GALLERY_LIST_TAG);
+                            Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
+                            break;
+                    }
+
                     break;
                 case Constants.WS_KEY_ITEM_ADD_PHOTO:
                     closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
                     openListFragment(Constants.FRAGMENT_PHOTO_GALLERY_LIST_TAG);
                     Toast.makeText(AllGalleryActivity.this, "Fotos agregadas correctamente", Toast.LENGTH_LONG).show();
+                    break;
+                case Constants.WS_KEY_ITEM_ADD_VIDEO:
+                    closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                    openListFragment(Constants.FRAGMENT_VIDEO_GALLERY_LIST_TAG);
+                    Toast.makeText(AllGalleryActivity.this, "Videos agregados correctamente", Toast.LENGTH_LONG).show();
                     break;
             }
             else {

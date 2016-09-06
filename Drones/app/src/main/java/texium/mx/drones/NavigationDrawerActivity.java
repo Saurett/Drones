@@ -1018,10 +1018,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         for (FilesManager fm : filesManager) {
 
-                            if (fm.getEncodeVideoFiles().length() > 0) {
+                            if (fm.getEncodeVideoSingleFiles().length() > 0) {
 
                                 List<String> fmPack = FileServices.getPackageList(getApplicationContext()
-                                        , fm.getEncodeVideoFiles());
+                                        , fm.getEncodeVideoSingleFiles());
 
                                 int packNumber = 1;
 

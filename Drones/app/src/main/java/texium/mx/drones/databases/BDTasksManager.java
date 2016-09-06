@@ -157,7 +157,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
             "create table " + FILES_PACKAGES_TABLE_NAME + "(" +
                     ColumnFilePackages.FILE_PACKAGE_CVE + " " + INT_TYPE + " primary key autoincrement, " +
                     ColumnFilePackages.BASE_PACKAGE + " " + STRING_TYPE + "," +
-                    ColumnFilePackages.FILE_TYPE + " " + INT_TYPE +
+                    ColumnFilePackages.FILE_TYPE + " " + INT_TYPE + "," +
                     ColumnFilePackages.TEMP_KEY_ID + " " + INT_TYPE +
                     ")";
 

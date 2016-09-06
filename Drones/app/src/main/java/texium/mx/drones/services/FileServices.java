@@ -2,11 +2,13 @@ package texium.mx.drones.services;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 
@@ -84,9 +86,52 @@ public class FileServices {
                 //encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
 
                 String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-                encodeVideo.setEncodeVideoFiles(tempData);
+                encodeVideo.setEncodeVideoSingleFiles(tempData);
 
                 encodeVideos.add(encodeVideo);
+            }
+
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            Log.e("OutOfMemoryVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_out_of_memory));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("AttachVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_video_error));
+        }
+
+        return encodeVideos;
+    }
+
+    public static List<String> attachVideos(Activity activity, List<Uri> uriFileVideo) throws Exception {
+        List<String> encodeVideos = new ArrayList<>();
+
+        Context context = activity.getApplicationContext();
+        try {
+
+            for (Uri uri : uriFileVideo) {
+
+                String encodeVideo = new String();
+
+                InputStream is = activity.getContentResolver().openInputStream(uri);
+
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+                // this is storage overwritten on each iteration with bytes
+                int bufferSize = 1024;
+                byte[] buffer = new byte[bufferSize];
+
+                // we need to know how may bytes were read to write them to the byteBuffer
+                int len = 0;
+                while ((len = is.read(buffer)) != -1) {
+                    byteBuffer.write(buffer, 0, len);
+                }
+                // and then we can return your byte array.
+                //encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
+
+                String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+                encodeVideos.add(tempData);
             }
 
         } catch (OutOfMemoryError e) {
@@ -147,8 +192,6 @@ public class FileServices {
                 //BDTasksManagerQuery.addTaskFiles(context,2010,tempData, Constants.VIDEO_FILE_TYPE);
 
             }
-
-            data.setEncodeVideoFiles(fmEncodeVideo);
 
 
         } catch (OutOfMemoryError e) {
@@ -278,5 +321,33 @@ public class FileServices {
             }
         }
         return bitmap;
+    }
+
+    public static String getRealPathFromURI(Context context,Uri contentURI,String type) {
+
+        String result  = null;
+        try {
+            Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
+            if (cursor == null) { // Source is Dropbox or other similar local file path
+                result = contentURI.getPath();
+                Log.d("TAG", "result******************" + result);
+            } else {
+                cursor.moveToFirst();
+                int idx = 0;
+                if(type.equalsIgnoreCase("IMAGE")){
+                    idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                }else if(type.equalsIgnoreCase("VIDEO")){
+                    idx = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
+                }else if(type.equalsIgnoreCase("AUDIO")){
+                    idx = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA);
+                }
+                result = cursor.getString(idx);
+                Log.d("TAG", "result*************else*****" + result);
+                cursor.close();
+            }
+        } catch (Exception e){
+            Log.e("TAG", "Exception ",e);
+        }
+        return result;
     }
 }

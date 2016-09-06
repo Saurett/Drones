@@ -216,9 +216,11 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                                 if (video.getBase_package() == null) continue;
 
-                                byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
-                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                                if (!video.getBase_package().isEmpty()) {
+                                    byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
+                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                                }
 
                                 tempGalleryList.add(video);
                             }

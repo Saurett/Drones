@@ -296,6 +296,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         switch (v.getId()) {
+            /*
             case R.id.picture_task_button:
                 Intent imgGalleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));
                 imgGalleryIntent.setType("image/*");
@@ -322,6 +323,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 ACTUAL_POSITION = tasksDecode.getTask_position();
 
                 break;
+                */
             case R.id.agree_task_button:
 
                 tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
@@ -368,7 +370,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
                 wsClose.execute();
                 break;
-            case R.id.gallery_task_button:
+            case R.id.gallery_task_button: case R.id.gallery_task_gallery:
 
                 setActualFragment(fragmentManager);
 
@@ -483,13 +485,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
         switch (requestCode) {
             case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
                 taskFiles.setFilesPicture(files);
-                TextView number_photos = (TextView) findViewById(R.id.number_photos);
-                number_photos.setText(String.valueOf(files.size()));
+                //TextView number_photos = (TextView) findViewById(R.id.number_photos);
+                //number_photos.setText(String.valueOf(files.size()));
                 break;
             case GALLERY_VIDEO_ACTIVITY_REQUEST_CODE:
                 taskFiles.setFilesVideo(files);
-                TextView number_videos = (TextView) findViewById(R.id.number_videos);
-                number_videos.setText(String.valueOf(files.size()));
+                //TextView number_videos = (TextView) findViewById(R.id.number_videos);
+                //number_videos.setText(String.valueOf(files.size()));
                 break;
         }
 
@@ -512,13 +514,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
         switch (requestCode) {
             case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
                 taskFiles.setFilesPicture(files);
-                TextView number_photos = (TextView) findViewById(R.id.number_photos);
-                number_photos.setText(String.valueOf(files.size()));
+                //TextView number_photos = (TextView) findViewById(R.id.number_photos);
+                //number_photos.setText(String.valueOf(files.size()));
                 break;
             case GALLERY_VIDEO_ACTIVITY_REQUEST_CODE:
                 taskFiles.setFilesVideo(files);
-                TextView number_videos = (TextView) findViewById(R.id.number_videos);
-                number_videos.setText(String.valueOf(files.size()));
+                //TextView number_videos = (TextView) findViewById(R.id.number_videos);
+                //number_videos.setText(String.valueOf(files.size()));
                 break;
         }
 

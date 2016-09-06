@@ -38,8 +38,11 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
     static FragmentTaskListener activityListener;
 
-    private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
-    private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
+   // private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
+    private static Button send_task_button,close_window_button,next_task_button,back_task_button, gallery_task_gallery;
+
+    //private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
+    private TextView title_task_window, content_task_window,comment_task_window;
     private ImageView task_window_icon;
 
     static Map<Long,Object> taskToken = new HashMap<>();
@@ -61,14 +64,15 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         send_task_button = (Button) view.findViewById(R.id.send_task_button);
         next_task_button = (Button) view.findViewById(R.id.next_task_button);
         back_task_button = (Button) view.findViewById(R.id.back_task_button);
-        picture_task_button = (Button) view.findViewById(R.id.picture_task_button);
-        video_task_button = (Button) view.findViewById(R.id.video_task_button);
+        //picture_task_button = (Button) view.findViewById(R.id.picture_task_button);
+        //video_task_button = (Button) view.findViewById(R.id.video_task_button);
+        gallery_task_gallery = (Button) view.findViewById(R.id.gallery_task_gallery);
 
         title_task_window = (TextView) view.findViewById(R.id.title_task_window);
         content_task_window = (TextView) view.findViewById(R.id.content_task_window);
         comment_task_window = (TextView) view.findViewById(R.id.comment_task_window);
-        number_photos = (TextView) view.findViewById(R.id.number_photos);
-        number_videos = (TextView) view.findViewById(R.id.number_videos);
+        //number_photos = (TextView) view.findViewById(R.id.number_photos);
+        //number_videos = (TextView) view.findViewById(R.id.number_videos);
 
         task_window_icon = (ImageView) view.findViewById(R.id.task_window_icon);
 
@@ -76,8 +80,9 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         send_task_button.setOnClickListener(this);
         close_window_button.setOnClickListener(this);
         next_task_button.setOnClickListener(this);
-        picture_task_button.setOnClickListener(this);
-        video_task_button.setOnClickListener(this);
+        //picture_task_button.setOnClickListener(this);
+        ///video_task_button.setOnClickListener(this);
+        gallery_task_gallery.setOnClickListener(this);
 
         View tokenView = (View) taskToken.get(1L);
         TaskListAdapter tokenAdapter = (TaskListAdapter) taskToken.get(2L);
@@ -146,7 +151,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.picture_task_button:
+           /* case R.id.picture_task_button:
 
                 TaskListAdapter pictureAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
                 Tasks pictureTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
@@ -163,6 +168,12 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 activityListener.taskActions(v, videoAdapter, videoTask, videoDecode);
 
+                break;*/
+            case R.id.gallery_task_gallery:
+                TaskListAdapter galleryAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
+                Tasks galleryTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
+                TasksDecode galleryDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
+                activityListener.taskActions(v,galleryAdapter,galleryTask,galleryDecode);
                 break;
             case R.id.send_task_button:
 
@@ -176,7 +187,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 sendDecode.setTask_comment(ssb.toString());
                 sendDecode.setOrigin_button(tokenView.getId());
 
-                AsyncSendTask wsSendTask = new AsyncSendTask(Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE
+               AsyncSendTask wsSendTask = new AsyncSendTask(Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE
                         ,v,sendAdapter,sendTask,sendDecode);
                 wsSendTask.execute();
 
@@ -216,7 +227,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualBackTask.getTask_tittle());
                 content_task_window.setText(actualBackTask.getTask_content());
-                setCountFiles();
+               // setCountFiles();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualBackTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,backDecode);
@@ -249,7 +260,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualNextTask.getTask_tittle());
                 content_task_window.setText(actualNextTask.getTask_content());
-                setCountFiles();
+               // setCountFiles();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualNextTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,nextDecode);
@@ -260,7 +271,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     }
 
     private void setCountFiles() {
-
+        /*
         number_photos.setText(Constants.NUMBER_ZERO);
         number_videos.setText(Constants.NUMBER_ZERO);
 
@@ -269,6 +280,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
             number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
         }
+        */
     }
 
     private void clearActualFiles() {
@@ -279,11 +291,13 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             filesManager.setFilesVideo(new ArrayList<Uri>());
             TASK_FILES.put(_ACTUAL_POSITION, filesManager);
 
+            /*
             number_photos.setText(String.valueOf(filesManager.getFilesPicture().size()));
             number_videos.setText(String.valueOf(filesManager.getFilesVideo().size()));
+            */
         }
     }
-
+/*
     private TasksDecode attachFiles(TasksDecode tasksDecode) throws Exception {
         try {
             FilesManager sendFile;
@@ -310,6 +324,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
         return tasksDecode;
     }
+
+*/
 
     private class AsyncSendTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -351,8 +367,9 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             try{
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE:
-                        webServiceTaskDecode = attachFiles(webServiceTaskDecode);
-                        validOperation = (webServiceTaskDecode != null);
+                        //webServiceTaskDecode = attachFiles(webServiceTaskDecode);
+                        //validOperation = (webServiceTaskDecode != null);
+                        validOperation = true;
                         break;
                 }
             } catch (Exception e) {
@@ -381,5 +398,4 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             }
         }
     }
-
 }

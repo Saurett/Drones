@@ -17,6 +17,7 @@ public class TaskGallery implements Serializable {
     private Integer file_type;
     private String description;
     private Integer sync_type;
+    private String localURI;
 
 
     public TaskGallery() {
@@ -89,5 +90,13 @@ public class TaskGallery implements Serializable {
 
     public void setPhoto_bitmap(Bitmap photo_bitmap) {
         this.photo_bitmap = photo_bitmap;
+    }
+
+    public String getLocalURI() {
+        return localURI;
+    }
+
+    public void setLocalURI(String localURI) {
+        this.localURI = localURI;
     }
 }

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.PhotoGalleryDescriptionFragment;
 import texium.mx.drones.fragments.PhotoGalleryFragment;
 import texium.mx.drones.fragments.VideoGalleryDescriptionFragment;
@@ -616,13 +617,98 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         break;
                     case Constants.WS_KEY_ITEM_SYNC:
 
+                        Integer idTask = _TASK_INFO.getTask_id();
+                        Integer idUser = _TASK_INFO.getTask_user_id();
 
                         switch (ACTUAL_GALLERY) {
                             case Constants.PICTURE_FILE_TYPE:
                                 validOperation = FileSoapServices.syncAllFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
                                 break;
                             case Constants.VIDEO_FILE_TYPE:
-                                validOperation = FileSoapServices.syncAllVideoFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
+                                //validOperation = FileSoapServices.syncAllVideoFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
+
+                                List<Integer> query = new ArrayList<>();
+
+                                query.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                                query.add(Constants.ITEM_SYNC_SERVER_CLOUD_OFF);
+
+                                List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getApplicationContext(), idTask);
+
+                                if (!taskGallery.isEmpty()) {
+                                    List<TaskGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
+                                            taskGallery, Constants.VIDEO_FILE_TYPE, query, Constants.ACTIVE);
+
+                                    //All Normal video Sync
+                                    for (TaskGallery video :
+                                            galleryBefore) {
+
+                                        if (video.getId() > 0) {
+                                            SoapServices.updatePhotoFile(getApplicationContext(), video, idUser);
+                                        } else {
+
+                                            //List<String> packages = BDTasksManagerQuery.getPackages(context, video);
+                                            FilesManager fm = FileServices.attachVideos(AllGalleryActivity.this, Uri.parse(video.getLocalURI()));
+
+                                            List<String> packages = FileServices.getPackageList(getApplicationContext()
+                                                    , fm.getEncodeVideoSingleFiles());
+
+                                            int packNumber = 1;
+
+                                            for (String pack : packages) {
+
+                            /*
+                            String title = "Transfiriendo al servidor video " + videoNumber + " de " + filesManager.size();
+                            String msg = "Subiendo paquete " + packNumber + " de " + fmPack.size();
+                            */
+
+                                                //publishProgress(title, msg, String.valueOf(packNumber), String.valueOf(fmPack.size()));
+                                                //pDialog.incrementProgressBy(1); //if needs see progress
+
+                                                try {
+                                                    soapPrimitive = SoapServices.updateVideoFiles(getApplicationContext()
+                                                            , idTask, idUser
+                                                            , pack, packNumber, (packNumber == packages.size()));
+
+                                                    packNumber++;
+                                                } catch (Exception e) {
+                                                    throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
+                                                }
+                                            }
+
+                                            video.setId(Integer.valueOf(soapPrimitive.toString()));
+                                        }
+
+                                        video.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
+                                        BDTasksManagerQuery.updateTaskFile(getApplicationContext(), video);
+                                    }
+
+                                    /*
+                                    query = new ArrayList<>();
+                                    query.add(Constants.ITEM_SYNC_SERVER_DELETE);
+                                    */
+
+                /*
+                galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
+                        taskGallery, Constants.VIDEO_FILE_TYPE, query, Constants.INACTIVE);
+                        */
+
+                /*
+                for (TaskGallery photo :
+                        galleryBefore) {
+
+                    if (photo.getId() > 0) {
+                        soapPrimitive = SoapServices.deletePhotoFile(context, photo.getId(), idUser);
+                        if (null != soapPrimitive)
+                            BDTasksManagerQuery.deleteTaskFile(context, photo);
+                    }
+                }
+                */
+
+                                }
+
+                                validOperation = true;
+
+
                                 break;
                             case Constants.DOCUMENT_FILE_TYPE:
                                 break;
@@ -665,6 +751,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                         for (Uri uriVideo : uriVideos) {
 
+                            String path = FileServices.getRealPathFromURI(getApplicationContext(), uriVideo);
+
                             //String mUri = FileServices.getRealPathFromURI(getApplicationContext(),uriVideo,"VIDEO");
 
                             //Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(
@@ -674,13 +762,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                             //TODO guardar thumbail
 
-                            List<FilesManager> videoManager = FileServices.attachVideo(AllGalleryActivity.this, fileManager.getFilesVideo());
+                            FilesManager videoManager = FileServices.attachVideos(AllGalleryActivity.this, uriVideo);
 
                             BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
                                     , "Se añaden videos"
                                     , _TASK_INFO.getTask_status()
                                     , _TASK_INFO.getTask_user_id()
-                                    , videoManager.get(0)
+                                    , videoManager
                                     , textError.length() == 0);
                         }
 

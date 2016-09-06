@@ -15,7 +15,6 @@ import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
-import texium.mx.drones.services.FileServices;
 import texium.mx.drones.utils.Constants;
 import texium.mx.drones.utils.DateTimeUtils;
 
@@ -25,7 +24,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 36;
+    static Integer BDVersion = 37;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -380,6 +379,7 @@ public class BDTasksManagerQuery {
             pg.setBase_package(videoBaseBitmap);
             pg.setDescription(Constants.EMPTY_STRING);
             pg.setCve_Task_Detail(task_detail_cve);
+            pg.setLocalURI(encodedFile.getTitle());
 
             addTaskFilesVideo(context, pg, encodedFile);
 
@@ -525,14 +525,18 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
+            cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
+
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
 
+            /*
             List<String> packages = FileServices.getPackageList(context,encodedVideo.getEncodeVideoSingleFiles());
 
             for (String pack : packages) {
                 addPackage(context, gallery, pack);
             }
+            */
 
             Log.i("SQLite: ", "Add task_file in the bd with task_id ");
 
@@ -874,6 +878,7 @@ public class BDTasksManagerQuery {
                     taskGallery.setFile_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.FILE_TYPE)));
                     taskGallery.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
                     taskGallery.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
+                    taskGallery.setLocalURI(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.LOCAL_URI)));
 
 
                     data.add(taskGallery);

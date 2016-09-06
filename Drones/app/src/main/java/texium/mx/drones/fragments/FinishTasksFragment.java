@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import org.ksoap2.serialization.SoapPrimitive;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import texium.mx.drones.R;
@@ -30,7 +28,6 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
-import texium.mx.drones.services.FileServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -38,19 +35,19 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
     static FragmentTaskListener activityListener;
 
-   // private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
-    private static Button send_task_button,close_window_button,next_task_button,back_task_button, gallery_task_gallery;
+    // private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
+    private static Button send_task_button, close_window_button, next_task_button, back_task_button, gallery_task_gallery;
 
     //private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
-    private TextView title_task_window, content_task_window,comment_task_window;
+    private TextView title_task_window, content_task_window, comment_task_window;
     private ImageView task_window_icon;
 
-    static Map<Long,Object> taskToken = new HashMap<>();
+    static Map<Long, Object> taskToken = new HashMap<>();
 
     static private int _ACTUAL_POSITION;
     static private int _ACTUAL_COUNT;
 
-    static Map<Integer,FilesManager> TASK_FILES = new HashMap<>();
+    static Map<Integer, FilesManager> TASK_FILES = new HashMap<>();
 
     private ProgressDialog pDialog;
 
@@ -173,7 +170,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 TaskListAdapter galleryAdapter = (TaskListAdapter) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_ADAPTER);
                 Tasks galleryTask = (Tasks) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS);
                 TasksDecode galleryDecode = (TasksDecode) taskToken.get(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE);
-                activityListener.taskActions(v,galleryAdapter,galleryTask,galleryDecode);
+                activityListener.taskActions(v, galleryAdapter, galleryTask, galleryDecode);
                 break;
             case R.id.send_task_button:
 
@@ -187,8 +184,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 sendDecode.setTask_comment(ssb.toString());
                 sendDecode.setOrigin_button(tokenView.getId());
 
-               AsyncSendTask wsSendTask = new AsyncSendTask(Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE
-                        ,v,sendAdapter,sendTask,sendDecode);
+                AsyncSendTask wsSendTask = new AsyncSendTask(Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE
+                        , v, sendAdapter, sendTask, sendDecode);
                 wsSendTask.execute();
 
                 break;
@@ -227,10 +224,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualBackTask.getTask_tittle());
                 content_task_window.setText(actualBackTask.getTask_content());
-               // setCountFiles();
+                // setCountFiles();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualBackTask);
-                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,backDecode);
+                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, backDecode);
                 break;
             case R.id.next_task_button:
 
@@ -260,10 +257,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 title_task_window.setText(actualNextTask.getTask_tittle());
                 content_task_window.setText(actualNextTask.getTask_content());
-               // setCountFiles();
+                // setCountFiles();
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualNextTask);
-                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE,nextDecode);
+                taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, nextDecode);
                 break;
             default:
                 break;
@@ -284,7 +281,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     }
 
     private void clearActualFiles() {
-        if(TASK_FILES.containsKey(_ACTUAL_POSITION)) {
+        if (TASK_FILES.containsKey(_ACTUAL_POSITION)) {
 
             FilesManager filesManager = TASK_FILES.get(_ACTUAL_POSITION);
             filesManager.setFilesPicture(new ArrayList<Uri>());
@@ -339,8 +336,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
         private String textError;
 
-        private AsyncSendTask(Integer wsOperation,View wsView,TaskListAdapter wsAdapter,Tasks wsTask
-                ,TasksDecode wsServiceTaskDecode) {
+        private AsyncSendTask(Integer wsOperation, View wsView, TaskListAdapter wsAdapter, Tasks wsTask
+                , TasksDecode wsServiceTaskDecode) {
             webServiceOperation = wsOperation;
             webServiceView = wsView;
             webServiceAdapter = wsAdapter;
@@ -364,7 +361,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
             Boolean validOperation = false;
 
-            try{
+            try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK_WITH_PICTURE:
                         //webServiceTaskDecode = attachFiles(webServiceTaskDecode);
@@ -384,7 +381,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         protected void onPostExecute(final Boolean success) {
 
             pDialog.dismiss();
-            if(success) {
+            if (success) {
 
                 taskToken = new HashMap<>();
                 activityListener.taskActions(webServiceView, webServiceAdapter
@@ -394,7 +391,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 String tempText = (textError.isEmpty() ? "Se excedio el limite de imagenes" : textError);
                 Toast.makeText(getContext(), tempText, Toast.LENGTH_LONG).show();
 
-               clearActualFiles();
+                clearActualFiles();
             }
         }
     }

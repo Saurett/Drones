@@ -139,7 +139,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTasksFiles.FILE_TYPE + " " + INT_TYPE + "," +
                     ColumnTasksFiles.DESCRIPTION_FILE + " " + STRING_TYPE + "," +
                     ColumnTasksFiles.SERVER_SYNC + " " + INT_TYPE + "," +
-                    ColumnTasksFiles.FILE_STATUS + " " + INT_TYPE +
+                    ColumnTasksFiles.FILE_STATUS + " " + INT_TYPE + "," +
                     ColumnTasksFiles.LOCAL_URI + " " + INT_TYPE +
             ")";
 

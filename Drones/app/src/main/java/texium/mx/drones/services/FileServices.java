@@ -104,35 +104,28 @@ public class FileServices {
         return encodeVideos;
     }
 
-    public static List<String> attachVideos(Activity activity, List<Uri> uriFileVideo) throws Exception {
-        List<String> encodeVideos = new ArrayList<>();
+    public static FilesManager attachVideos(Activity activity, Uri uriFileVideo) throws Exception {
+        FilesManager data = new FilesManager();
 
         Context context = activity.getApplicationContext();
         try {
+            InputStream is = activity.getContentResolver().openInputStream(uriFileVideo);
 
-            for (Uri uri : uriFileVideo) {
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
-                String encodeVideo = new String();
+            // this is storage overwritten on each iteration with bytes
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
 
-                InputStream is = activity.getContentResolver().openInputStream(uri);
-
-                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-                // this is storage overwritten on each iteration with bytes
-                int bufferSize = 1024;
-                byte[] buffer = new byte[bufferSize];
-
-                // we need to know how may bytes were read to write them to the byteBuffer
-                int len = 0;
-                while ((len = is.read(buffer)) != -1) {
-                    byteBuffer.write(buffer, 0, len);
-                }
-                // and then we can return your byte array.
-                //encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
-
-                String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-                encodeVideos.add(tempData);
+            // we need to know how may bytes were read to write them to the byteBuffer
+            int len = 0;
+            while ((len = is.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
             }
+
+            String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+            data.setEncodeVideoSingleFiles(tempData);
+            data.setTitle(uriFileVideo.toString());
 
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
@@ -144,7 +137,7 @@ public class FileServices {
             throw new Exception(context.getString(R.string.default_attaching_video_error));
         }
 
-        return encodeVideos;
+        return data;
     }
 
     /*
@@ -323,31 +316,18 @@ public class FileServices {
         return bitmap;
     }
 
-    public static String getRealPathFromURI(Context context,Uri contentURI,String type) {
-
-        String result  = null;
+    public static String getRealPathFromURI(Context context,Uri contentURI) {
+        Cursor cursor = null;
         try {
-            Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
-            if (cursor == null) { // Source is Dropbox or other similar local file path
-                result = contentURI.getPath();
-                Log.d("TAG", "result******************" + result);
-            } else {
-                cursor.moveToFirst();
-                int idx = 0;
-                if(type.equalsIgnoreCase("IMAGE")){
-                    idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-                }else if(type.equalsIgnoreCase("VIDEO")){
-                    idx = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
-                }else if(type.equalsIgnoreCase("AUDIO")){
-                    idx = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA);
-                }
-                result = cursor.getString(idx);
-                Log.d("TAG", "result*************else*****" + result);
+            String[] proj = { MediaStore.Video.Media.DATA};
+            cursor = context.getContentResolver().query(contentURI,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
                 cursor.close();
             }
-        } catch (Exception e){
-            Log.e("TAG", "Exception ",e);
         }
-        return result;
     }
 }

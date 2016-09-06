@@ -530,8 +530,7 @@ public class BDTasksManagerQuery {
 
             List<String> packages = FileServices.getPackageList(context,encodedVideo.getEncodeVideoSingleFiles());
 
-            for (String pack :
-                    packages) {
+            for (String pack : packages) {
                 addPackage(context, gallery, pack);
             }
 

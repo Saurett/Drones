@@ -331,15 +331,20 @@ public class BDTasksManagerQuery {
                 addTaskFiles(context, pg);
             }
 
-            TaskGallery pg = new TaskGallery();
+            if (!encodedVideoFile.isEmpty()) {
+                TaskGallery pg = new TaskGallery();
 
-            pg.setFile_type(Constants.VIDEO_FILE_TYPE);
-            pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
-            pg.setBase_package(encodedVideoFile);
-            pg.setDescription(Constants.EMPTY_STRING);
-            pg.setCve_Task_Detail(task_detail_cve);
+                pg.setFile_type(Constants.VIDEO_FILE_TYPE);
+                pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                pg.setBase_package(encodedVideoFile);
+                pg.setDescription(Constants.EMPTY_STRING);
+                pg.setCve_Task_Detail(task_detail_cve);
 
-            addTaskFiles(context, pg);
+                addTaskFiles(context, pg);
+            }
+
+
+
 
             bd.close();
 
@@ -622,6 +627,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID, gallery.getId());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
+            cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
 
             bd.update(BDTasksManager.TASKS_FILES_TABLE_NAME, cv,
                     BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE + " = " + gallery.getCve(), null);

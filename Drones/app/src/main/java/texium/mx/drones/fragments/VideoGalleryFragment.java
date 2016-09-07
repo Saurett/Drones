@@ -3,8 +3,6 @@ package texium.mx.drones.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +30,6 @@ import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
-import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -110,8 +106,13 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
         video_gallery_adapter.removeItem(position);
 
         //Move to preview list
-        activityListener.getDecodeGallery().setTaskGallery(videoGallery.get(position - 1));
-        activityListener.openDescriptionFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+        if (video_gallery_adapter.getItemCount() > 0) {
+            activityListener.getDecodeGallery().setTaskGallery(videoGallery.get(position - 1));
+            activityListener.openDescriptionFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+        } else {
+            activityListener.closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+        }
+
         //setEmptyView(Constants.SEARCH);
     }
 
@@ -180,12 +181,13 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                                     if (!exist) {
 
-                                        Bitmap serverPhoto = FileServices.reverseVideoFrameFromVideo(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
+                                        /*Bitmap serverPhoto = FileServices.reverseVideoFrameFromVideo(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
                                         if (serverPhoto == null) continue;
 
                                         videoServer.setPhoto_bitmap(serverPhoto);
                                         videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
+                                        */
 
                                         taskGalleries.add(videoServer);
                                     }
@@ -214,13 +216,14 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
                             for (TaskGallery video : allPhotos) {
 
 
-                                if (video.getBase_package() == null) continue;
-
+                                //if (video.getBase_package() == null) continue;
+/*
                                 if (!video.getBase_package().isEmpty()) {
                                     byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
                                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                     video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
                                 }
+                                */
 
                                 tempGalleryList.add(video);
                             }
@@ -244,11 +247,15 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                         for (TaskGallery video : allPhotos) {
 
+                            /*
                             if (video.getBase_package() == null) continue;
 
-                            byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
-                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                            video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                            if (!video.getBase_package().isEmpty()) {
+                                byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
+                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                            }
+                            */
 
                             tempGalleryList.add(video);
                         }
@@ -262,6 +269,7 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
                 }
 
             } catch (Exception e) {
+                e.printStackTrace();
                 textError = e.getMessage();
                 validOperation = false;
             }
@@ -289,7 +297,7 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                         FragmentManager fmDescription = getActivity().getSupportFragmentManager();
                         FragmentTransaction description = fmDescription.beginTransaction();
-                        description.add(R.id.detail_gallery_container, new PhotoGalleryDescriptionFragment(), Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                        description.add(R.id.detail_gallery_container, new VideoGalleryDescriptionFragment(), Constants.FRAGMENT_VIDEO_GALLERY_TAG);
                         description.commit();
                     } else {
                         Toast.makeText(getActivity(), "La galeria de videos se encuentra vacía", Toast.LENGTH_SHORT).show();

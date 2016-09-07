@@ -1041,7 +1041,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                         SoapServices.updateVideoFiles(getApplicationContext()
                                                 , webServiceTask.getTask_id()
                                                 , webServiceTaskDecode.getTask_user_id()
-                                                , pack, packNumber, (packNumber == fmPack.size()));
+                                                , pack, packNumber, (packNumber == fmPack.size()), "");
 
                                         Log.i("Send TO Main Server", "Pack item " + packNumber + " to " + fmPack.size());
 

@@ -410,7 +410,22 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
             case R.id.item_photo_description:
             case R.id.item_video_description:
 
-                showQuestion = PhotoGalleryDescriptionFragment.changeDescription();
+                Map<Integer, String> mapGallery = new HashMap<>();
+
+                mapGallery.put(Constants.PICTURE_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                mapGallery.put(Constants.VIDEO_FILE_TYPE, Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                mapGallery.put(Constants.DOCUMENT_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+
+                switch (ACTUAL_GALLERY) {
+                    case Constants.PICTURE_FILE_TYPE:
+                        showQuestion = PhotoGalleryDescriptionFragment.changeDescription();
+                        break;
+                    case Constants.VIDEO_FILE_TYPE:
+                        showQuestion = VideoGalleryDescriptionFragment.changeDescription();
+                        break;
+                    case Constants.DOCUMENT_FILE_TYPE:
+                        break;
+                }
 
                 if (showQuestion) {
 
@@ -422,12 +437,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     ad.setNeutralButton(getString(R.string.default_negative_cancel_button), this);
 
                 } else {
-
-                    Map<Integer, String> mapGallery = new HashMap<>();
-                    mapGallery.put(Constants.PICTURE_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                    mapGallery.put(Constants.VIDEO_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-                    mapGallery.put(Constants.DOCUMENT_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
-
                     closeFragment(mapGallery.get(ACTUAL_GALLERY));
                     openDescriptionFragment(mapGallery.get(ACTUAL_GALLERY));
                 }
@@ -491,6 +500,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                 switch (idView) {
                     case R.id.item_photo_delete:
+                    case R.id.item_video_delete:
                         AsyncGallery wsDeletePhoto = new AsyncGallery(Constants.WS_KEY_ITEM_DELETE);
                         wsDeletePhoto.execute();
                         break;
@@ -508,6 +518,10 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 switch (idView) {
                     case R.id.item_photo_description:
                         openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                        break;
+                    case R.id.item_video_description:
+                        closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                        openDescriptionFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
                         break;
                     case android.R.id.home:
                         galleryBefore = new ArrayList<>();
@@ -625,8 +639,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 validOperation = FileSoapServices.syncAllFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
                                 break;
                             case Constants.VIDEO_FILE_TYPE:
-                                //validOperation = FileSoapServices.syncAllVideoFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
-
                                 List<Integer> query = new ArrayList<>();
 
                                 query.add(Constants.ITEM_SYNC_LOCAL_TABLET);
@@ -638,15 +650,15 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                     List<TaskGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
                                             taskGallery, Constants.VIDEO_FILE_TYPE, query, Constants.ACTIVE);
 
+                                    int videoNumber = 1;
+
                                     //All Normal video Sync
-                                    for (TaskGallery video :
-                                            galleryBefore) {
+                                    for (TaskGallery video : galleryBefore) {
 
                                         if (video.getId() > 0) {
                                             SoapServices.updatePhotoFile(getApplicationContext(), video, idUser);
                                         } else {
 
-                                            //List<String> packages = BDTasksManagerQuery.getPackages(context, video);
                                             FilesManager fm = FileServices.attachVideos(AllGalleryActivity.this, Uri.parse(video.getLocalURI()));
 
                                             List<String> packages = FileServices.getPackageList(getApplicationContext()
@@ -656,18 +668,16 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                                             for (String pack : packages) {
 
-                            /*
-                            String title = "Transfiriendo al servidor video " + videoNumber + " de " + filesManager.size();
-                            String msg = "Subiendo paquete " + packNumber + " de " + fmPack.size();
-                            */
 
-                                                //publishProgress(title, msg, String.valueOf(packNumber), String.valueOf(fmPack.size()));
+                                                String title = "Transfiriendo al servidor video " + videoNumber + " de " + galleryBefore.size();
+                                                String msg = "Subiendo paquete " + packNumber + " de " + packages.size();
+
+                                                publishProgress(title, msg, String.valueOf(packNumber), String.valueOf(packages.size()));
                                                 //pDialog.incrementProgressBy(1); //if needs see progress
 
                                                 try {
                                                     soapPrimitive = SoapServices.updateVideoFiles(getApplicationContext()
-                                                            , idTask, idUser
-                                                            , pack, packNumber, (packNumber == packages.size()));
+                                                            , idTask, idUser, pack, packNumber, (packNumber == packages.size()), video.getDescription());
 
                                                     packNumber++;
                                                 } catch (Exception e) {
@@ -675,34 +685,33 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                                 }
                                             }
 
-                                            video.setId(Integer.valueOf(soapPrimitive.toString()));
+                                            videoNumber++;
+                                            try {
+                                                video.setId(Integer.valueOf(soapPrimitive.toString()));
+                                            } catch (Exception e) {
+                                                throw new Exception(getString(R.string.default_exception_error));
+                                            }
                                         }
 
                                         video.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
                                         BDTasksManagerQuery.updateTaskFile(getApplicationContext(), video);
                                     }
 
-                                    /*
                                     query = new ArrayList<>();
                                     query.add(Constants.ITEM_SYNC_SERVER_DELETE);
-                                    */
 
-                /*
-                galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
-                        taskGallery, Constants.VIDEO_FILE_TYPE, query, Constants.INACTIVE);
-                        */
+                                    galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
+                                            taskGallery, Constants.VIDEO_FILE_TYPE, query, Constants.INACTIVE);
 
-                /*
-                for (TaskGallery photo :
-                        galleryBefore) {
+                                    for (TaskGallery photo : galleryBefore) {
 
-                    if (photo.getId() > 0) {
-                        soapPrimitive = SoapServices.deletePhotoFile(context, photo.getId(), idUser);
-                        if (null != soapPrimitive)
-                            BDTasksManagerQuery.deleteTaskFile(context, photo);
-                    }
-                }
-                */
+                                        if (photo.getId() > 0) {
+                                            soapPrimitive = SoapServices.deletePhotoFile(getApplicationContext(), photo.getId(), idUser);
+                                            if (null != soapPrimitive)
+                                                BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), photo);
+                                        }
+                                    }
+
 
                                 }
 
@@ -787,13 +796,24 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             validOperation = true;
                             textError = "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
 
-                            BDTasksManagerQuery.updateCommonTask(getApplicationContext(), _TASK_INFO.getTask_id()
-                                    , "Se elimina foto sin conexión desde la app móvil"
-                                    , _TASK_INFO.getTask_status()
-                                    , _TASK_INFO.getTask_user_id()
-                                    , fileManager
-                                    , textError.length() == 0);
-
+                            switch (ACTUAL_GALLERY) {
+                                case Constants.PICTURE_FILE_TYPE:
+                                    BDTasksManagerQuery.updateCommonTask(getApplicationContext(), _TASK_INFO.getTask_id()
+                                            , "Se elimina foto sin conexión desde la app móvil"
+                                            , _TASK_INFO.getTask_status()
+                                            , _TASK_INFO.getTask_user_id()
+                                            , fileManager
+                                            , textError.length() == 0);
+                                    break;
+                                case Constants.VIDEO_FILE_TYPE:
+                                    BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
+                                            , "Se elimina foto sin conexión desde la app móvil"
+                                            , _TASK_INFO.getTask_status()
+                                            , _TASK_INFO.getTask_user_id()
+                                            , fileManager
+                                            , textError.length() == 0);
+                                    break;
+                            }
 
                         } catch (Exception e1) {
                             e1.printStackTrace();
@@ -802,6 +822,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 }
 
             } catch (Exception e) {
+                e.printStackTrace();
                 textError = e.getMessage();
                 validOperation = false;
             }
@@ -834,7 +855,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                         try {
                             BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
-                            PhotoGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -845,9 +865,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         try {
                             TaskGallery photoDelete = _DECODE_GALLERY.getTaskGallery();
                             photoDelete.setSync_type(Constants.ITEM_SYNC_SERVER_DELETE);
-
                             BDTasksManagerQuery.updateTaskFile(getApplicationContext(), photoDelete);
-                            PhotoGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
 
                             txtDelete = textError;
                         } catch (Exception e) {
@@ -857,7 +875,18 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     }
 
                     Toast.makeText(AllGalleryActivity.this, txtDelete, Toast.LENGTH_LONG).show();
-                    closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+
+                    switch (ACTUAL_GALLERY) {
+                        case Constants.PICTURE_FILE_TYPE:
+                            PhotoGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
+                            closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                            break;
+                        case Constants.VIDEO_FILE_TYPE:
+                            VideoGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
+                            closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                            break;
+                    }
+
 
                     break;
                 case Constants.WS_KEY_ITEM_SYNC_HOME:

@@ -134,13 +134,14 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://187.170.231.115"; //Sin / al final
 
+    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    */
 
-    /*
+
     public static final String WEB_SERVICE_COMPLETE_URL = "http://187.170.231.115/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
-    */
 
     //endregion SOAP CONFIGURATION//
 
@@ -184,7 +185,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_VIDEO_PART_NUMBER = "NumeroParte";
     public static final String WEB_SERVICE_PARAM_VIDEO_LAST_ONE = "Ultimo";
     public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "CorreoElectronico";
-    public static final String WEB_SERVICE_PARAM_APP_VERSION = "CorreoElectronico";
+    public static final String WEB_SERVICE_PARAM_DESCRIPTION = "Descripcion";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//

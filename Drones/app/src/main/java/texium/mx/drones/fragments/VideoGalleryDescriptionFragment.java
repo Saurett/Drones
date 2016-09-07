@@ -4,6 +4,7 @@ package texium.mx.drones.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,8 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import org.ksoap2.serialization.SoapObject;
 
@@ -37,7 +39,7 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
     private ProgressDialog pDialog;
 
     private static EditText description;
-    private static ImageView taskVideo;
+    private static VideoView taskVideo;
     private Button save, cancel;
 
 
@@ -48,7 +50,7 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
         View view = inflater.inflate(R.layout.item_video, container, false);
 
         description = (EditText) view.findViewById(R.id.videoDescription);
-        taskVideo = (ImageView) view.findViewById(R.id.taskVideo);
+        taskVideo = (VideoView) view.findViewById(R.id.taskVideo);
 
         save = (Button) view.findViewById(R.id.saveVideoDescription);
         cancel = (Button) view.findViewById(R.id.cancelVideoDescription);
@@ -57,7 +59,15 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
         cancel.setOnClickListener(this);
 
         description.setText(_DESCRIPTION.getDescription());
-        taskVideo.setImageBitmap(_DESCRIPTION.getPhoto_bitmap());
+
+        if (null != _DESCRIPTION.getLocalURI()) {
+            taskVideo.setVideoURI(Uri.parse(_DESCRIPTION.getLocalURI()));
+            taskVideo.setMediaController(new MediaController(getContext()));
+            taskVideo.requestFocus();
+            taskVideo.start();
+        }
+
+
 
         //view.setVisibility(View.VISIBLE);
 

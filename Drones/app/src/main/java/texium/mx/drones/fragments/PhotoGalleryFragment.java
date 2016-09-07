@@ -110,8 +110,12 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
         photo_gallery_adapter.removeItem(position);
 
         //Move to preview list
-        activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(position - 1));
-        activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+        if (position > 0) {
+            activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(position - 1));
+            activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+        } else {
+            activityListener.closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+        }
         //setEmptyView(Constants.SEARCH);
     }
 
@@ -174,7 +178,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
                                     photoServer.setFile_type(Constants.PICTURE_FILE_TYPE);
 
-                                    TaskGallery photoLocal = BDTasksManagerQuery.getFileByServerId(getContext(),photoServer);
+                                    TaskGallery photoLocal = BDTasksManagerQuery.getFileByServerId(getContext(), photoServer);
 
                                     Boolean exist = (photoLocal.getCve() != null);
 
@@ -196,9 +200,9 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                             FilesManager filesManager = new FilesManager();
                             filesManager.setTaskGalleries(photoGalleries);
 
-                            BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(),_TASK_INFO.getTask_id(),
-                                    "Se agregan imagenes por ws", _TASK_INFO.getTask_status(),_TASK_INFO.getTask_user_id(),
-                                    filesManager,true);
+                            BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(), _TASK_INFO.getTask_id(),
+                                    "Se agregan imagenes por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
+                                    filesManager, true);
                         }
 
                         List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
@@ -247,7 +251,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                         }
                     }
                     validOperation = (tempGalleryList.size() > 0);
-                    textError =  (tempGalleryList.size() > 0) ? textError
+                    textError = (tempGalleryList.size() > 0) ? textError
                             : "La galeria de imagenes se encuentra vacía";
                 } catch (Exception ex) {
                     textError = ex.getMessage();

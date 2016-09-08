@@ -11,9 +11,11 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-    public static final String APP_VERSION = "1.0.6";
+    public static final String APP_VERSION = "1.0.7";
+
 
     //region SYS CONSTANTS//
+    public static final String APP_DEFAULT_PATH = "/data/data/texium.mx.drones/";
     public static  final String EMPTY_STRING = "";
     public static final String NUMBER_ZERO = "0";
     public static final Integer SERVER_SYNC_FALSE = 0;

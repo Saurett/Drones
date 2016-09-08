@@ -3,6 +3,8 @@ package texium.mx.drones.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +29,10 @@ import texium.mx.drones.adapters.VideoGalleryAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
 import texium.mx.drones.models.DecodeGallery;
-import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -170,24 +173,24 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
                                     videoServer.setSync_type(systemType);
 
                                     if (soItem.hasProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT)) {
-                                        videoServer.setDescription(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                                        videoServer.setDescription(soItem.getPrimitiveProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
                                     }
 
                                     videoServer.setFile_type(Constants.VIDEO_FILE_TYPE);
 
-                                    TaskGallery videoLocal = BDTasksManagerQuery.getFileByServerId(getContext(),videoServer);
+                                    TaskGallery videoLocal = BDTasksManagerQuery.getFileByServerId(getContext(), videoServer);
 
                                     Boolean exist = (videoLocal.getCve() != null);
 
                                     if (!exist) {
 
-                                        /*Bitmap serverPhoto = FileServices.reverseVideoFrameFromVideo(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
+                                        TaskGallery decodeVideo = FileServices.downloadFile(soItem.getProperty(
+                                                Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString(),
+                                                Constants.APP_DEFAULT_PATH);
 
-                                        if (serverPhoto == null) continue;
-
-                                        videoServer.setPhoto_bitmap(serverPhoto);
+                                        videoServer.setLocalURI(decodeVideo.getLocalURI());
+                                        videoServer.setPhoto_bitmap(decodeVideo.getPhoto_bitmap());
                                         videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
-                                        */
 
                                         taskGalleries.add(videoServer);
                                     }
@@ -197,14 +200,11 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                         if (!taskGalleries.isEmpty()) {
 
-                            FilesManager filesManager = new FilesManager();
-                            filesManager.setTaskGalleries(taskGalleries);
-
-                            BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(),_TASK_INFO.getTask_id(),
-                                    "Se agregan videos por ws", _TASK_INFO.getTask_status(),_TASK_INFO.getTask_user_id(),
-                                    filesManager,true);
-
-                            //TODO GUARDAR VIDEO EN EL DISPOSITIVO
+                            for (TaskGallery videoGallery : taskGalleries) {
+                                BDTasksManagerQuery.addTaskDetailVideo(getContext(), _TASK_INFO.getTask_id(),
+                                        "Se agregan videos por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
+                                        videoGallery, true);
+                            }
                         }
 
                         List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
@@ -215,15 +215,11 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                             for (TaskGallery video : allPhotos) {
 
-
-                                //if (video.getBase_package() == null) continue;
-/*
                                 if (!video.getBase_package().isEmpty()) {
                                     byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
                                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                     video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
                                 }
-                                */
 
                                 tempGalleryList.add(video);
                             }
@@ -247,21 +243,17 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                         for (TaskGallery video : allPhotos) {
 
-                            /*
-                            if (video.getBase_package() == null) continue;
-
                             if (!video.getBase_package().isEmpty()) {
                                 byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
                                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                 video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
                             }
-                            */
 
                             tempGalleryList.add(video);
                         }
                     }
                     validOperation = (tempGalleryList.size() > 0);
-                    textError =  (tempGalleryList.size() > 0) ? textError
+                    textError = (tempGalleryList.size() > 0) ? textError
                             : "La galeria de videos se encuentra vacía";
                 } catch (Exception ex) {
                     textError = ex.getMessage();

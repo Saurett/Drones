@@ -356,7 +356,7 @@ public class BDTasksManagerQuery {
     }
 
     public static void addTaskDetailVideo(Context context, Integer task, String comment
-            , Integer status, Integer user, FilesManager encodedFile, String videoBaseBitmap, Boolean serverSync) throws Exception {
+            , Integer status, Integer user, TaskGallery encodedFile, Boolean serverSync) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -376,17 +376,9 @@ public class BDTasksManagerQuery {
                     + task + " task_comment : " + comment);
 
             Integer task_detail_cve = getLastTaskDetailCve(context, task);
+            encodedFile.setCve_Task_Detail(task_detail_cve);
 
-            TaskGallery pg = new TaskGallery();
-
-            pg.setFile_type(Constants.VIDEO_FILE_TYPE);
-            pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
-            pg.setBase_package(videoBaseBitmap);
-            pg.setDescription(Constants.EMPTY_STRING);
-            pg.setCve_Task_Detail(task_detail_cve);
-            pg.setLocalURI(encodedFile.getTitle());
-
-            addTaskFilesVideo(context, pg, encodedFile);
+            addTaskFilesVideo(context, encodedFile);
 
             bd.close();
 
@@ -512,7 +504,7 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static void addTaskFilesVideo(Context context, TaskGallery gallery, FilesManager encodedVideo)
+    public static void addTaskFilesVideo(Context context, TaskGallery gallery)
             throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
@@ -1080,7 +1072,7 @@ public class BDTasksManagerQuery {
     }
 
     public static void updateCommonTaskVideo(Context context, Integer task, String comment
-            , Integer status, Integer user, FilesManager encodedFile, Boolean serverSync) throws Exception {
+            , Integer status, Integer user, TaskGallery encodedFile, Boolean serverSync) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -1094,7 +1086,7 @@ public class BDTasksManagerQuery {
 
             Log.i("SQLite: ", "Update task in the bd with task_id : " + task);
 
-            addTaskDetailVideo(context, task, comment, status, user, encodedFile, "", serverSync);
+            addTaskDetailVideo(context, task, comment, status, user, encodedFile, serverSync);
 
             bd.close();
 

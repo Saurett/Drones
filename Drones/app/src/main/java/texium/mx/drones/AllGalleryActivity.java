@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -561,11 +562,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         private Integer webServiceOperation;
         private String textError;
         private Boolean localAccess;
+        private Integer itemSync;
 
         private AsyncGallery(Integer wsOperation) {
             webServiceOperation = wsOperation;
             textError = "";
             localAccess = false;
+            itemSync = 0;
         }
 
         @Override
@@ -636,7 +639,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                         switch (ACTUAL_GALLERY) {
                             case Constants.PICTURE_FILE_TYPE:
-                                validOperation = FileSoapServices.syncAllFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
+                                itemSync = FileSoapServices.syncAllFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
+                                validOperation = true;
                                 break;
                             case Constants.VIDEO_FILE_TYPE:
                                 List<Integer> query = new ArrayList<>();
@@ -647,7 +651,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getApplicationContext(), idTask);
 
                                 if (!taskGallery.isEmpty()) {
-                                    List<TaskGallery> galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
+                                    galleryBefore = new ArrayList<>();
+                                    galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
                                             taskGallery, Constants.VIDEO_FILE_TYPE, query, Constants.ACTIVE);
 
                                     int videoNumber = 1;
@@ -668,23 +673,21 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                                             for (String pack : packages) {
 
-
                                                 String title = "Transfiriendo al servidor video " + videoNumber + " de " + galleryBefore.size();
                                                 String msg = "Subiendo paquete " + packNumber + " de " + packages.size();
 
                                                 publishProgress(title, msg, String.valueOf(packNumber), String.valueOf(packages.size()));
-                                                //pDialog.incrementProgressBy(1); //if needs see progress
 
                                                 try {
                                                     soapPrimitive = SoapServices.updateVideoFiles(getApplicationContext()
                                                             , idTask, idUser, pack, packNumber, (packNumber == packages.size()), video.getDescription());
 
                                                     packNumber++;
+
                                                 } catch (Exception e) {
                                                     throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
                                                 }
                                             }
-
                                             videoNumber++;
                                             try {
                                                 video.setId(Integer.valueOf(soapPrimitive.toString()));
@@ -693,6 +696,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             }
                                         }
 
+                                        itemSync++;
                                         video.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
                                         BDTasksManagerQuery.updateTaskFile(getApplicationContext(), video);
                                     }
@@ -709,15 +713,12 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             soapPrimitive = SoapServices.deletePhotoFile(getApplicationContext(), photo.getId(), idUser);
                                             if (null != soapPrimitive)
                                                 BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), photo);
+                                            itemSync++;
                                         }
                                     }
-
-
                                 }
 
                                 validOperation = true;
-
-
                                 break;
                             case Constants.DOCUMENT_FILE_TYPE:
                                 break;
@@ -734,9 +735,9 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 photo.setId(Integer.valueOf(soapPrimitive.toString()));
                             }
 
-
                             photo.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
                             BDTasksManagerQuery.updateTaskFile(getApplicationContext(), photo);
+                            itemSync++;
                         }
 
                         validOperation = true;
@@ -754,33 +755,30 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         validOperation = true;
                         break;
                     case Constants.WS_KEY_ITEM_ADD_VIDEO:
-                        //List<String> fileManageVideo = (FileServices.attachVideos(AllGalleryActivity.this, fileManager.getFilesVideo()));
 
                         List<Uri> uriVideos = fileManager.getFilesVideo();
 
                         for (Uri uriVideo : uriVideos) {
 
-                            String path = FileServices.getRealPathFromURI(getApplicationContext(), uriVideo);
+                            Bitmap  thumbnail = FileServices.createVideoThumbnail(getApplicationContext(),uriVideo);
 
-                            //String mUri = FileServices.getRealPathFromURI(getApplicationContext(),uriVideo,"VIDEO");
+                            TaskGallery videoGallery = new TaskGallery();
 
-                            //Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(
-                            // mUri, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-
-                            //if (thumbnail == null) continue;
-
-                            //TODO guardar thumbail
-
-                            FilesManager videoManager = FileServices.attachVideos(AllGalleryActivity.this, uriVideo);
+                            videoGallery.setLocalURI(uriVideo.toString());
+                            videoGallery.setFile_type(Constants.VIDEO_FILE_TYPE);
+                            videoGallery.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                            videoGallery.setDescription(Constants.EMPTY_STRING);
+                            videoGallery.setPhoto_bitmap(thumbnail);
+                            videoGallery.setBase_package(FileServices.attachImgFromBitmap(videoGallery.getPhoto_bitmap()));
+                            videoGallery.setLocalURI(uriVideo.toString());
 
                             BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
                                     , "Se añaden videos"
                                     , _TASK_INFO.getTask_status()
                                     , _TASK_INFO.getTask_user_id()
-                                    , videoManager
+                                    , videoGallery
                                     , textError.length() == 0);
                         }
-
 
                         validOperation = true;
                         break;
@@ -806,11 +804,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             , textError.length() == 0);
                                     break;
                                 case Constants.VIDEO_FILE_TYPE:
+                                    TaskGallery videoGallery = new TaskGallery();
+                                    videoGallery.setLocalURI(fileManager.getTitle());
                                     BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
                                             , "Se elimina foto sin conexión desde la app móvil"
                                             , _TASK_INFO.getTask_status()
                                             , _TASK_INFO.getTask_user_id()
-                                            , fileManager
+                                            , videoGallery
                                             , textError.length() == 0);
                                     break;
                             }
@@ -845,7 +845,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            String textSync = (galleryBefore.size() > 0) ? "Sincronizado correctamente" : "No hay archivos para sincronizar";
+            String textSync = (itemSync > 0) ? "Sincronizado correctamente" : "No hay archivos para sincronizar";
             if (success) switch (webServiceOperation) {
                 case Constants.WS_KEY_ITEM_DELETE:
 

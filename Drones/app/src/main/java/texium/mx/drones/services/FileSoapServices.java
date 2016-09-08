@@ -2,7 +2,6 @@ package texium.mx.drones.services;
 
 import android.content.Context;
 
-import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
 import java.util.ArrayList;
@@ -18,11 +17,10 @@ import texium.mx.drones.utils.Constants;
 public class FileSoapServices {
 
     private static SoapPrimitive soapPrimitive;
-    private static SoapObject soapObject;
 
-    public static Boolean syncAllFiles(Context context, Integer idTask, Integer idUser) {
+    public static Integer syncAllFiles(Context context, Integer idTask, Integer idUser) {
 
-        Boolean success = false;
+        Integer success = 0;
 
         try {
 
@@ -50,6 +48,7 @@ public class FileSoapServices {
 
                     photo.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
                     BDTasksManagerQuery.updateTaskFile(context, photo);
+                    success++;
                 }
 
                 query = new ArrayList<>();
@@ -58,19 +57,16 @@ public class FileSoapServices {
                 galleryBefore = BDTasksManagerQuery.getGalleryFiles(context,
                         taskGallery, Constants.PICTURE_FILE_TYPE, query, Constants.INACTIVE);
 
-                for (TaskGallery photo :
-                        galleryBefore) {
+                for (TaskGallery photo : galleryBefore) {
 
                     if (photo.getId() > 0) {
                         soapPrimitive = SoapServices.deletePhotoFile(context, photo.getId(), idUser);
                         if (null != soapPrimitive)
                             BDTasksManagerQuery.deleteTaskFile(context, photo);
+                        success++;
                     }
                 }
-
             }
-
-            success = true;
 
         } catch (Exception e) {
             e.printStackTrace();

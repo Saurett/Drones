@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -13,11 +14,12 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import java.util.List;
 
 import texium.mx.drones.R;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.TaskGallery;
 
 /**
  * Created by texiumuser on 11/03/2016.
@@ -251,10 +254,8 @@ public class FileServices {
         Bitmap myBitmap = null;
         try {
 
-            URL url = new URL(src);
-            //Quit blank space
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-            url = uri.toURL();
+            String path = quitUrlBlackSpace(src);
+            URL url = URI.create(path).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoInput(true);
             connection.connect();
@@ -263,8 +264,6 @@ public class FileServices {
         } catch (java.net.MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
@@ -292,10 +291,7 @@ public class FileServices {
         Bitmap bitmap = null;
         MediaMetadataRetriever mediaMetadataRetriever = null;
         try {
-            URL url = new URL(videoPath);
-            //Quit blank space
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-            videoPath = uri.toURL().toString();
+            videoPath = quitUrlBlackSpace(videoPath);
 
             mediaMetadataRetriever = new MediaMetadataRetriever();
             if (Build.VERSION.SDK_INT >= 14)
@@ -306,7 +302,7 @@ public class FileServices {
             bitmap = mediaMetadataRetriever.getFrameAtTime();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception("Exception in retriveVideoFrameFromVideo(String videoPath)" + e.getMessage());
+            throw new Exception("Exception in reverseVideoFrameFromVideo(String videoPath)" + e.getMessage());
 
         } finally {
             if (mediaMetadataRetriever != null) {
@@ -316,11 +312,11 @@ public class FileServices {
         return bitmap;
     }
 
-    public static String getRealPathFromURI(Context context,Uri contentURI) {
+    public static String getRealPathFromURI(Context context, Uri contentURI) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Video.Media.DATA};
-            cursor = context.getContentResolver().query(contentURI,  proj, null, null, null);
+            String[] proj = {MediaStore.Video.Media.DATA};
+            cursor = context.getContentResolver().query(contentURI, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
@@ -330,4 +326,118 @@ public class FileServices {
             }
         }
     }
+
+    public static TaskGallery downloadFile(String fileURL, String saveDir) throws IOException {
+        TaskGallery taskGallery = new TaskGallery();
+        try {
+            String videoURIPath;
+            fileURL = quitUrlBlackSpace(fileURL);
+            URL url = new URL(fileURL);
+
+            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+            int responseCode = httpConn.getResponseCode();
+
+            // always check HTTP response code first
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String fileName = "";
+                String disposition = httpConn.getHeaderField("Content-Disposition");
+                String contentType = httpConn.getContentType();
+                int contentLength = httpConn.getContentLength();
+
+                if (disposition != null) {
+                    // extracts file name from header field
+                    int index = disposition.indexOf("filename=");
+                    if (index > 0) {
+                        fileName = disposition.substring(index + 10,
+                                disposition.length() - 1);
+                    }
+                } else {
+                    // extracts file name from URL
+                    fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1,
+                            fileURL.length());
+                }
+
+                System.out.println("Content-Type = " + contentType);
+                System.out.println("Content-Disposition = " + disposition);
+                System.out.println("Content-Length = " + contentLength);
+                System.out.println("fileName = " + fileName);
+
+                // opens input stream from the HTTP connection
+                InputStream inputStream = httpConn.getInputStream();
+                String saveFilePath = saveDir + File.separator + fileName;
+
+                // opens an output stream to save into file
+                FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+
+                int bytesRead = -1;
+                byte[] buffer = new byte[4096];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                outputStream.close();
+                inputStream.close();
+
+                videoURIPath = saveFilePath.toString();
+
+                System.out.println("File downloaded" + videoURIPath);
+            } else {
+                System.out.println("No file to download. Server replied HTTP code: " + responseCode);
+                throw new Exception("No file to download. Server replied HTTP code: " + responseCode);
+            }
+
+            httpConn.disconnect();
+
+            Uri videoURI = Uri.fromFile(new File(videoURIPath));
+            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(videoURIPath).getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+
+            taskGallery.setLocalURI(videoURI.toString());
+            taskGallery.setPhoto_bitmap(bitmap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return taskGallery;
+    }
+
+    public static Bitmap createVideoThumbnail(Context context, Uri uri)
+    {
+        MediaMetadataRetriever mediametadataretriever = new MediaMetadataRetriever();
+
+        try {
+            mediametadataretriever.setDataSource(context, uri);
+            Bitmap bitmap = mediametadataretriever.getFrameAtTime(-1L);
+            if(null != bitmap)
+            {
+                return ThumbnailUtils.extractThumbnail(bitmap, 50, 50, 2);
+            }
+            return bitmap;
+        } catch (Throwable t) {
+            // TODO log
+            return null;
+        } finally {
+            try
+            {
+                mediametadataretriever.release();
+            }
+            catch(RuntimeException e) { }
+        }
+    }
+
+    public static String quitUrlBlackSpace(String fileURL) {
+        String correctUri = "";
+        try {
+            URL url = new URL(fileURL);
+            //Quit blank space
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+
+            correctUri = uri.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return correctUri;
+    }
+
+
 }

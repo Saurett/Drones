@@ -2,24 +2,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="texium.mx.drones.fragments.PhotoGalleryFragment">
-
+    tools:context="texium.mx.drones.fragments.DocumentGalleryFragment">
 
     <LinearLayout
-        android:layout_width="320dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/photo_gallery_list"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content" />
-
-
+            android:id="@+id/document_gallery_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/emptyPhotoGallery"
+        android:id="@+id/emptyDocumentGallery"
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -27,9 +24,10 @@
         android:visibility="invisible">
 
         <ImageView
+            android:id="@+id/emptyDocument"
             android:layout_width="200dp"
             android:layout_height="150dp"
-            android:background="@drawable/image_empty_gallery" />
+            android:background="@drawable/pdf_empty_gallery" />
 
         <TextView
             android:layout_width="match_parent"
@@ -43,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="Adjunte imagenes en el botón"
+            android:text="Adjunte documentos en el botón"
             android:textAlignment="center"
             android:textSize="20sp" />
 
@@ -54,6 +52,4 @@
             android:background="@mipmap/ic_add_to_photos_black" />
 
     </LinearLayout>
-
-
 </FrameLayout>

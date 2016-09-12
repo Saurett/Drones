@@ -54,7 +54,6 @@ public class BDTasksManagerQuery {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -104,7 +103,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "msg 2 :" + appVersion.getVersion_msg());
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -127,7 +125,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Add app_version in the bd with");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -151,7 +148,6 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -177,7 +173,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -209,7 +204,6 @@ public class BDTasksManagerQuery {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -234,7 +228,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Add link in the bd with link name :" + tempLink);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -288,7 +281,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Add task in the bd with task_id :" + t.getTask_id());
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -350,7 +342,6 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -384,7 +375,6 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -434,7 +424,6 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -466,7 +455,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -499,7 +487,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -540,7 +527,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -570,7 +556,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -597,7 +582,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -628,7 +612,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Update task_file in the bd ");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -650,7 +633,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Update task_file in the bd ");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -681,7 +663,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Add user in the bd with user_id : " + u.getIdUser());
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -715,7 +696,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -742,7 +722,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -806,7 +785,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -837,7 +815,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -888,7 +865,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -919,7 +895,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -958,7 +933,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
         return data;
@@ -998,7 +972,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
         return data;
@@ -1038,7 +1011,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 
@@ -1066,7 +1038,6 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -1092,7 +1063,6 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -1118,7 +1088,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Update user in the bd with user_id : " + user.getIdUser());
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -1139,7 +1108,6 @@ public class BDTasksManagerQuery {
             Log.i("SQLite: ", "Update task_detail in the bd with task_detail_cve : " + task_detail_cve);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -1160,7 +1128,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
     }
@@ -1187,7 +1154,6 @@ public class BDTasksManagerQuery {
             bd.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("SQLite Exception", "Database error: " + e.getMessage());
             throw new Exception("Database error");
         }
 

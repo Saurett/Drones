@@ -100,6 +100,8 @@ public final class Constants {
     public static final int WS_KEY_ITEM_SYNC_HOME = 26;
     public static final int WS_KEY_ITEM_VIDEO_GALLERY = 27;
     public static final int WS_KEY_ITEM_ADD_VIDEO = 28;
+    public static final int WS_KEY_ITEM_DOCUMENT_GALLERY = 29;
+    public static final int WS_KEY_ITEM_ADD_DOCUMENT = 4;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -137,10 +139,9 @@ public final class Constants {
     public static final String WEB_SERVICE_PARTIAL_URL = "http://187.170.231.115"; //Sin / al final
 
     /*
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.65/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     */
-
 
     public static final String WEB_SERVICE_COMPLETE_URL = "http://187.170.231.115/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/itemVideo"
+            android:id="@+id/itemDocument"
             android:layout_width="640dp"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -33,7 +33,7 @@
                     android:orientation="vertical">
 
                     <VideoView
-                        android:id="@+id/taskVideo"
+                        android:id="@+id/taskDocument"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:layout_weight="1"
@@ -41,14 +41,14 @@
                         />
 
                     <EditText
-                        android:id="@+id/videoDescription"
+                        android:id="@+id/documentDescription"
                         android:layout_width="400dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_weight="1"
                         android:background="@color/colorPrimary"
                         android:gravity="top"
-                        android:hint="Ingresa la descripción del video ..."
+                        android:hint="Ingresa la descripción del documento ..."
                         android:inputType="textMultiLine"
                         android:paddingBottom="20dp"
                         android:paddingLeft="20dp"
@@ -68,7 +68,7 @@
                     android:layout_marginTop="10dp">
 
                     <Button
-                        android:id="@+id/cancelVideoDescription"
+                        android:id="@+id/cancelDocumentDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_marginBottom="100dp"
@@ -79,7 +79,7 @@
                         android:textStyle="bold" />
 
                     <Button
-                        android:id="@+id/saveVideoDescription"
+                        android:id="@+id/saveDocumentDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_weight="1"

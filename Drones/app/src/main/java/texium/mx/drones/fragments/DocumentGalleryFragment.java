@@ -26,11 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import texium.mx.drones.R;
-import texium.mx.drones.adapters.PhotoGalleryAdapter;
+import texium.mx.drones.adapters.DocumentGalleryAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
 import texium.mx.drones.models.DecodeGallery;
-import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
@@ -39,19 +38,19 @@ import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
-public class PhotoGalleryFragment extends Fragment implements View.OnClickListener {
+public class DocumentGalleryFragment extends Fragment implements View.OnClickListener {
 
     private Tasks _TASK_INFO;
     private SoapObject soapObject;
     private static Users SESSION_DATA;
 
     static FragmentGalleryListener activityListener;
-    static List<TaskGallery> taskGallery;
+    static List<TaskGallery> documentGallery;
 
-    static RecyclerView photos_list;
+    private static RecyclerView document_list;
     private static LinearLayout emptyGallery;
 
-    static PhotoGalleryAdapter photo_gallery_adapter;
+    static DocumentGalleryAdapter document_gallery_adapter;
 
     private ProgressDialog pDialog;
     static FragmentManager fragmentManager;
@@ -60,15 +59,15 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        final View view = inflater.inflate(R.layout.fragment_gallery_photo, container, false);
+        final View view = inflater.inflate(R.layout.fragment_gallery_document, container, false);
         fragmentManager = getActivity().getSupportFragmentManager();
 
 
-        photos_list = (RecyclerView) view.findViewById(R.id.photo_gallery_list);
-        emptyGallery = (LinearLayout) view.findViewById(R.id.emptyPhotoGallery);
+        document_list = (RecyclerView) view.findViewById(R.id.document_gallery_list);
+        emptyGallery = (LinearLayout) view.findViewById(R.id.emptyDocumentGallery);
 
-        photo_gallery_adapter = new PhotoGalleryAdapter();
-        photo_gallery_adapter.setOnClickListener(this);
+        document_gallery_adapter = new DocumentGalleryAdapter();
+        document_gallery_adapter.setOnClickListener(this);
 
         return view;
     }
@@ -79,7 +78,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
         _TASK_INFO = (Tasks) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY);
 
-        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_ITEM_PHOTO_GALLERY);
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_ITEM_DOCUMENT_GALLERY);
         wsTaskList.execute();
     }
 
@@ -93,10 +92,23 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    private static void setEmptyView(View view) {
-        photos_list.setVisibility((photo_gallery_adapter.getItemCount() > 0) ? View.VISIBLE : View.INVISIBLE);
-        emptyGallery.setVisibility((photo_gallery_adapter.getItemCount() > 0) ? View.INVISIBLE : View.VISIBLE);
-        activityListener.setEmptyDescription(photo_gallery_adapter.getItemCount());
+    private static void setEmptyView(Integer request) {
+        document_list.setVisibility((document_gallery_adapter.getItemCount() > 0) ? View.VISIBLE : View.INVISIBLE);
+        emptyGallery.setVisibility((document_gallery_adapter.getItemCount() > 0) ? View.INVISIBLE : View.VISIBLE);
+        activityListener.setEmptyDescription(document_gallery_adapter.getItemCount());
+
+        /*
+        String title = "¿Desea buscar un perfil?";
+        String msg = "Capture un nombre en la barra de busqueda";
+
+        if ((photos_list.getVisibility() == View.INVISIBLE) && (Constants.SEARCH == request)){
+            title = "¡No es posible localizar el perfil!";
+            msg = "Lo sentimos su busqueda no arrojó resultados";
+        }
+
+        emptyTitle.setText(title);
+        emptyMsg.setText(msg);
+        */
     }
 
     @Override
@@ -115,16 +127,17 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
 
     public static void removeAt(int position) {
-        taskGallery.remove(position);
-        photo_gallery_adapter.removeItem(position);
+        documentGallery.remove(position);
+        document_gallery_adapter.removeItem(position);
 
         //Move to preview list
-        if (position > 0) {
-            activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(position - 1));
-            activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+        if (document_gallery_adapter.getItemCount() > 0) {
+            activityListener.getDecodeGallery().setTaskGallery(documentGallery.get(position - 1));
+            activityListener.openDescriptionFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
         } else {
-            activityListener.closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+            activityListener.closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
         }
+
         setEmptyView(null);
     }
 
@@ -144,7 +157,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(getContext());
-            pDialog.setMessage(getString(R.string.default_load_pictures));
+            pDialog.setMessage(getString(R.string.default_load_videos));
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -157,12 +170,12 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
             try {
                 switch (webServiceOperation) {
-                    case Constants.WS_KEY_ITEM_PHOTO_GALLERY:
+                    case Constants.WS_KEY_ITEM_DOCUMENT_GALLERY:
 
                         tempGalleryList = new ArrayList<>();
-                        List<TaskGallery> photoGalleries = new ArrayList<>();
+                        List<TaskGallery> taskGalleries = new ArrayList<>();
 
-                        soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0, Constants.PICTURE_FILE_TYPE);
+                        soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0, Constants.DOCUMENT_FILE_TYPE);
 
                         if (soapObject.hasProperty(Constants.SOAP_PROPERTY_DIFFGRAM)) {
                             SoapObject soDiffGram = (SoapObject) soapObject.getProperty(Constants.SOAP_PROPERTY_DIFFGRAM);
@@ -172,63 +185,65 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                                 for (int i = 0; i < soNewDataSet.getPropertyCount(); i++) {
                                     SoapObject soItem = (SoapObject) soNewDataSet.getProperty(i);
 
-                                    TaskGallery photoServer = new TaskGallery();
+                                    TaskGallery videoServer = new TaskGallery();
 
                                     Integer systemType = (Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SYSTEM_ID).toString()).
                                             equals(Constants.ITEM_SYNC_SERVER_DEFAULT)
                                             ? Constants.ITEM_SYNC_SERVER_DEFAULT : Constants.ITEM_SYNC_SERVER_CLOUD);
 
-                                    photoServer.setId(Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
-                                    photoServer.setSync_type(systemType);
+                                    videoServer.setId(Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                                    videoServer.setSync_type(systemType);
 
                                     if (soItem.hasProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT)) {
-                                        photoServer.setDescription(soItem.getPrimitiveProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                                        videoServer.setDescription(soItem.getPrimitiveProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
                                     }
 
-                                    photoServer.setFile_type(Constants.PICTURE_FILE_TYPE);
+                                    videoServer.setFile_type(Constants.DOCUMENT_FILE_TYPE);
 
-                                    TaskGallery photoLocal = BDTasksManagerQuery.getFileByServerId(getContext(), photoServer);
+                                    TaskGallery videoLocal = BDTasksManagerQuery.getFileByServerId(getContext(), videoServer);
 
-                                    Boolean exist = (photoLocal.getCve() != null);
+                                    Boolean exist = (videoLocal.getCve() != null);
 
                                     if (!exist) {
-                                        Bitmap serverPhoto = FileServices.getBitmapFromURL(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
-                                        if (serverPhoto == null) continue;
+                                        TaskGallery decodeVideo = FileServices.downloadFile(soItem.getProperty(
+                                                Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString(),
+                                                Constants.APP_DEFAULT_PATH);
 
-                                        photoServer.setPhoto_bitmap(serverPhoto);
-                                        photoServer.setBase_package(FileServices.attachImgFromBitmap(photoServer.getPhoto_bitmap()));
-                                        photoGalleries.add(photoServer);
+                                        videoServer.setLocalURI(decodeVideo.getLocalURI());
+                                        videoServer.setPhoto_bitmap(decodeVideo.getPhoto_bitmap());
+                                        videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
+
+                                        taskGalleries.add(videoServer);
                                     }
                                 }
                             }
                         }
 
-                        if (!photoGalleries.isEmpty()) {
+                        if (!taskGalleries.isEmpty()) {
 
-                            FilesManager filesManager = new FilesManager();
-                            filesManager.setTaskGalleries(photoGalleries);
-
-                            BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(), _TASK_INFO.getTask_id(),
-                                    "Se agregan imagenes por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
-                                    filesManager, true);
+                            for (TaskGallery videoGallery : taskGalleries) {
+                                BDTasksManagerQuery.addTaskDetailVideo(getContext(), _TASK_INFO.getTask_id(),
+                                        "Se agregan videos por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
+                                        videoGallery, true);
+                            }
                         }
 
                         List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
 
                         if (!taskGallery.isEmpty()) {
-                            List<TaskGallery> allPhotos = BDTasksManagerQuery.getGalleryFiles(
-                                    getContext(), taskGallery, Constants.PICTURE_FILE_TYPE, null, Constants.ACTIVE);
+                            List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(
+                                    getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
-                            for (TaskGallery photo : allPhotos) {
+                            for (TaskGallery video : allDocuments) {
 
-                                if (photo.getBase_package() == null) continue;
+                                if (!video.getBase_package().isEmpty()) {
+                                    byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
+                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                                }
 
-                                byte[] decodedString = Base64.decode(photo.getBase_package(), Base64.DEFAULT);
-                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                photo.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
-
-                                tempGalleryList.add(photo);
+                                tempGalleryList.add(video);
                             }
                         }
 
@@ -246,28 +261,29 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                     List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
 
                     if (!taskGallery.isEmpty()) {
-                        List<TaskGallery> allPhotos = BDTasksManagerQuery.getGalleryFiles(getContext(), taskGallery, Constants.PICTURE_FILE_TYPE, null, Constants.ACTIVE);
+                        List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
-                        for (TaskGallery photo : allPhotos) {
+                        for (TaskGallery video : allDocuments) {
 
-                            if (photo.getBase_package() == null) continue;
+                            if (!video.getBase_package().isEmpty()) {
+                                byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
+                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                            }
 
-                            byte[] decodedString = Base64.decode(photo.getBase_package(), Base64.DEFAULT);
-                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                            photo.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
-
-                            tempGalleryList.add(photo);
+                            tempGalleryList.add(video);
                         }
                     }
                     validOperation = (tempGalleryList.size() > 0);
                     textError = (tempGalleryList.size() > 0) ? textError
-                            : "La galeria de imagenes se encuentra vacía";
+                            : "La galeria de videos se encuentra vacía";
                 } catch (Exception ex) {
                     textError = ex.getMessage();
                     ex.printStackTrace();
                 }
 
             } catch (Exception e) {
+                e.printStackTrace();
                 textError = e.getMessage();
                 validOperation = false;
             }
@@ -278,31 +294,30 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
         @Override
         protected void onPostExecute(final Boolean success) {
             try {
-                taskGallery = new ArrayList<>();
+                documentGallery = new ArrayList<>();
                 pDialog.dismiss();
                 if (success) {
 
                     if (tempGalleryList.size() > 0) {
-                        taskGallery.addAll(tempGalleryList);
-                        photo_gallery_adapter.addAll(taskGallery);
+                        documentGallery.addAll(tempGalleryList);
+                        document_gallery_adapter.addAll(documentGallery);
 
-                        photos_list.setAdapter(photo_gallery_adapter);
+                        document_list.setAdapter(document_gallery_adapter);
 
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-                        photos_list.setLayoutManager(linearLayoutManager);
+                        document_list.setLayoutManager(linearLayoutManager);
 
-                        activityListener.setExtraDecodeGallery(taskGallery.get(0));
+                        activityListener.setExtraDecodeGallery(documentGallery.get(0));
 
                         FragmentManager fmDescription = getActivity().getSupportFragmentManager();
                         FragmentTransaction description = fmDescription.beginTransaction();
-                        description.add(R.id.detail_gallery_container, new PhotoGalleryDescriptionFragment(), Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                        description.add(R.id.detail_gallery_container, new DocumentGalleryDescriptionFragment(), Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
                         description.commit();
-
                     } else {
-                        Toast.makeText(getActivity(), "La galeria de imagenes se encuentra vacía", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "La galeria de documentos se encuentra vacía", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    String tempText = (textError.isEmpty() ? "La galeria de imagenes se encuentra vacía" : textError);
+                    String tempText = (textError.isEmpty() ? "La galeria de documentos se encuentra vacía" : textError);
                     Toast.makeText(getActivity(), tempText, Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {

@@ -9,12 +9,14 @@ import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -415,6 +417,7 @@ public class FileServices {
             return bitmap;
         } catch (Throwable t) {
             // TODO log
+            t.printStackTrace();
             return null;
         } finally {
             try
@@ -422,6 +425,19 @@ public class FileServices {
                 mediametadataretriever.release();
             }
             catch(RuntimeException e) { }
+        }
+    }
+
+    public static Bitmap createDocumentThumbnail(Context context, Uri uri) throws Exception {
+        try {
+            final ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(
+                    uri, "r");
+            final FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            final Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+            parcelFileDescriptor.close();
+            return bitmap;
+        } catch (Exception e) {
+            throw new Exception("failed to parse image uri");
         }
     }
 

@@ -16,6 +16,8 @@ public interface FragmentGalleryListener {
     void closeFragment(String tag);
     void replaceFragmentPhotoFragment();
     void replaceFragmentVideoFragment();
+    void replaceFragmentDocumentFragment();
+    void setEmptyDescription(int size);
 
 
 

@@ -16,6 +16,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
@@ -46,7 +47,8 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
     static FragmentGalleryListener activityListener;
     static List<TaskGallery> videoGallery;
 
-    RecyclerView videos_list;
+    private static RecyclerView videos_list;
+    private static LinearLayout emptyGallery;
 
     static VideoGalleryAdapter video_gallery_adapter;
 
@@ -62,6 +64,7 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
 
         videos_list = (RecyclerView) view.findViewById(R.id.video_gallery_list);
+        emptyGallery = (LinearLayout) view.findViewById(R.id.emptyVideoGallery);
 
         video_gallery_adapter = new VideoGalleryAdapter();
         video_gallery_adapter.setOnClickListener(this);
@@ -87,6 +90,25 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() + " debe implementar ");
         }
+    }
+
+    private static void setEmptyView(Integer request) {
+        videos_list.setVisibility((video_gallery_adapter.getItemCount() > 0) ? View.VISIBLE : View.INVISIBLE);
+        emptyGallery.setVisibility((video_gallery_adapter.getItemCount() > 0) ? View.INVISIBLE : View.VISIBLE);
+        activityListener.setEmptyDescription(video_gallery_adapter.getItemCount());
+
+        /*
+        String title = "¿Desea buscar un perfil?";
+        String msg = "Capture un nombre en la barra de busqueda";
+
+        if ((photos_list.getVisibility() == View.INVISIBLE) && (Constants.SEARCH == request)){
+            title = "¡No es posible localizar el perfil!";
+            msg = "Lo sentimos su busqueda no arrojó resultados";
+        }
+
+        emptyTitle.setText(title);
+        emptyMsg.setText(msg);
+        */
     }
 
     @Override
@@ -116,7 +138,7 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
             activityListener.closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
         }
 
-        //setEmptyView(Constants.SEARCH);
+        setEmptyView(null);
     }
 
 
@@ -301,6 +323,8 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            setEmptyView(null);
         }
     }
 

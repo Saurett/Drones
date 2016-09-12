@@ -12,7 +12,7 @@ public class FilesManager {
 
     private List<Uri> filesPicture;
     private List<Uri> filesVideo;
-    private List<Uri> filePdf;
+    private List<Uri> filesPdf;
     private List<String> encodePictureFiles;
     private List<String> encodeVideoFiles;
     private String encodeVideoSingleFiles;
@@ -97,12 +97,12 @@ public class FilesManager {
         this.title = title;
     }
 
-    public List<Uri> getFilePdf() {
-        return filePdf;
+    public List<Uri> getFilesPdf() {
+        return filesPdf;
     }
 
-    public void setFilePdf(List<Uri> filePdf) {
-        this.filePdf = filePdf;
+    public void setFilesPdf(List<Uri> filesPdf) {
+        this.filesPdf = filesPdf;
     }
 
     public List<TaskGallery> getTaskGalleries() {

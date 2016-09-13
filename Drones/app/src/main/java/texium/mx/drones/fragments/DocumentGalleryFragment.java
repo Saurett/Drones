@@ -157,7 +157,7 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(getContext());
-            pDialog.setMessage(getString(R.string.default_load_videos));
+            pDialog.setMessage(getString(R.string.default_load_document));
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -185,36 +185,36 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                                 for (int i = 0; i < soNewDataSet.getPropertyCount(); i++) {
                                     SoapObject soItem = (SoapObject) soNewDataSet.getProperty(i);
 
-                                    TaskGallery videoServer = new TaskGallery();
+                                    TaskGallery documentServer = new TaskGallery();
 
                                     Integer systemType = (Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SYSTEM_ID).toString()).
                                             equals(Constants.ITEM_SYNC_SERVER_DEFAULT)
                                             ? Constants.ITEM_SYNC_SERVER_DEFAULT : Constants.ITEM_SYNC_SERVER_CLOUD);
 
-                                    videoServer.setId(Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
-                                    videoServer.setSync_type(systemType);
+                                    documentServer.setId(Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                                    documentServer.setSync_type(systemType);
 
                                     if (soItem.hasProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT)) {
-                                        videoServer.setDescription(soItem.getPrimitiveProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                                        documentServer.setDescription(soItem.getPrimitiveProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
                                     }
 
-                                    videoServer.setFile_type(Constants.DOCUMENT_FILE_TYPE);
+                                    documentServer.setFile_type(Constants.DOCUMENT_FILE_TYPE);
 
-                                    TaskGallery videoLocal = BDTasksManagerQuery.getFileByServerId(getContext(), videoServer);
+                                    TaskGallery documentLocal = BDTasksManagerQuery.getFileByServerId(getContext(), documentServer);
 
-                                    Boolean exist = (videoLocal.getCve() != null);
+                                    Boolean exist = (documentLocal.getCve() != null);
 
                                     if (!exist) {
 
-                                        TaskGallery decodeVideo = FileServices.downloadFile(soItem.getProperty(
+                                        TaskGallery decodeDocument = FileServices.downloadFile(soItem.getProperty(
                                                 Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString(),
                                                 Constants.APP_DEFAULT_PATH);
 
-                                        videoServer.setLocalURI(decodeVideo.getLocalURI());
-                                        videoServer.setPhoto_bitmap(decodeVideo.getPhoto_bitmap());
-                                        videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
+                                        documentServer.setLocalURI(decodeDocument.getLocalURI());
+                                        documentServer.setPhoto_bitmap(decodeDocument.getPhoto_bitmap());
+                                        documentServer.setBase_package(FileServices.attachImgFromBitmap(documentServer.getPhoto_bitmap()));
 
-                                        taskGalleries.add(videoServer);
+                                        taskGalleries.add(documentServer);
                                     }
                                 }
                             }
@@ -222,10 +222,10 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
 
                         if (!taskGalleries.isEmpty()) {
 
-                            for (TaskGallery videoGallery : taskGalleries) {
+                            for (TaskGallery documentGallery : taskGalleries) {
                                 BDTasksManagerQuery.addTaskDetailVideo(getContext(), _TASK_INFO.getTask_id(),
-                                        "Se agregan videos por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
-                                        videoGallery, true);
+                                        "Se agregan documentos por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
+                                        documentGallery, true);
                             }
                         }
 
@@ -235,15 +235,18 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                             List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(
                                     getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
-                            for (TaskGallery video : allDocuments) {
+                            for (TaskGallery document : allDocuments) {
 
-                                if (!video.getBase_package().isEmpty()) {
-                                    byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                    video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                                if (document.getBase_package() != null ) {
+
+                                    if (!document.getBase_package().isEmpty()) {
+                                        byte[] decodedString = Base64.decode(document.getBase_package(), Base64.DEFAULT);
+                                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                        document.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                                    }
                                 }
 
-                                tempGalleryList.add(video);
+                                tempGalleryList.add(document);
                             }
                         }
 
@@ -263,20 +266,22 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                     if (!taskGallery.isEmpty()) {
                         List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
-                        for (TaskGallery video : allDocuments) {
+                        for (TaskGallery document : allDocuments) {
 
-                            if (!video.getBase_package().isEmpty()) {
-                                byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);
-                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                video.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                            if (document.getBase_package() != null ) {
+                                if (!document.getBase_package().isEmpty()) {
+                                    byte[] decodedString = Base64.decode(document.getBase_package(), Base64.DEFAULT);
+                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    document.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
+                                }
                             }
 
-                            tempGalleryList.add(video);
+                            tempGalleryList.add(document);
                         }
                     }
                     validOperation = (tempGalleryList.size() > 0);
                     textError = (tempGalleryList.size() > 0) ? textError
-                            : "La galeria de videos se encuentra vacía";
+                            : "La galeria de documentos se encuentra vacía";
                 } catch (Exception ex) {
                     textError = ex.getMessage();
                     ex.printStackTrace();

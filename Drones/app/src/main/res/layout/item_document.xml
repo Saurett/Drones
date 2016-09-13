@@ -32,11 +32,12 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <VideoView
+                    <ImageView
                         android:id="@+id/taskDocument"
-                        android:layout_width="match_parent"
+                        android:layout_width="200dp"
                         android:layout_height="200dp"
                         android:layout_weight="1"
+                        android:background="@drawable/document_pdf"
                         android:layout_gravity="center"
                         />
 
@@ -75,6 +76,16 @@
                         android:layout_weight="1"
                         android:background="@null"
                         android:text="Cancelar"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold" />
+                    <Button
+                        android:id="@+id/openDocumentDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="100dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:text="Abrir"
                         android:textColor="@color/colorAccent"
                         android:textStyle="bold" />
 

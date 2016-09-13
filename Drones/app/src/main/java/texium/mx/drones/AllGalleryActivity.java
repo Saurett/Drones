@@ -3,19 +3,14 @@ package texium.mx.drones;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -449,7 +444,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                 mapGallery.put(Constants.PICTURE_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
                 mapGallery.put(Constants.VIDEO_FILE_TYPE, Constants.FRAGMENT_VIDEO_GALLERY_TAG);
-                mapGallery.put(Constants.DOCUMENT_FILE_TYPE, Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                mapGallery.put(Constants.DOCUMENT_FILE_TYPE, Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
 
                 switch (ACTUAL_GALLERY) {
                     case Constants.PICTURE_FILE_TYPE:
@@ -538,6 +533,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 switch (idView) {
                     case R.id.item_photo_delete:
                     case R.id.item_video_delete:
+                    case R.id.item_document_delete:
                         AsyncGallery wsDeletePhoto = new AsyncGallery(Constants.WS_KEY_ITEM_DELETE);
                         wsDeletePhoto.execute();
                         break;
@@ -559,6 +555,10 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     case R.id.item_video_description:
                         closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
                         openDescriptionFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                        break;
+                    case R.id.item_document_description:
+                        closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+                        openDescriptionFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
                         break;
                     case android.R.id.home:
                         galleryBefore = new ArrayList<>();
@@ -828,36 +828,45 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                         for (Uri uriDocument : uriDocuments) {
 
+                            /*
+                            String realPath = FileServices.getPath(getApplicationContext(), uriDocument);
 
-                            ParcelFileDescriptor mFileDescriptor = getBaseContext().getAssets().openFd("Guia Pokemon ROZA.pdf").getParcelFileDescriptor();
+
+                            File file = new File(realPath);
+                            ParcelFileDescriptor mFileDescriptor;
+                            try {
+                                mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                                return false;
+                            }
+
                             PdfRenderer mPdfRenderer = new PdfRenderer(mFileDescriptor);
                             // Use `openPage` to open a specific page in PDF.
                             PdfRenderer.Page mCurrentPage = mPdfRenderer.openPage(0);
                             // Important: the destination bitmap must be ARGB (not RGB).
-                            Bitmap bitmap = Bitmap.createBitmap(mCurrentPage.getWidth(), mCurrentPage.getHeight(),
+                            Bitmap thumbnail = Bitmap.createBitmap(mCurrentPage.getWidth(), mCurrentPage.getHeight(),
                                     Bitmap.Config.ARGB_8888);
-
-                            Bitmap thumbnail = FileServices.createDocumentThumbnail(getApplicationContext(), uriDocument);
-
-                            TaskGallery videoGallery = new TaskGallery();
-
-                            videoGallery.setLocalURI(uriDocument.toString());
-                            videoGallery.setFile_type(Constants.DOCUMENT_FILE_TYPE);
-                            videoGallery.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
-                            videoGallery.setDescription(Constants.EMPTY_STRING);
-                            videoGallery.setPhoto_bitmap(thumbnail);
-                            videoGallery.setBase_package(FileServices.attachImgFromBitmap(videoGallery.getPhoto_bitmap()));
-
-                            /*
-                            BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
-                                    , "Se añaden videos"
-                                    , _TASK_INFO.getTask_status()
-                                    , _TASK_INFO.getTask_user_id()
-                                    , videoGallery
-                                    , textError.length() == 0);
                                     */
 
 
+                            TaskGallery documentGallery = new TaskGallery();
+
+                            documentGallery.setLocalURI(uriDocument.toString());
+                            documentGallery.setFile_type(Constants.DOCUMENT_FILE_TYPE);
+                            documentGallery.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                            documentGallery.setDescription(Constants.EMPTY_STRING);
+                            //documentGallery.setPhoto_bitmap(thumbnail);
+                            //documentGallery.setBase_package(FileServices.attachImgFromBitmap(documentGallery.getPhoto_bitmap()));
+
+                            BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
+                                    , "Se añaden documentos"
+                                    , _TASK_INFO.getTask_status()
+                                    , _TASK_INFO.getTask_user_id()
+                                    , documentGallery
+                                    , textError.length() == 0);
+
+                            validOperation = true;
                         }
                         break;
                     default:
@@ -965,6 +974,10 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             VideoGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
                             closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
                             break;
+                        case Constants.DOCUMENT_FILE_TYPE:
+                            DocumentGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
+                            closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+                            break;
                     }
 
 
@@ -1004,6 +1017,11 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     openListFragment(Constants.FRAGMENT_VIDEO_GALLERY_LIST_TAG);
                     Toast.makeText(AllGalleryActivity.this, "Videos agregados correctamente", Toast.LENGTH_LONG).show();
                     break;
+                case Constants.WS_KEY_ITEM_ADD_DOCUMENT:
+                    closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+                    openListFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_LIST_TAG);
+                    Toast.makeText(AllGalleryActivity.this, "Documentos agregados correctamente", Toast.LENGTH_LONG).show();
+                    break;
             }
             else {
                 String tempText = (textError.isEmpty() ? "Error desconocido" : textError);
@@ -1012,31 +1030,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
             pDialog.dismiss();
         }
-    }
-
-    public String getFilename()
-    {
-/*  Intent intent = getIntent();
-    String name = intent.getData().getLastPathSegment();
-    return name;*/
-        Uri uri= getIntent().getData();
-        String fileName = null;
-        Context context=getApplicationContext();
-        String scheme = uri.getScheme();
-        if (scheme.equals("file")) {
-            fileName = uri.getLastPathSegment();
-        }
-        else if (scheme.equals("content")) {
-            String[] proj = { MediaStore.Video.Media.TITLE };
-            Uri contentUri = null;
-            Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
-            if (cursor != null && cursor.getCount() != 0) {
-                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.TITLE);
-                cursor.moveToFirst();
-                fileName = cursor.getString(columnIndex);
-            }
-        }
-        return fileName;
     }
 }
 

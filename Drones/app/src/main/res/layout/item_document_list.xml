@@ -26,11 +26,11 @@
 
                 <ImageView
                     android:id="@+id/item_document"
-                    android:layout_width="80dp"
-                    android:layout_height="50dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:background="@drawable/pdf_empty_gallery"
+                    android:background="@mipmap/ic_picture_as_pdf_black"
                     />
 
                 <android.support.v4.widget.Space

@@ -4,6 +4,8 @@ package texium.mx.drones.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +28,7 @@ import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
 import texium.mx.drones.models.TaskGallery;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -38,7 +42,7 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
 
     private static EditText description;
     private static ImageView taskDocument;
-    private Button save, cancel;
+    private Button save, cancel, open;
 
 
     @Override
@@ -52,11 +56,14 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
 
         save = (Button) view.findViewById(R.id.saveDocumentDescription);
         cancel = (Button) view.findViewById(R.id.cancelDocumentDescription);
+        open = (Button) view.findViewById(R.id.openDocumentDescription);
 
         save.setOnClickListener(this);
         cancel.setOnClickListener(this);
+        open.setOnClickListener(this);
 
         description.setText(_DESCRIPTION.getDescription());
+        //taskDocument.setImageBitmap(_DESCRIPTION.getPhoto_bitmap());
 
         return view;
     }
@@ -108,8 +115,19 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.cancelDocumentDescription:
-
                 description.setText(_DESCRIPTION.getDescription());
+                break;
+            case R.id.openDocumentDescription:
+                String realPath = FileServices.getPath(getContext(), Uri.parse(_DESCRIPTION.getLocalURI()));
+
+
+                File file = new File(realPath);
+                Uri uriFile = Uri.fromFile(file);
+                Intent intent = new Intent("com.adobe.reader");
+                intent.setType("application/pdf");
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setDataAndType(uriFile, "application/pdf");
+                startActivity(intent);
 
                 break;
             case R.id.saveDocumentDescription:

@@ -132,7 +132,7 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
         //Move to preview list
         if (video_gallery_adapter.getItemCount() > 0) {
-            activityListener.getDecodeGallery().setTaskGallery(videoGallery.get(position - 1));
+            activityListener.getDecodeGallery().setTaskGallery(videoGallery.get(((position > 0) ? position - 1 : 0)));
             activityListener.openDescriptionFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
         } else {
             activityListener.closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);

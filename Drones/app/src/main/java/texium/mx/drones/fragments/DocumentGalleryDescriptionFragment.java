@@ -123,8 +123,7 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
 
                 File file = new File(realPath);
                 Uri uriFile = Uri.fromFile(file);
-                Intent intent = new Intent("com.adobe.reader");
-                intent.setType("application/pdf");
+                Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setDataAndType(uriFile, "application/pdf");
                 startActivity(intent);

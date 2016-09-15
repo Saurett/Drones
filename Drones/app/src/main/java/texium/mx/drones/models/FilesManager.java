@@ -15,7 +15,7 @@ public class FilesManager {
     private List<Uri> filesPdf;
     private List<String> encodePictureFiles;
     private List<String> encodeVideoFiles;
-    private String encodeVideoSingleFiles;
+    private String encodeSingleFile;
     private Integer totalFiles;
     private Integer actualFile;
     private String message;
@@ -26,7 +26,7 @@ public class FilesManager {
         filesPicture = new ArrayList<>();
         filesVideo = new ArrayList<>();
         encodePictureFiles = new ArrayList<>();
-        encodeVideoSingleFiles = "";
+        encodeSingleFile = "";
     }
 
     public FilesManager(List<String> fmEncodePictureFiles) {
@@ -57,12 +57,12 @@ public class FilesManager {
         this.encodePictureFiles = encodePictureFiles;
     }
 
-    public String getEncodeVideoSingleFiles() {
-        return encodeVideoSingleFiles;
+    public String getEncodeSingleFile() {
+        return encodeSingleFile;
     }
 
-    public void setEncodeVideoSingleFiles(String encodeVideoSingleFiles) {
-        this.encodeVideoSingleFiles = encodeVideoSingleFiles;
+    public void setEncodeSingleFile(String encodeSingleFile) {
+        this.encodeSingleFile = encodeSingleFile;
     }
 
     public void setTotalFiles(Integer totalFiles) {

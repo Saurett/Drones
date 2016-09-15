@@ -132,7 +132,7 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
 
         //Move to preview list
         if (document_gallery_adapter.getItemCount() > 0) {
-            activityListener.getDecodeGallery().setTaskGallery(documentGallery.get(position - 1));
+            activityListener.getDecodeGallery().setTaskGallery(documentGallery.get(((position > 0) ? position - 1 : 0)));
             activityListener.openDescriptionFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
         } else {
             activityListener.closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);

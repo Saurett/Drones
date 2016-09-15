@@ -95,7 +95,7 @@ public class FileServices {
                 //encodeVideo = getPackageBase64(context, byteBuffer.toByteArray());
 
                 String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-                encodeVideo.setEncodeVideoSingleFiles(tempData);
+                encodeVideo.setEncodeSingleFile(tempData);
 
                 encodeVideos.add(encodeVideo);
             }
@@ -133,8 +133,44 @@ public class FileServices {
             }
 
             String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
-            data.setEncodeVideoSingleFiles(tempData);
+            data.setEncodeSingleFile(tempData);
             data.setTitle(uriFileVideo.toString());
+
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            Log.e("OutOfMemoryVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_out_of_memory));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("AttachVideo Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_video_error));
+        }
+
+        return data;
+    }
+
+    public static FilesManager attachFile(Activity activity, Uri uriFile) throws Exception {
+        FilesManager data = new FilesManager();
+
+        Context context = activity.getApplicationContext();
+        try {
+            InputStream is = activity.getContentResolver().openInputStream(uriFile);
+
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+            // this is storage overwritten on each iteration with bytes
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+
+            // we need to know how may bytes were read to write them to the byteBuffer
+            int len = 0;
+            while ((len = is.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+
+            String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
+            data.setEncodeSingleFile(tempData);
+            data.setTitle(uriFile.toString());
 
         } catch (OutOfMemoryError e) {
             e.printStackTrace();

@@ -708,7 +708,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             FilesManager fm = FileServices.attachVideos(AllGalleryActivity.this, Uri.parse(video.getLocalURI()));
 
                                             List<String> packages = FileServices.getPackageList(getApplicationContext()
-                                                    , fm.getEncodeVideoSingleFiles());
+                                                    , fm.getEncodeSingleFile());
 
                                             int packNumber = 1;
 
@@ -827,6 +827,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         List<Uri> uriDocuments = fileManager.getFilesPdf();
 
                         for (Uri uriDocument : uriDocuments) {
+
+                            /*
+
+                            FilesManager filesManager = FileServices.attachFile(AllGalleryActivity.this,uriDocument);
+
+                            String encode = filesManager.getEncodeSingleFile();
+                            */
 
                             /*
                             String realPath = FileServices.getPath(getApplicationContext(), uriDocument);

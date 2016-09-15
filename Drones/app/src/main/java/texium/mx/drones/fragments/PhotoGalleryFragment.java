@@ -120,7 +120,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
         //Move to preview list
         if (position > 0) {
-            activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(position - 1));
+            activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(((position > 0) ? position - 1 : 0)));
             activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
         } else {
             activityListener.closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);

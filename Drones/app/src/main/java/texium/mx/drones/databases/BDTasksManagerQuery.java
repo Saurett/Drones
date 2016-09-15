@@ -308,7 +308,7 @@ public class BDTasksManagerQuery {
             Integer task_detail_cve = getLastTaskDetailCve(context, task);
 
             List<String> encodedPictureFiles = encodedFile.getEncodePictureFiles();
-            String encodedVideoFile = encodedFile.getEncodeVideoSingleFiles();
+            String encodedVideoFile = encodedFile.getEncodeSingleFile();
 
 
             for (String encode : encodedPictureFiles) {
@@ -513,14 +513,6 @@ public class BDTasksManagerQuery {
 
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
-
-            /*
-            List<String> packages = FileServices.getPackageList(context,encodedVideo.getEncodeVideoSingleFiles());
-
-            for (String pack : packages) {
-                addPackage(context, gallery, pack);
-            }
-            */
 
             Log.i("SQLite: ", "Add task_file in the bd with task_id ");
 

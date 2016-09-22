@@ -88,6 +88,9 @@
     <string name="default_load_videos">Cargando videos adjuntos</string>
     <string name="default_msg_sync_server">Archivo agregado por el monitor</string>
     <string name="default_load_document">Cargando documentos adjuntos</string>
+    <string name="default_no_add_file">No es posible adjuntar archivos con el estatus actual de la tarea</string>
+    <string name="default_alert_empty_descripcion">Uno o más archivos no tienen descripción</string>
+    <string name="default_alert_empty_unique_description">La descripción de los archivos es oblogaroria</string>
 
 
 </resources>

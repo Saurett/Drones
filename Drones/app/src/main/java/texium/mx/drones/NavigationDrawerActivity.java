@@ -289,7 +289,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             TasksDecode tasksDecode = new TasksDecode();
             tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
 
-
             tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
             tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
             tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());

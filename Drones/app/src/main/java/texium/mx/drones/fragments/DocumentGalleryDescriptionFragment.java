@@ -85,14 +85,30 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
         }
     }
 
-    private void showQuestion() {
+    private void showQuestion(int item) {
 
         AlertDialog.Builder ad = new AlertDialog.Builder(getContext());
 
-        ad.setTitle(getString(R.string.default_title_alert_dialog));
-        ad.setMessage(getString(R.string.default_no_edit_msg));
-        ad.setCancelable(false);
-        ad.setNeutralButton(getString(R.string.default_positive_button), this);
+        switch (item) {
+
+            case Constants.ITEM_SYNC_SERVER_DEFAULT:
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage(getString(R.string.default_no_edit_msg));
+                ad.setCancelable(false);
+                ad.setPositiveButton(getString(R.string.default_positive_button), this);
+
+                break;
+            default:
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage(getString(R.string.default_alert_empty_unique_description));
+                ad.setCancelable(false);
+                ad.setPositiveButton(getString(R.string.default_positive_button), this);
+
+                break;
+        }
+
 
         ad.show();
 
@@ -136,13 +152,17 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
 
                 switch (taskGallery.getSync_type()) {
                     case Constants.ITEM_SYNC_SERVER_DEFAULT:
-                        this.showQuestion();
+                        this.showQuestion(taskGallery.getSync_type());
                         break;
                     case Constants.ITEM_SYNC_LOCAL_TABLET:
                         try {
-                            BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
-                            Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
-                            _DESCRIPTION = taskGallery;
+                           if (emptyDescription()) {
+                               this.showQuestion(taskGallery.getSync_type());
+                           } else {
+                               BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
+                               Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
+                               _DESCRIPTION = taskGallery;
+                           }
                         } catch (Exception e) {
                             e.printStackTrace();
                             Toast.makeText(getActivity(), R.string.default_fail_save, Toast.LENGTH_SHORT).show();
@@ -150,12 +170,16 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
                         break;
                     case Constants.ITEM_SYNC_SERVER_CLOUD:
                         try {
-                            taskGallery.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD_OFF);
-                            BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
-                            Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
-                            _DESCRIPTION = taskGallery;
-                            activityListener.closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
-                            activityListener.replaceFragmentDocumentFragment();
+                            if (emptyDescription()) {
+                                this.showQuestion(taskGallery.getSync_type());
+                            } else {
+                                taskGallery.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD_OFF);
+                                BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
+                                Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
+                                _DESCRIPTION = taskGallery;
+                                activityListener.closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+                                activityListener.replaceFragmentDocumentFragment();
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                             Toast.makeText(getActivity(), R.string.default_fail_save, Toast.LENGTH_SHORT).show();
@@ -163,11 +187,15 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
                         break;
                     case Constants.ITEM_SYNC_SERVER_CLOUD_OFF:
                         try {
-                            BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
-                            Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
-                            activityListener.closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
-                            activityListener.replaceFragmentDocumentFragment();
-                            _DESCRIPTION = taskGallery;
+                           if (emptyDescription()) {
+                               this.showQuestion(taskGallery.getSync_type());
+                           } else {
+                               BDTasksManagerQuery.updateTaskFile(getContext(), taskGallery);
+                               Toast.makeText(getActivity(), "Guardado Correctamente ...", Toast.LENGTH_SHORT).show();
+                               activityListener.closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+                               activityListener.replaceFragmentDocumentFragment();
+                               _DESCRIPTION = taskGallery;
+                           }
                         } catch (Exception e) {
                             e.printStackTrace();
                             Toast.makeText(getActivity(), R.string.default_fail_save, Toast.LENGTH_SHORT).show();
@@ -186,6 +214,11 @@ public class DocumentGalleryDescriptionFragment extends Fragment implements View
         String actual = (null != description.getText() ? description.getText().toString() : Constants.EMPTY_STRING);
 
         return !original.equals(actual);
+    }
+
+    public static Boolean emptyDescription() {
+        String actual = (null != description.getText() ? description.getText().toString() : Constants.EMPTY_STRING);
+        return actual.isEmpty();
     }
 
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {

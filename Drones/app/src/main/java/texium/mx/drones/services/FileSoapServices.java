@@ -7,6 +7,7 @@ import org.ksoap2.serialization.SoapPrimitive;
 import java.util.ArrayList;
 import java.util.List;
 
+import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.utils.Constants;
@@ -18,7 +19,7 @@ public class FileSoapServices {
 
     private static SoapPrimitive soapPrimitive;
 
-    public static Integer syncAllFiles(Context context, Integer idTask, Integer idUser) {
+    public static Integer syncAllFiles(Context context, Integer idTask, Integer idUser) throws Exception {
 
         Integer success = 0;
 
@@ -38,6 +39,10 @@ public class FileSoapServices {
                 //All Normal Photo Sync
                 for (TaskGallery photo :
                         galleryBefore) {
+
+                    if (photo.getDescription().isEmpty()) {
+                        throw new Exception(context.getString(R.string.default_alert_empty_descripcion));
+                    }
 
                     if (photo.getId() > 0) {
                         SoapServices.updatePhotoFile(context, photo, idUser);
@@ -70,6 +75,7 @@ public class FileSoapServices {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw  new Exception(e.getMessage());
         }
 
         return success;

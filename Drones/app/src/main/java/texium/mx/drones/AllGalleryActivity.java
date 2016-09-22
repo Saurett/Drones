@@ -134,6 +134,11 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 return true;
             case R.id.action_add_item:
 
+                if (_TASK_INFO.getTask_status() == Constants.NEWS_TASK) {
+                    showQuestion(R.id.action_add_item);
+                    return true;
+                }
+
                 int galleryType = GALLERY_IMAGE_ACTIVITY_REQUEST_CODE;
 
                 Intent galleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));
@@ -398,6 +403,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this);
         Boolean showQuestion = true;
+        Boolean showAlert = false;
 
         Integer syncType = 0;
 
@@ -408,6 +414,14 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         }
 
         switch (idView) {
+            case R.id.action_add_item:
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage(getString(R.string.default_no_add_file));
+                ad.setCancelable(false);
+                ad.setPositiveButton(getString(R.string.default_positive_button), this);
+
+                break;
             case android.R.id.home:
 
                 ad.setTitle(getString(R.string.default_title_alert_dialog));
@@ -448,28 +462,40 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                 switch (ACTUAL_GALLERY) {
                     case Constants.PICTURE_FILE_TYPE:
+                        showAlert = PhotoGalleryDescriptionFragment.emptyDescription();
                         showQuestion = PhotoGalleryDescriptionFragment.changeDescription();
                         break;
                     case Constants.VIDEO_FILE_TYPE:
+                        showAlert = VideoGalleryDescriptionFragment.emptyDescription();
                         showQuestion = VideoGalleryDescriptionFragment.changeDescription();
                         break;
                     case Constants.DOCUMENT_FILE_TYPE:
+                        showAlert = DocumentGalleryDescriptionFragment.emptyDescription();
                         showQuestion = DocumentGalleryDescriptionFragment.changeDescription();
                         break;
                 }
 
-                if (showQuestion) {
+                if (showAlert) {
 
                     ad.setTitle(getString(R.string.default_title_alert_dialog));
-                    ad.setMessage(getString(R.string.default_item_description_msg));
+                    ad.setMessage(getString(R.string.default_alert_empty_unique_description));
                     ad.setCancelable(false);
-                    ad.setPositiveButton(getString(R.string.default_positive_yes_button), this);
-                    ad.setNegativeButton(getString(R.string.default_negative_no_button), this);
-                    ad.setNeutralButton(getString(R.string.default_negative_cancel_button), this);
+                    ad.setPositiveButton(getString(R.string.default_positive_button), this);
 
                 } else {
-                    closeFragment(mapGallery.get(ACTUAL_GALLERY));
-                    openDescriptionFragment(mapGallery.get(ACTUAL_GALLERY));
+                    if (showQuestion) {
+
+                        ad.setTitle(getString(R.string.default_title_alert_dialog));
+                        ad.setMessage(getString(R.string.default_item_description_msg));
+                        ad.setCancelable(false);
+                        ad.setPositiveButton(getString(R.string.default_positive_yes_button), this);
+                        ad.setNegativeButton(getString(R.string.default_negative_no_button), this);
+                        ad.setNeutralButton(getString(R.string.default_negative_cancel_button), this);
+
+                    } else {
+                        closeFragment(mapGallery.get(ACTUAL_GALLERY));
+                        openDescriptionFragment(mapGallery.get(ACTUAL_GALLERY));
+                    }
                 }
 
                 break;
@@ -515,7 +541,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 break;
         }
 
-        if (showQuestion) ad.show();
+        if (showQuestion || showAlert) ad.show();
 
     }
 
@@ -602,12 +628,14 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         private String textError;
         private Boolean localAccess;
         private Integer itemSync;
+        private Boolean emptyDescription;
 
         private AsyncGallery(Integer wsOperation) {
             webServiceOperation = wsOperation;
             textError = "";
             localAccess = false;
             itemSync = 0;
+            emptyDescription = false;
         }
 
         @Override
@@ -701,6 +729,11 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                     //All Normal video Sync
                                     for (TaskGallery video : galleryBefore) {
 
+                                        if (video.getDescription().isEmpty()) {
+                                            emptyDescription = true;
+                                            break;
+                                        }
+
                                         if (video.getId() > 0) {
                                             SoapServices.updatePhotoFile(getApplicationContext(), video, idUser);
                                         } else {
@@ -770,6 +803,12 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     case Constants.WS_KEY_ITEM_SYNC_HOME:
 
                         for (TaskGallery photo : galleryBefore) {
+
+                            if (photo.getDescription().isEmpty()) {
+                                emptyDescription = true;
+                                break;
+                            }
+
                             if (photo.getId() > 0) {
                                 SoapServices.updatePhotoFile(getApplicationContext(), photo, _TASK_INFO.getTask_user_id());
                             } else {
@@ -827,35 +866,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         List<Uri> uriDocuments = fileManager.getFilesPdf();
 
                         for (Uri uriDocument : uriDocuments) {
-
-                            /*
-
-                            FilesManager filesManager = FileServices.attachFile(AllGalleryActivity.this,uriDocument);
-
-                            String encode = filesManager.getEncodeSingleFile();
-                            */
-
-                            /*
-                            String realPath = FileServices.getPath(getApplicationContext(), uriDocument);
-
-
-                            File file = new File(realPath);
-                            ParcelFileDescriptor mFileDescriptor;
-                            try {
-                                mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                                return false;
-                            }
-
-                            PdfRenderer mPdfRenderer = new PdfRenderer(mFileDescriptor);
-                            // Use `openPage` to open a specific page in PDF.
-                            PdfRenderer.Page mCurrentPage = mPdfRenderer.openPage(0);
-                            // Important: the destination bitmap must be ARGB (not RGB).
-                            Bitmap thumbnail = Bitmap.createBitmap(mCurrentPage.getWidth(), mCurrentPage.getHeight(),
-                                    Bitmap.Config.ARGB_8888);
-                                    */
-
 
                             TaskGallery documentGallery = new TaskGallery();
 
@@ -990,11 +1000,22 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                     break;
                 case Constants.WS_KEY_ITEM_SYNC_HOME:
+
+                    if (emptyDescription) {
+                        textSync = getString(R.string.default_alert_empty_descripcion);
+                    } else {
+                        galleryBefore = new ArrayList<>();
+                        finish();
+                    }
+
                     Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
-                    galleryBefore = new ArrayList<>();
-                    finish();
+
                     break;
                 case Constants.WS_KEY_ITEM_SYNC:
+
+                    if (emptyDescription) {
+                        textSync = getString(R.string.default_alert_empty_descripcion);
+                    }
 
                     switch (ACTUAL_GALLERY) {
                         case Constants.PICTURE_FILE_TYPE:
@@ -1031,6 +1052,27 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     break;
             }
             else {
+
+                switch (webServiceOperation) {
+                    case Constants.WS_KEY_ITEM_SYNC:
+
+                        switch (ACTUAL_GALLERY) {
+                            case Constants.PICTURE_FILE_TYPE:
+                                closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+                                openListFragment(Constants.FRAGMENT_PHOTO_GALLERY_LIST_TAG);
+                                break;
+                            case Constants.VIDEO_FILE_TYPE:
+                                closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
+                                openListFragment(Constants.FRAGMENT_VIDEO_GALLERY_LIST_TAG);
+                                break;
+                            case Constants.DOCUMENT_FILE_TYPE:
+                                closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+                                openListFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_LIST_TAG);
+                        }
+
+                        break;
+                }
+
                 String tempText = (textError.isEmpty() ? "Error desconocido" : textError);
                 Toast.makeText(getApplicationContext(), tempText, Toast.LENGTH_LONG).show();
             }

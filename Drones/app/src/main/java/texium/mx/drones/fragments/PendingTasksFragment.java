@@ -29,6 +29,7 @@ import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.NotificationService;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -143,6 +144,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_PENDING:
 
+                        NotificationService.callNotification(getActivity(), idTeam);
                         soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 

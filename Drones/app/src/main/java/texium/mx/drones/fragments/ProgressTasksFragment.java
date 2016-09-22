@@ -29,6 +29,7 @@ import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.NotificationService;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -59,7 +60,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_progress_tasks,container,false);
+        View view = inflater.inflate(R.layout.fragment_progress_tasks, container, false);
 
         tasks_list_tittle = (RecyclerView) view.findViewById(R.id.progress_task_list_title);
         tasks_list = (RecyclerView) view.findViewById(R.id.progress_task_list);
@@ -78,7 +79,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
         SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
-        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_PROGRESS,Integer.valueOf(SESSION_DATA.getIdTeam().toString()),Constants.PROGRESS_TASK);
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_PROGRESS, Integer.valueOf(SESSION_DATA.getIdTeam().toString()), Constants.PROGRESS_TASK);
         wsTaskList.execute();
 
     }
@@ -104,7 +105,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public static void fragmentJump(View view,Tasks task,TasksDecode tasksDecode) {
+    public static void fragmentJump(View view, Tasks task, TasksDecode tasksDecode) {
         activityListener.taskActions(view, task_list_adapter, task, tasksDecode);
     }
 
@@ -116,7 +117,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         private List<Tasks> tempTaskList;
         private String textError;
 
-        private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
+        private AsyncCallWS(Integer wsOperation, Integer wsIdTeam, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
             idTeam = wsIdTeam;
             idStatus = wsIdStatus;
@@ -138,10 +139,10 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
             Boolean validOperation = false;
 
-            try{
+            try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
-
+                        NotificationService.callNotification(getActivity(), idTeam);
                         soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
@@ -161,9 +162,9 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                 Tasks t = new Tasks(idStatus);
 
                 try {
-                   tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
-                   validOperation = (tempTaskList.size() > 0);
-                    textError =  (tempTaskList.size() > 0) ? textError
+                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                    validOperation = (tempTaskList.size() > 0);
+                    textError = (tempTaskList.size() > 0) ? textError
                             : getString(R.string.default_empty_task_list);
                 } catch (Exception ex) {
                     textError = ex.getMessage();
@@ -188,10 +189,10 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                 progressTask = new ArrayList<>();
                 pDialog.dismiss();
 
-                if(success) {
+                if (success) {
 
                     if (tempTaskList.size() == 0) {
-                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                        for (int i = 0; i < soapObject.getPropertyCount(); i++) {
                             Tasks t = new Tasks();
 
                             SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
@@ -211,7 +212,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                             progressTask.add(t);
 
                             try {
-                                Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(),t);
+                                Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);
 
                                 Integer tempTaskStatus = (tempTask.getTask_id() != null)
                                         ? tempTask.getTask_status() : Constants.INACTIVE;
@@ -221,12 +222,12 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                                         BDTasksManagerQuery.addTask(getContext(), t);
                                         break;
                                     case Constants.NEWS_TASK:
-                                        case Constants.PENDING_TASK:
-                                            case Constants.CLOSE_TASK:
-                                                progressTask.remove(t);
+                                    case Constants.PENDING_TASK:
+                                    case Constants.CLOSE_TASK:
+                                        progressTask.remove(t);
                                         break;
                                     default:
-                                        Log.i("ProgressTasks","No remove task");
+                                        Log.i("ProgressTasks", "No remove task");
                                         break;
                                 }
                             } catch (Exception e) {
@@ -252,7 +253,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
                     } else progressTask.addAll(tempTaskList);
 
-                    if (progressTask.size() > 0 ) {
+                    if (progressTask.size() > 0) {
                         task_list_adapter.addAll(progressTask);
                         task_list_title_adapter.addAll(progressTaskTitle);
 

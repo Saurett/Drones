@@ -12,11 +12,11 @@ import texium.mx.drones.R;
 public final class Constants {
 
     public static final String APP_VERSION = "1.0.7";
-
+    public static final int LOOP_TIME = 600000; //60000 * 1 = 1 Minute
 
     //region SYS CONSTANTS//
     public static final String APP_DEFAULT_PATH = "/data/data/texium.mx.drones/";
-    public static  final String EMPTY_STRING = "";
+    public static final String EMPTY_STRING = "";
     public static final String NUMBER_ZERO = "0";
     public static final Integer SERVER_SYNC_FALSE = 0;
     public static final Integer SERVER_SYNC_TRUE = 1;
@@ -76,7 +76,7 @@ public final class Constants {
     public static final int WS_KEY_LOGIN_SERVICE = 1;
     public static final int WS_KEY_TASK_SERVICE_NEWS = 2;
     public static final int WS_KEY_TASK_SERVICE_PROGRESS = 3;
-    public static final int WS_KEY_TASK_SERVICE_PENDING= 4;
+    public static final int WS_KEY_TASK_SERVICE_PENDING = 4;
     public static final int WS_KEY_UPDATE_TASK = 5;
     public static final int WS_KEY_UPDATE_TASK_WITH_PICTURE = 6;
     public static final int WS_KEY_UPDATE_TASK_FILE = 8;
@@ -101,7 +101,8 @@ public final class Constants {
     public static final int WS_KEY_ITEM_VIDEO_GALLERY = 27;
     public static final int WS_KEY_ITEM_ADD_VIDEO = 28;
     public static final int WS_KEY_ITEM_DOCUMENT_GALLERY = 29;
-    public static final int WS_KEY_ITEM_ADD_DOCUMENT = 4;
+    public static final int WS_KEY_ITEM_ADD_DOCUMENT = 30;
+    public static final int WS_KEY_SEND_LOCATION_HIDDEN_LOOP = 31;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -235,6 +236,7 @@ public final class Constants {
     public static final String ACTIVITY_EXTRA_PARAMS_LOGIN = "data";
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY = "task_gallery_info";
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY_DESCRIPTION = "task_gallery_description";
+    public static final String ACTIVITY_EXTRA_PARAMS_NEW_TASK = "new_task";
     //endregion ACTIVITY PARAMS//
 
     //region ACCESS TO MAP TASK PRIORITY//
@@ -275,6 +277,15 @@ public final class Constants {
         MAP_STATUS_ICON.put(TASK_PRIORITY_MID_ID,R.drawable.task_priority_mid);
         MAP_STATUS_ICON.put(TASK_PRIORITY_TOP_ID,R.drawable.task_priority_top);
         MAP_STATUS_ICON.put(TASK_PRIORITY_EXPRESS_ID,R.drawable.task_priority_express);
+    }
+
+    public static Map<Integer,Integer> MAP_STATUS_COLOR;
+    static {
+        MAP_STATUS_COLOR = new HashMap<>();
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_LOW_ID,R.color.colorPriorityLow);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_MID_ID,R.color.colorPriorityMid);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_TOP_ID,R.color.colorPriorityTop);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_EXPRESS_ID,R.color.colorPriorityExpress);
     }
 
     //endregion ACCESS TO MAP PRIORITY//

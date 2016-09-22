@@ -5,4 +5,12 @@
     <color name="colorPrimaryWhite">#ffffff</color>
     <color name="colorPrimaryGray">#666666</color>
     <color name="colorAccent">#ee0068</color>
+
+    <!-- Priority colors -->
+    <color name="colorPriorityLow">#330066</color>
+    <color name="colorPriorityMid">#FDCB01</color>
+    <color name="colorPriorityTop">#FF843B</color>
+    <color name="colorPriorityExpress">#FD0066</color>
+
+
 </resources>

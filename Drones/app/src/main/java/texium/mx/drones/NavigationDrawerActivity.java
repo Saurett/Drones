@@ -2,6 +2,8 @@ package texium.mx.drones;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -15,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,10 +26,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -55,6 +60,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
@@ -74,6 +82,7 @@ import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.FileSoapServices;
+import texium.mx.drones.services.NotificationService;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -119,7 +128,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
-
+    private Boolean stopThread = false;
+    private Handler handler;
+    private Runnable runnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,11 +139,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+        handler = new Handler();
+
         try {
             SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
         } catch (Exception e) {
             e.printStackTrace();
             getIntent().putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, SESSION_DATA);
+        }
+
+        try {
+            ACTUAL_FRAGMENT = (String) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_NEW_TASK);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
@@ -261,17 +280,54 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
-    private void callWebServiceLocation(int type) {
-        TasksDecode tasksDecode = new TasksDecode();
-        tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
+    private void callWebServiceLocation(final int type) {
+
+        if (type == Constants.WS_KEY_SEND_LOCATION_HIDDEN) {
+            loopWebServiceLocation(type);
+        } else {
+
+            TasksDecode tasksDecode = new TasksDecode();
+            tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
 
 
-        tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
-        tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
-        tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+            tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
+            tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
+            tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
 
-        AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
-        wsLocation.execute();
+            AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
+            wsLocation.execute();
+        }
+    }
+
+    private void loopWebServiceLocation(final int type) {
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                runnable = new Runnable() {
+                    public void run() {
+                        try {
+                            if (!stopThread) {
+                                TasksDecode tasksDecode = new TasksDecode();
+                                tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
+
+                                tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
+                                tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
+                                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                                //Ejecuta tu AsyncTask!
+                                AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
+                                wsLocation.execute();
+                            }
+                        } catch (Exception e) {
+                            Log.e("error", e.getMessage());
+                        }
+                    }
+                };
+                handler.post(runnable);
+            }
+        };
+
+        timer.schedule(task, 0, Constants.LOOP_TIME);
     }
 
     //Save media content
@@ -370,7 +426,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
                 wsClose.execute();
                 break;
-            case R.id.gallery_task_button: case R.id.gallery_task_gallery:
+            case R.id.gallery_task_button:
+            case R.id.gallery_task_gallery:
 
                 setActualFragment(fragmentManager);
 
@@ -547,6 +604,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             taskToken.clear();
 
         } else if (id == R.id.nav_progress_task) {
+
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
             fragmentTransaction.commit();
@@ -554,6 +612,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             taskToken.clear();
 
         } else if (id == R.id.nav_pending_task) {
+
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), Constants.FRAGMENT_PENDING_TAG);
             fragmentTransaction.commit();
@@ -561,6 +620,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             taskToken.clear();
 
         } else if (id == R.id.nav_revision_task) {
+
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), Constants.FRAGMENT_REVISION_TAG);
             fragmentTransaction.commit();
@@ -568,6 +628,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             taskToken.clear();
 
         } else if (id == R.id.nav_close_task) {
+
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), Constants.FRAGMENT_CLOSE_TAG);
             fragmentTransaction.commit();
@@ -590,8 +651,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
 
             ACTUAL_FRAGMENT = null;
-            callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
-
+            stopThread = true;
+            handler.removeCallbacks(runnable);
             taskToken.clear();
             finish();
         }
@@ -603,42 +664,53 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     private void showFragment(String fragmentTag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        if (fragmentTag == Constants.FRAGMENT_NEWS_TAG) {
+        if (fragmentTag != null) {
+            switch (fragmentTag) {
+                case Constants.FRAGMENT_NEWS_TAG:
 
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new NewsTasksFragment(), Constants.FRAGMENT_NEWS_TAG);
-            fragmentTransaction.commit();
+                    fragmentTransaction.add(R.id.tasks_fragment_container, new NewsTasksFragment(), Constants.FRAGMENT_NEWS_TAG);
+                    fragmentTransaction.commit();
 
-            taskToken.clear();
+                    taskToken.clear();
 
-        } else if (fragmentTag == Constants.FRAGMENT_PROGRESS_TAG) {
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
-            fragmentTransaction.commit();
+                    break;
+                case Constants.FRAGMENT_PROGRESS_TAG:
 
-            taskToken.clear();
+                    fragmentTransaction.add(R.id.tasks_fragment_container, new ProgressTasksFragment(), Constants.FRAGMENT_PROGRESS_TAG);
+                    fragmentTransaction.commit();
 
-        } else if (fragmentTag == Constants.FRAGMENT_PENDING_TAG) {
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), Constants.FRAGMENT_PENDING_TAG);
-            fragmentTransaction.commit();
+                    taskToken.clear();
 
-            taskToken.clear();
+                    break;
+                case Constants.FRAGMENT_PENDING_TAG:
 
-        } else if (fragmentTag == Constants.FRAGMENT_REVISION_TAG) {
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), Constants.FRAGMENT_REVISION_TAG);
-            fragmentTransaction.commit();
+                    fragmentTransaction.add(R.id.tasks_fragment_container, new PendingTasksFragment(), Constants.FRAGMENT_PENDING_TAG);
+                    fragmentTransaction.commit();
 
-            taskToken.clear();
+                    taskToken.clear();
 
-        } else if (fragmentTag == Constants.FRAGMENT_CLOSE_TAG) {
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), Constants.FRAGMENT_CLOSE_TAG);
-            fragmentTransaction.commit();
+                    break;
 
-            taskToken.clear();
+                case Constants.FRAGMENT_REVISION_TAG:
+
+                    fragmentTransaction.add(R.id.tasks_fragment_container, new RevisionTasksFragment(), Constants.FRAGMENT_REVISION_TAG);
+                    fragmentTransaction.commit();
+
+                    taskToken.clear();
+
+                    break;
+
+                case Constants.FRAGMENT_CLOSE_TAG:
+
+                    fragmentTransaction.add(R.id.tasks_fragment_container, new CloseTasksFragment(), Constants.FRAGMENT_CLOSE_TAG);
+                    fragmentTransaction.commit();
+
+                    taskToken.clear();
+
+                    break;
+            }
         }
 
         ACTUAL_FRAGMENT = null;
@@ -902,6 +974,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         client.disconnect();
     }
 
+
     //WEB SERVICE CLASS CALL//
     private class AsyncCallWS extends AsyncTask<Void, String, Boolean> {
 
@@ -973,6 +1046,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             Boolean validOperation = false;
 
             try {
+                NotificationService.callNotification(NavigationDrawerActivity.this, SESSION_DATA.getIdTeam());
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK:
 
@@ -1000,7 +1074,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                             //UPDATE ALL PICTURE
                             FileSoapServices.syncAllFilesWithDetail(getApplicationContext(),
-                                    syncTaskServer.getTask_id(),syncTaskServer.getTask_user_id(),
+                                    syncTaskServer.getTask_id(), syncTaskServer.getTask_user_id(),
                                     syncTaskServer.getTask_detail_cve());
 
                             Log.i("Sync Task", "task_id " + syncTaskServer.getTask_id()
@@ -1059,7 +1133,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         soapPrimitive = SoapServices.sendFile(getApplicationContext(), webServiceTask.getTask_id()
                                 , webServiceTask.getTask_user_id(), webServiceTaskDecode.getSendImgFiles());
 
-                        FileSoapServices.syncAllFiles(getApplicationContext(),webServiceTask.getTask_id(),webServiceTask.getTask_user_id());
+                        FileSoapServices.syncAllFiles(getApplicationContext(), webServiceTask.getTask_id(), webServiceTask.getTask_user_id());
 
                         validOperation = (soapPrimitive != null);
                         break;
@@ -1070,6 +1144,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 , webServiceTaskDecode.getTask_latitude()
                                 , webServiceTaskDecode.getTask_longitude()
                                 , webServiceTaskDecode.getTask_user_id());
+
                         validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_ALL_TASKS:
@@ -1103,7 +1178,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , syncTaskServer.getTask_detail_cve()
                                     , Constants.SERVER_SYNC_TRUE);
 
-                            FileSoapServices.syncAllFilesWithDetail(getApplicationContext(),syncTaskServer.getTask_id(),syncTaskServer.getTask_user_id(),syncTaskServer.getTask_detail_cve());
+                            FileSoapServices.syncAllFilesWithDetail(getApplicationContext(), syncTaskServer.getTask_id(), syncTaskServer.getTask_user_id(), syncTaskServer.getTask_detail_cve());
 
                             Log.i("Sync Task", "task_id " + syncTaskServer.getTask_id()
                                     + " comment " + syncTaskServer.getTask_comment());
@@ -1267,6 +1342,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                     case Constants.WS_KEY_SERVER_SYNC:
                         Toast.makeText(NavigationDrawerActivity.this, textError, Toast.LENGTH_LONG).show();
+                        break;
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+
+                        if (!stopThread) {
+                            Log.i("CHECK TASK", "Buscando nuevas tareas");
+                        }
                         break;
                     default:
                         break;

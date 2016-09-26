@@ -4,6 +4,7 @@ package texium.mx.drones.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.VideoView;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
 import texium.mx.drones.models.TaskGallery;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -40,7 +43,7 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
 
     private static EditText description;
     private static VideoView taskVideo;
-    private Button save, cancel;
+    private Button save, cancel, open;
 
 
     @Override
@@ -54,9 +57,11 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
 
         save = (Button) view.findViewById(R.id.saveVideoDescription);
         cancel = (Button) view.findViewById(R.id.cancelVideoDescription);
+        open = (Button) view.findViewById(R.id.openVideoDescription);
 
         save.setOnClickListener(this);
         cancel.setOnClickListener(this);
+        open.setOnClickListener(this);
 
         description.setText(_DESCRIPTION.getDescription());
 
@@ -66,9 +71,6 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
             taskVideo.requestFocus();
             taskVideo.start();
         }
-
-
-        //view.setVisibility(View.VISIBLE);
 
         return view;
     }
@@ -138,6 +140,18 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
             case R.id.cancelVideoDescription:
 
                 description.setText(_DESCRIPTION.getDescription());
+
+                break;
+            case R.id.openVideoDescription:
+
+                String realPath = FileServices.getPath(getContext(), Uri.parse(_DESCRIPTION.getLocalURI()));
+
+                File file = new File(realPath);
+                Uri uriFile = Uri.fromFile(file);
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setDataAndType(uriFile, "video/mp4");
+                startActivity(intent);
 
                 break;
             case R.id.saveVideoDescription:

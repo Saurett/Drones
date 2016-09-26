@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CIVAR II</string>
     <string name="title_activity_main">CIVAR II</string>
-    <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
+    <string name="title_activity_navigation_drawer">CIVAR II</string>
 
     <string name="app_bar_navigation_name">CUADRILLAS DE INSPECCCIÓN</string>
 

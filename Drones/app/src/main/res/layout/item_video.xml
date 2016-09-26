@@ -79,6 +79,18 @@
                         android:textStyle="bold" />
 
                     <Button
+                        android:id="@+id/openVideoDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="100dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:text="Abrir"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold" />
+
+
+                    <Button
                         android:id="@+id/saveVideoDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"

@@ -335,7 +335,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (requestType == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             //cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 65898240);//X MB*1048*1048= X MB
+            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 54915200);//X MB*1048*1048= X MB
         }
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {

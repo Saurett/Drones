@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by saurett on 14/01/2016.
  */
-public class Tasks implements Serializable{
+public class Tasks implements Serializable {
 
     private Integer task_cve;
     private String task_tittle;
@@ -19,12 +19,16 @@ public class Tasks implements Serializable{
     private Integer task_status;
     private Integer task_user_id;
 
+
+    private Integer idTeam;
+
     public Tasks() {
 
     }
 
-    public Tasks(Integer tTaskStatus) {
+    public Tasks(Integer tTaskStatus, Integer tIdTeam) {
         task_status = tTaskStatus;
+        idTeam = tIdTeam;
     }
 
     public Integer getTask_cve() {
@@ -113,5 +117,13 @@ public class Tasks implements Serializable{
 
     public void setTask_user_id(Integer task_user_id) {
         this.task_user_id = task_user_id;
+    }
+
+    public Integer getIdTeam() {
+        return idTeam;
+    }
+
+    public void setIdTeam(Integer idTeam) {
+        this.idTeam = idTeam;
     }
 }

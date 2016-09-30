@@ -145,13 +145,14 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
             case R.id.openVideoDescription:
 
                 String realPath = FileServices.getPath(getContext(), Uri.parse(_DESCRIPTION.getLocalURI()));
+                //realPath = realPath.replaceAll("/data/data/texium.mx.drones/","content://texium.mx.drones/");
 
-                File file = new File(realPath);
-                Uri uriFile = Uri.fromFile(file);
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_VIEW);
-                intent.setDataAndType(uriFile, "video/mp4");
+                Uri uriFile = Uri.parse(realPath);
+                Intent intent = new Intent(Intent.ACTION_VIEW,uriFile);
+                intent.setDataAndType(uriFile, "video/*");
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
+
 
                 break;
             case R.id.saveVideoDescription:

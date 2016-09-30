@@ -186,6 +186,7 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
                         t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
                         t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
                         t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                        t.setIdTeam(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL).toString()));
 
                         try {
                             Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);

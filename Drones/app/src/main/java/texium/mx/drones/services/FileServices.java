@@ -372,6 +372,7 @@ public class FileServices {
     public static TaskGallery downloadFile(String fileURL, String saveDir) throws IOException {
         TaskGallery taskGallery = new TaskGallery();
         try {
+
             String videoURIPath;
             fileURL = quitUrlBlackSpace(fileURL);
             URL url = new URL(fileURL);
@@ -406,7 +407,7 @@ public class FileServices {
 
                 // opens input stream from the HTTP connection
                 InputStream inputStream = httpConn.getInputStream();
-                String saveFilePath = saveDir + File.separator + fileName;
+                String saveFilePath = Environment.getExternalStorageDirectory() + File.separator + fileName;
 
                 // opens an output stream to save into file
                 FileOutputStream outputStream = new FileOutputStream(saveFilePath);

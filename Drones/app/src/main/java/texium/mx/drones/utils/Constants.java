@@ -11,7 +11,7 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-    public static final String APP_VERSION = "1.0.7";
+    public static final String APP_VERSION = "1.0.8";
     public static final int LOOP_TIME = 600000; //60000 * 1 = 1 Minute
 
     //region SYS CONSTANTS//
@@ -206,6 +206,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE = "idtipoactor";
     public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME = "nombretipoactor";
     public static final String SOAP_OBJECT_KEY_LOGIN_ID_TEAM = "idcuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL = "IDCuadrilla";
     public static final String SOAP_OBJECT_KEY_LOGIN_TEAM_NAME = "nombrecuadrilla";
     public static final String SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION = "coordenadascuadrilla";
     public static final String SOAP_OBJECT_KEY_LOGIN_LATITUDE = "Latitud";

@@ -36,6 +36,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String TASK_LONGITUDE = "task_longitude";
         public static final String TASK_STATUS = "task_status";
         public static final String TASK_USER_ID = "task_user_id";
+        public static final String TEAM_ID = "idTeam";
     }
 
     public static class ColumnUsers {
@@ -110,7 +111,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTasks.TASK_LATITUDE + " " + REAL_TYPE + "," +
                     ColumnTasks.TASK_LONGITUDE  + " " + REAL_TYPE + "," +
                     ColumnTasks.TASK_STATUS + " " + STRING_TYPE + "," +
-                    ColumnTasks.TASK_USER_ID + " " + INT_TYPE +
+                    ColumnTasks.TASK_USER_ID + " " + INT_TYPE + "," +
+                    ColumnTasks.TEAM_ID + " " + INT_TYPE +
             ")";
 
     public static final String CREATE_USERS_TABLE_SCRIPT =

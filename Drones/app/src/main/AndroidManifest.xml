@@ -60,6 +60,8 @@
             android:label="@string/title_activity_tab"
             android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <provider android:name=".utils.MyProvider" android:authorities="texium.mx.drones" android:exported="true" />
     </application>
 
 </manifest>

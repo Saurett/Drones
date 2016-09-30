@@ -24,7 +24,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 37;
+    static Integer BDVersion = 38;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -274,6 +274,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasks.TASK_LONGITUDE, t.getTask_longitude());
             cv.put(BDTasksManager.ColumnTasks.TASK_STATUS, t.getTask_status());
             cv.put(BDTasksManager.ColumnTasks.TASK_USER_ID, t.getTask_user_id());
+            cv.put(BDTasksManager.ColumnTasks.TEAM_ID, t.getIdTeam());
 
             bd.insert(BDTasksManager.TASKS_TABLE_NAME, null, cv);
             bd.close();
@@ -665,7 +666,9 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            Cursor result = bd.rawQuery("select * from tasks where task_id =" + t.getTask_id(), null);
+            Cursor result = bd.rawQuery("select * from tasks where task_id =" + t.getTask_id() +
+                    " and " + BDTasksManager.ColumnTasks.TEAM_ID + " = "  + t.getIdTeam()
+                    , null);
 
             if (result.moveToFirst()) {
                 do {
@@ -680,6 +683,7 @@ public class BDTasksManagerQuery {
                     data.setTask_longitude(result.getDouble(8));
                     data.setTask_status(result.getInt(9));
                     data.setTask_user_id(result.getInt(10));
+                    data.setIdTeam(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasks.TEAM_ID)));
 
                     Log.i("SQLite: ", "Get task in the bd with task_id :" + data.getTask_cve());
                 } while (result.moveToNext());
@@ -975,7 +979,8 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            Cursor result = bd.rawQuery("select * from tasks where task_status=" + t.getTask_status(), null);
+            Cursor result = bd.rawQuery("select * from tasks where task_status=" + t.getTask_status()
+                    + " and " + BDTasksManager.ColumnTasks.TEAM_ID + " = " + t.getIdTeam(), null);
 
             if (result.moveToFirst()) {
                 do {
@@ -992,7 +997,7 @@ public class BDTasksManagerQuery {
                     data.setTask_longitude(result.getDouble(8));
                     data.setTask_status(result.getInt(9));
                     data.setTask_user_id(result.getInt(10));
-
+                    data.setIdTeam(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasks.TEAM_ID)));
 
                     dataList.add(data);
 

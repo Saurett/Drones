@@ -149,7 +149,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
-                            Tasks t = new Tasks(idStatus);
+                            Tasks t = new Tasks(idStatus,idTeam);
                             tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
                             if (tempTaskList.size() > 0) validOperation = true;
                         }
@@ -161,7 +161,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                 textError = e.getMessage();
                 validOperation = false;
 
-                Tasks t = new Tasks(idStatus);
+                Tasks t = new Tasks(idStatus,idTeam);
 
                 try {
                     tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
@@ -209,6 +209,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                             t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
                             t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
                             t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                            t.setIdTeam(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL).toString()));
 
                             closeTask.add(t);
 
@@ -238,7 +239,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                             }
                         }
 
-                        Tasks t = new Tasks(idStatus);
+                        Tasks t = new Tasks(idStatus,idTeam);
                         tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
 
                         for (Tasks tempTask : tempTaskList) {

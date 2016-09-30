@@ -16,6 +16,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -55,6 +56,8 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
     private ProgressDialog pDialog;
     static FragmentManager fragmentManager;
 
+    private Button videoGalleryBtn;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,9 +68,12 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
         videos_list = (RecyclerView) view.findViewById(R.id.video_gallery_list);
         emptyGallery = (LinearLayout) view.findViewById(R.id.emptyVideoGallery);
+        videoGalleryBtn = (Button) view.findViewById(R.id.internal_gallery_video_button);
 
         video_gallery_adapter = new VideoGalleryAdapter();
         video_gallery_adapter.setOnClickListener(this);
+
+        videoGalleryBtn.setOnClickListener(this);
 
         return view;
     }
@@ -96,25 +102,15 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
         videos_list.setVisibility((video_gallery_adapter.getItemCount() > 0) ? View.VISIBLE : View.INVISIBLE);
         emptyGallery.setVisibility((video_gallery_adapter.getItemCount() > 0) ? View.INVISIBLE : View.VISIBLE);
         activityListener.setEmptyDescription(video_gallery_adapter.getItemCount());
-
-        /*
-        String title = "¿Desea buscar un perfil?";
-        String msg = "Capture un nombre en la barra de busqueda";
-
-        if ((photos_list.getVisibility() == View.INVISIBLE) && (Constants.SEARCH == request)){
-            title = "¡No es posible localizar el perfil!";
-            msg = "Lo sentimos su busqueda no arrojó resultados";
-        }
-
-        emptyTitle.setText(title);
-        emptyMsg.setText(msg);
-        */
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
 
+            case R.id.internal_gallery_video_button:
+                activityListener.openGallery();
+                break;
             default:
                 break;
         }

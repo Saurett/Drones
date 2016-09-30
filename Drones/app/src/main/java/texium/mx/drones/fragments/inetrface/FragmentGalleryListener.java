@@ -18,6 +18,7 @@ public interface FragmentGalleryListener {
     void replaceFragmentVideoFragment();
     void replaceFragmentDocumentFragment();
     void setEmptyDescription(int size);
+    Boolean openGallery();
 
 
 

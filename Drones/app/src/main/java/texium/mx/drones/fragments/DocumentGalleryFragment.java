@@ -16,6 +16,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -55,6 +56,8 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
     private ProgressDialog pDialog;
     static FragmentManager fragmentManager;
 
+    private static Button documentGalleryBtn;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,9 +68,11 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
 
         document_list = (RecyclerView) view.findViewById(R.id.document_gallery_list);
         emptyGallery = (LinearLayout) view.findViewById(R.id.emptyDocumentGallery);
+        documentGalleryBtn = (Button) view.findViewById(R.id.internal_gallery_document_button);
 
         document_gallery_adapter = new DocumentGalleryAdapter();
         document_gallery_adapter.setOnClickListener(this);
+        documentGalleryBtn.setOnClickListener(this);
 
         return view;
     }
@@ -96,25 +101,14 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
         document_list.setVisibility((document_gallery_adapter.getItemCount() > 0) ? View.VISIBLE : View.INVISIBLE);
         emptyGallery.setVisibility((document_gallery_adapter.getItemCount() > 0) ? View.INVISIBLE : View.VISIBLE);
         activityListener.setEmptyDescription(document_gallery_adapter.getItemCount());
-
-        /*
-        String title = "¿Desea buscar un perfil?";
-        String msg = "Capture un nombre en la barra de busqueda";
-
-        if ((photos_list.getVisibility() == View.INVISIBLE) && (Constants.SEARCH == request)){
-            title = "¡No es posible localizar el perfil!";
-            msg = "Lo sentimos su busqueda no arrojó resultados";
-        }
-
-        emptyTitle.setText(title);
-        emptyMsg.setText(msg);
-        */
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-
+            case  R.id.internal_gallery_document_button:
+                activityListener.openGallery();
+                break;
             default:
                 break;
         }

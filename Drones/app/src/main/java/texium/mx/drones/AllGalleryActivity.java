@@ -116,6 +116,46 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
     }
 
     @Override
+    public Boolean openGallery() {
+
+        if (_TASK_INFO.getTask_status() == Constants.NEWS_TASK) {
+            showQuestion(R.id.action_add_item);
+            return true;
+        }
+
+        int galleryType = GALLERY_IMAGE_ACTIVITY_REQUEST_CODE;
+
+        Intent galleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));
+
+        switch (ACTUAL_GALLERY) {
+            case Constants.PICTURE_FILE_TYPE:
+                galleryIntent.setType("image/*");
+                galleryType = GALLERY_IMAGE_ACTIVITY_REQUEST_CODE;
+                break;
+            case Constants.VIDEO_FILE_TYPE:
+                galleryIntent.setType("video/*");
+                galleryType = GALLERY_VIDEO_ACTIVITY_REQUEST_CODE;
+                break;
+            case Constants.DOCUMENT_FILE_TYPE:
+                galleryIntent.setType("application/pdf");
+                galleryType = GALLERY_PDF_ACTIVITY_REQUEST_CODE;
+                break;
+            default:
+                break;
+        }
+
+
+        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(galleryIntent, galleryType);
+
+        Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
+                        + getString(R.string.default_file_multiple_selection)
+                , Toast.LENGTH_LONG).show();
+
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_gallery, menu);
@@ -134,6 +174,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 return true;
             case R.id.action_add_item:
 
+                /*
                 if (_TASK_INFO.getTask_status() == Constants.NEWS_TASK) {
                     showQuestion(R.id.action_add_item);
                     return true;
@@ -167,7 +208,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
                                 + getString(R.string.default_file_multiple_selection)
                         , Toast.LENGTH_LONG).show();
-                return true;
+                return true;*/
+                return openGallery();
             case android.R.id.home:
 
                 //Check back activity question

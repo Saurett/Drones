@@ -48,6 +48,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         Button decline_task_button;
         Button finish_task_button;
         Button gallery_task_button;
+        Button task_location_button;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -62,6 +63,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
             decline_task_button = (Button) itemView.findViewById(R.id.decline_task_button);
             finish_task_button = (Button) itemView.findViewById(R.id.finish_task_button);
             gallery_task_button = (Button) itemView.findViewById(R.id.gallery_task_button);
+            task_location_button = (Button) itemView.findViewById(R.id.task_location_button);
         }
     }
 
@@ -125,6 +127,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 fragmentJumper(v,task,taskDecode);
+            }
+        });
+
+        holder.task_location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragmentJumper(view,task,taskDecode);
             }
         });
     }

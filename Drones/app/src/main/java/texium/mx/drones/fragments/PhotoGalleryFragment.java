@@ -16,6 +16,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -56,6 +57,8 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
     private ProgressDialog pDialog;
     static FragmentManager fragmentManager;
 
+    private static Button photoGalleryBtn;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,9 +69,11 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
         photos_list = (RecyclerView) view.findViewById(R.id.photo_gallery_list);
         emptyGallery = (LinearLayout) view.findViewById(R.id.emptyPhotoGallery);
+        photoGalleryBtn = (Button) view.findViewById(R.id.internal_gallery_photo_button);
 
         photo_gallery_adapter = new PhotoGalleryAdapter();
         photo_gallery_adapter.setOnClickListener(this);
+        photoGalleryBtn.setOnClickListener(this);
 
         return view;
     }
@@ -103,6 +108,9 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
 
+            case R.id.internal_gallery_photo_button:
+                activityListener.openGallery();
+                break;
             default:
                 break;
         }

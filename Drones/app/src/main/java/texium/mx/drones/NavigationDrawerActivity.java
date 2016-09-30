@@ -48,7 +48,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.ksoap2.serialization.SoapObject;
@@ -435,6 +437,34 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 startActivity(intentAG);
 
                 break;
+            case R.id.task_location_button:
+
+
+                LatLng taskLatLng = new LatLng(task.getTask_latitude(), task.getTask_longitude());
+
+                MarkerOptions mo = new MarkerOptions();
+                mo.position(taskLatLng);
+                mo.title(task.getTask_tittle());
+                mo.snippet(Constants.MAP_STATUS_NAME.get(task.getTask_priority()));
+                //mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
+                mo.icon(BitmapDescriptorFactory.fromResource(Constants.MAP_STATUS_ICON.get(task.getTask_priority())));
+
+                Marker marker = mMap.addMarker(mo);
+                marker.showInfoWindow();
+
+                LatLng cdMx = new LatLng(task.getTask_latitude(),task.getTask_longitude() - 0.002);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
+
+                CameraPosition cameraPosition1 = new CameraPosition.Builder()
+                        .target(cdMx)
+                        .tilt(9)
+                        .zoom(17)
+                        .build();
+
+                mMap.animateCamera(CameraUpdateFactory
+                        .newCameraPosition(cameraPosition1));
+
+                break;
             default:
                 Snackbar.make(v, "Acción no registrada ", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -803,10 +833,33 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 mo.snippet(Constants.MAP_STATUS_NAME.get(actualTask.getTask_priority()));
                 //mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
                 mo.icon(BitmapDescriptorFactory.fromResource(Constants.MAP_STATUS_ICON.get(actualTask.getTask_priority())));
-
                 mMap.addMarker(mo);
             }
 
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    // TODO Auto-generated method stub
+
+                    LatLng latLng = marker.getPosition();
+                    LatLng cdMx = new LatLng(latLng.latitude,latLng.longitude - 0.002);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
+                    marker.showInfoWindow();
+
+                    /*
+                    LatLng point = marker.getPosition();
+                    CameraPosition cameraPosition1 = new CameraPosition.Builder()
+                            .target(point)
+                            .tilt(900)
+                            .zoom(10)
+                            .build();
+
+                    mMap.animateCamera(CameraUpdateFactory
+                            .newCameraPosition(cameraPosition1));
+                            */
+                    return true;
+                }
+            });
         }
     }
 
@@ -972,7 +1025,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
     }
-
 
     //WEB SERVICE CLASS CALL//
     private class AsyncCallWS extends AsyncTask<Void, String, Boolean> {

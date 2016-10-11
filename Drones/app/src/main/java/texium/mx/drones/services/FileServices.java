@@ -250,12 +250,13 @@ public class FileServices {
     public static List<String> getPackageList(Context context, String dataPackage) throws Exception {
 
         List<String> data = new ArrayList<>();
-        int minBitPackage = 1000;
+        int midBitPackage = 1000000;
         int maxBitPackage = 3000000;
 
         try {
             int packSize = dataPackage.length();
-            int pack = (packSize > maxBitPackage) ? maxBitPackage : minBitPackage;
+            int pack = (packSize > maxBitPackage) ? maxBitPackage :
+                    (packSize < midBitPackage) ? packSize : midBitPackage;
             int packNumbers = packSize / pack;
             int packSpecial = packSize - (packNumbers * pack);
             boolean specialItem = (packSpecial > 0);
@@ -273,13 +274,15 @@ public class FileServices {
 
                 } else {
 
-                    tempData = dataPackage.substring(starCount, endCount);
+                    if (endCount <= packSize) {
+                        tempData = dataPackage.substring(starCount, endCount);
 
-                    starCount = endCount;
-                    endCount += pack;
+                        starCount = endCount;
+                        endCount += pack;
+                    }
                 }
 
-                data.add(tempData);
+                if (!tempData.isEmpty()) data.add(tempData);
 
                 i++;
             }
@@ -453,11 +456,10 @@ public class FileServices {
             Bitmap bitmap = mediametadataretriever.getFrameAtTime(-1L);
             if(null != bitmap)
             {
-                return ThumbnailUtils.extractThumbnail(bitmap, 50, 50, 2);
+                return ThumbnailUtils.extractThumbnail(bitmap, 100, 100, 2);
             }
             return bitmap;
         } catch (Throwable t) {
-            // TODO log
             t.printStackTrace();
             return null;
         } finally {

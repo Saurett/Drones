@@ -11,9 +11,10 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-    public static final String APP_VERSION = "1.0.8";
     public static final int LOOP_TIME = 600000; //60000 * 1 = 1 Minute
+    public static final int VIDEO_SIZE = 54915200;  //X MB*1048*1048= X MB
 
+    //region SYS CONSTANTS//
     //region SYS CONSTANTS//
     public static final String APP_DEFAULT_PATH = "/data/data/texium.mx.drones/";
     public static final String EMPTY_STRING = "";
@@ -102,7 +103,7 @@ public final class Constants {
     public static final int WS_KEY_ITEM_ADD_VIDEO = 28;
     public static final int WS_KEY_ITEM_DOCUMENT_GALLERY = 29;
     public static final int WS_KEY_ITEM_ADD_DOCUMENT = 30;
-    public static final int WS_KEY_SEND_LOCATION_HIDDEN_LOOP = 31;
+    public static final int WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT = 31;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -129,6 +130,7 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_SEND_FILE = "192.168.12.10/AgregarArchivos";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_USERS = "192.168.12.10/ListadoUsuarios";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_VIDEO = "192.168.12.10/AgregarVideo";
+    public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_DOCUMENT = "192.168.12.10/AgregarPDF";
     public static final String WEB_SERVICE_SOAP_ACTION_FORGET_USERNAME = "192.168.12.10/RecuperarContrasena";
     public static final String WEB_SERVICE_SOAP_ACTION_DELETE_PHOTO_FILE = "192.168.12.10/EliminarArchivo";
     public static final String WEB_SERVICE_SOAP_ACTION_SAVE_PHOTO_FILE = "192.168.12.10/AgregarArchivo";
@@ -139,7 +141,7 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
-    /*
+/*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.65/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     */
@@ -162,6 +164,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
+    public static final String WEB_SERVICE_METHOD_NAME_UPDATE_DOCUMENT = "AgregarPDF";
     public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "RecuperarContrasena";
     public static final String WEB_SERVICE_METHOD_NAME_DELETE_PHOTO_FILE = "EliminarArchivo";
     public static final String WEB_SERVICE_METHOD_NAME_SAVE_PHOTO_FILE = "AgregarArchivo";
@@ -183,6 +186,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_TASK_ID_USER = "IDUsuario";
     public static final String WEB_SERVICE_PARAM_TASK_LATITUDE = "Latitud";
     public static final String WEB_SERVICE_PARAM_TASK_LONGITUDE = "Longitud";
+    public static final String WEB_SERVICE_PARAM_TASK_CONNECTION = "Conectado";
     public static final String WEB_SERVICE_PARAM_TASK_FILE = "Archivo";
     public static final String WEB_SERVICE_PARAM_CODE_FILE = "Codigo";
     public static final String WEB_SERVICE_PARAM_OBJECT_STRING = "string";
@@ -205,13 +209,12 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME = "nombreactor";
     public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE = "idtipoactor";
     public static final String SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME = "nombretipoactor";
-    public static final String SOAP_OBJECT_KEY_LOGIN_ID_TEAM = "idcuadrilla";
     public static final String SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL = "IDCuadrilla";
     public static final String SOAP_OBJECT_KEY_LOGIN_TEAM_NAME = "nombrecuadrilla";
-    public static final String SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION = "coordenadascuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION = "coordenadas";
     public static final String SOAP_OBJECT_KEY_LOGIN_LATITUDE = "Latitud";
     public static final String SOAP_OBJECT_KEY_LOGIN_LONGITUDE = "Longitud";
-    public static final String SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION = "ultimaconexioncuadrilla";
+    public static final String SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION = "ultimaconexion";
     public static final String SOAP_OBJECT_KEY_LOGIN_PASSWORD = "contrasenausuario";
     public static final String SOAP_OBJECT_KEY_ID = "ID";
     public static final String SOAP_OBJECT_KEY_TASK_TITTLE = "Nombre";

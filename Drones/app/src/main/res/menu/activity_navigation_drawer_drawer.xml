@@ -10,7 +10,7 @@
         <item
             android:id="@+id/nav_progress_task"
             android:icon="@mipmap/ic_assignment_white"
-            android:title="Tareas en Proceso"/>
+            android:title="Tareas en Seguimiento"/>
         <item
             android:id="@+id/nav_pending_task"
             android:icon="@mipmap/ic_assignment_late_white"

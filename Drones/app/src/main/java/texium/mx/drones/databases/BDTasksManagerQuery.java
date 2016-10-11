@@ -1,9 +1,12 @@
 package texium.mx.drones.databases;
 
+import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -24,7 +27,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 38;
+    static Integer BDVersion = 39;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -60,8 +63,10 @@ public class BDTasksManagerQuery {
         return data;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static AppVersion getAppVersion(Context context) throws Exception {
         AppVersion appVersion = new AppVersion();
+        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),0);
         String data = "";
 
         try {
@@ -83,7 +88,8 @@ public class BDTasksManagerQuery {
                     Log.i("SQLite: ", "app version :" + appVersion.getApp_version());
                     Log.i("SQLite: ", "msg :" + appVersion.getVersion_msg());
 
-                    updateAppVersion(context, Constants.APP_VERSION, appVersion.getVersion_msg());
+
+                    updateAppVersion(context, packageInfo.versionName, appVersion.getVersion_msg());
 
                 } while (result.moveToNext());
             }
@@ -91,10 +97,10 @@ public class BDTasksManagerQuery {
             bd.close();
 
             if (appVersion.getApp_version_cve() == null) {
-                addAppVersion(context, Constants.APP_VERSION, "Si");
+                addAppVersion(context, packageInfo.versionName, "Si");
 
                 appVersion.setApp_version_cve(1);
-                appVersion.setApp_version(Constants.APP_VERSION);
+                appVersion.setApp_version(packageInfo.versionName);
                 appVersion.setVersion_msg("Si");
             }
 
@@ -274,7 +280,6 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasks.TASK_LONGITUDE, t.getTask_longitude());
             cv.put(BDTasksManager.ColumnTasks.TASK_STATUS, t.getTask_status());
             cv.put(BDTasksManager.ColumnTasks.TASK_USER_ID, t.getTask_user_id());
-            cv.put(BDTasksManager.ColumnTasks.TEAM_ID, t.getIdTeam());
 
             bd.insert(BDTasksManager.TASKS_TABLE_NAME, null, cv);
             bd.close();
@@ -643,8 +648,6 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnUsers.ACTOR_NAME, u.getActorName());
             cv.put(BDTasksManager.ColumnUsers.ACTOR_TYPE, u.getActorType());
             cv.put(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME, u.getActorTypeName());
-            cv.put(BDTasksManager.ColumnUsers.TEAM_ID, u.getIdTeam());
-            cv.put(BDTasksManager.ColumnUsers.TEAM_NAME, u.getTeamName());
             cv.put(BDTasksManager.ColumnUsers.LATITUDE, u.getLatitude());
             cv.put(BDTasksManager.ColumnUsers.LONGITUDE, u.getLongitude());
             cv.put(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION, u.getLastTeamConnection());
@@ -666,8 +669,11 @@ public class BDTasksManagerQuery {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
+            //TODO COSA DE ADMIN
+
+
             Cursor result = bd.rawQuery("select * from tasks where task_id =" + t.getTask_id() +
-                    " and " + BDTasksManager.ColumnTasks.TEAM_ID + " = "  + t.getIdTeam()
+                    " and " + BDTasksManager.ColumnTasks.TASK_USER_ID + " = "  + t.getTask_user_id()
                     , null);
 
             if (result.moveToFirst()) {
@@ -683,7 +689,7 @@ public class BDTasksManagerQuery {
                     data.setTask_longitude(result.getDouble(8));
                     data.setTask_status(result.getInt(9));
                     data.setTask_user_id(result.getInt(10));
-                    data.setIdTeam(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasks.TEAM_ID)));
+                    //data.setIdTeam(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasks.TEAM_ID)));
 
                     Log.i("SQLite: ", "Get task in the bd with task_id :" + data.getTask_cve());
                 } while (result.moveToNext());
@@ -915,12 +921,10 @@ public class BDTasksManagerQuery {
                     data.setActorName(result.getString(4));
                     data.setActorType(result.getInt(5));
                     data.setActorTypeName(result.getString(6));
-                    data.setIdTeam(result.getInt(7));
-                    data.setTeamName(result.getString(8));
-                    data.setLatitude(result.getDouble(9));
-                    data.setLongitude(result.getDouble(10));
-                    data.setLastTeamConnection(result.getString(11));
-                    data.setPassword(result.getString(12));
+                    data.setLatitude(result.getDouble(7));
+                    data.setLongitude(result.getDouble(8));
+                    data.setLastTeamConnection(result.getString(9));
+                    data.setPassword(result.getString(10));
 
                     Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser());
                 } while (result.moveToNext());
@@ -953,12 +957,10 @@ public class BDTasksManagerQuery {
                     data.setActorName(result.getString(4));
                     data.setActorType(result.getInt(5));
                     data.setActorTypeName(result.getString(6));
-                    data.setIdTeam(result.getInt(7));
-                    data.setTeamName(result.getString(8));
-                    data.setLatitude(result.getDouble(9));
-                    data.setLongitude(result.getDouble(10));
-                    data.setLastTeamConnection(result.getString(11));
-                    data.setPassword(result.getString(12));
+                    data.setLatitude(result.getDouble(7));
+                    data.setLongitude(result.getDouble(8));
+                    data.setLastTeamConnection(result.getString(9));
+                    data.setPassword(result.getString(10));
 
                     Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser()
                             + " username : " + data.getUserName() + " password :" + data.getPassword());
@@ -978,9 +980,10 @@ public class BDTasksManagerQuery {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+            //TODO COSA DE admin
 
             Cursor result = bd.rawQuery("select * from tasks where task_status=" + t.getTask_status()
-                    + " and " + BDTasksManager.ColumnTasks.TEAM_ID + " = " + t.getIdTeam(), null);
+                    + " and " + BDTasksManager.ColumnTasks.TASK_USER_ID + " = " + t.getTask_user_id(), null);
 
             if (result.moveToFirst()) {
                 do {
@@ -997,7 +1000,6 @@ public class BDTasksManagerQuery {
                     data.setTask_longitude(result.getDouble(8));
                     data.setTask_status(result.getInt(9));
                     data.setTask_user_id(result.getInt(10));
-                    data.setIdTeam(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasks.TEAM_ID)));
 
                     dataList.add(data);
 
@@ -1075,8 +1077,6 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnUsers.ACTOR_NAME, user.getActorName());
             cv.put(BDTasksManager.ColumnUsers.ACTOR_TYPE, user.getActorType());
             cv.put(BDTasksManager.ColumnUsers.ACTOR_NAME, user.getActorTypeName());
-            cv.put(BDTasksManager.ColumnUsers.TEAM_NAME, user.getTeamName());
-            cv.put(BDTasksManager.ColumnUsers.TEAM_ID, user.getIdTeam());
             cv.put(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION, user.getLastTeamConnection());
 
             bd.update(BDTasksManager.USERS_TABLE_NAME, cv, BDTasksManager.ColumnUsers.USER_ID + " = " + user.getIdUser(), null);

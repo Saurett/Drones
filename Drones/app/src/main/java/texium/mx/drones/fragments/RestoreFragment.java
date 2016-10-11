@@ -25,7 +25,6 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.Users;
-import texium.mx.drones.services.NotificationService;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
@@ -102,7 +101,6 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
             case R.id.agree_restore_button:
 
                 TasksDecode tasksDecode = new TasksDecode();
-                tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
                 tasksDecode.setTask_status(Constants.ALL_TASK);
 
                 AsyncRestoreDevice wsRestore = new AsyncRestoreDevice(Constants.WS_KEY_ALL_TASKS,v,tasksDecode);
@@ -147,7 +145,8 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
             try{
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_ALL_TASKS:
-                        soapObject = SoapServices.getServerAllTasks(getContext(), webServiceTaskDecode.getTask_team_id()
+                        soapObject = SoapServices.getServerAllTasks(getContext()
+                                , SESSION_DATA.getIdUser()
                                 , webServiceTaskDecode.getTask_status());
                         validOperation = (soapObject.getPropertyCount() > 0);
 
@@ -186,7 +185,6 @@ public class RestoreFragment extends Fragment implements View.OnClickListener {
                         t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
                         t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
                         t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
-                        t.setIdTeam(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL).toString()));
 
                         try {
                             Tasks tempTask = BDTasksManagerQuery.getTaskById(getContext(), t);

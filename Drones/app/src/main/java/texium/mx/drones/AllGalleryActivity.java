@@ -730,7 +730,15 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
             Boolean validOperation = false;
 
             try {
+
+                List<Integer> query = new ArrayList<>();
+                List<Integer> taskGallery;
+
+                query.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                query.add(Constants.ITEM_SYNC_SERVER_CLOUD_OFF);
+
                 switch (webServiceOperation) {
+
                     case Constants.WS_KEY_ITEM_DELETE:
 
                         validOperation = true;
@@ -754,12 +762,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 validOperation = true;
                                 break;
                             case Constants.VIDEO_FILE_TYPE:
-                                List<Integer> query = new ArrayList<>();
 
-                                query.add(Constants.ITEM_SYNC_LOCAL_TABLET);
-                                query.add(Constants.ITEM_SYNC_SERVER_CLOUD_OFF);
-
-                                List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getApplicationContext(), idTask);
+                                taskGallery = BDTasksManagerQuery.getListTaskDetail(getApplicationContext(), idTask);
 
                                 if (!taskGallery.isEmpty()) {
                                     galleryBefore = new ArrayList<>();
@@ -837,6 +841,82 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 validOperation = true;
                                 break;
                             case Constants.DOCUMENT_FILE_TYPE:
+
+                                taskGallery = BDTasksManagerQuery.getListTaskDetail(getApplicationContext(), idTask);
+
+                                if (!taskGallery.isEmpty()) {
+                                    galleryBefore = new ArrayList<>();
+                                    galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
+                                            taskGallery, Constants.DOCUMENT_FILE_TYPE, query, Constants.ACTIVE);
+
+                                    int documentNumber = 1;
+
+                                    //All Normal video Sync
+                                    for (TaskGallery document : galleryBefore) {
+
+                                        if (document.getDescription().isEmpty()) {
+                                            emptyDescription = true;
+                                            break;
+                                        }
+
+                                        if (document.getId() > 0) {
+                                            SoapServices.updatePhotoFile(getApplicationContext(), document, idUser);
+                                        } else {
+
+                                            FilesManager fm = FileServices.attachVideos(AllGalleryActivity.this, Uri.parse(document.getLocalURI()));
+
+                                            List<String> packages = FileServices.getPackageList(getApplicationContext()
+                                                    , fm.getEncodeSingleFile());
+
+                                            int packNumber = 1;
+
+                                            for (String pack : packages) {
+
+                                                String title = "Transfiriendo al servidor documento " + documentNumber + " de " + galleryBefore.size();
+                                                String msg = "Subiendo paquete " + packNumber + " de " + packages.size();
+
+                                                publishProgress(title, msg, String.valueOf(packNumber), String.valueOf(packages.size()));
+
+                                                try {
+                                                    soapPrimitive = SoapServices.updateDocumentFiles(getApplicationContext()
+                                                            , idTask, idUser, pack, packNumber, (packNumber == packages.size()), document.getDescription());
+
+                                                    packNumber++;
+
+                                                } catch (Exception e) {
+                                                    throw new VideoSyncSoapException("Error al intetar enviar los videos", e);
+                                                }
+                                            }
+                                            documentNumber++;
+                                            try {
+                                                document.setId(Integer.valueOf(soapPrimitive.toString()));
+                                            } catch (Exception e) {
+                                                throw new Exception(getString(R.string.default_exception_error));
+                                            }
+                                        }
+
+                                        itemSync++;
+                                        document.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
+                                        BDTasksManagerQuery.updateTaskFile(getApplicationContext(), document);
+                                    }
+
+                                    query = new ArrayList<>();
+                                    query.add(Constants.ITEM_SYNC_SERVER_DELETE);
+
+                                    galleryBefore = BDTasksManagerQuery.getGalleryFiles(getApplicationContext(),
+                                            taskGallery, Constants.DOCUMENT_FILE_TYPE, query, Constants.INACTIVE);
+
+                                    for (TaskGallery document : galleryBefore) {
+
+                                        if (document.getId() > 0) {
+                                            soapPrimitive = SoapServices.deletePhotoFile(getApplicationContext(), document.getId(), idUser);
+                                            if (null != soapPrimitive)
+                                                BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), document);
+                                            itemSync++;
+                                        }
+                                    }
+                                }
+
                                 validOperation = true;
                                 break;
 

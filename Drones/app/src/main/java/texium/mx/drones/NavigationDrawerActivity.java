@@ -2,8 +2,6 @@ package texium.mx.drones;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -26,12 +24,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -64,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
@@ -133,6 +128,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private Boolean stopThread = false;
     private Handler handler;
     private Runnable runnable;
+    private Boolean connection = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +152,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        connection = true;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -198,7 +195,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         getTaskForceData(navigationView);
 
         TasksDecode tasksDecode = new TasksDecode();
-        tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
         tasksDecode.setTask_status(Constants.ALL_TASK);
 
         AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_TASKS, tasksDecode);
@@ -220,7 +216,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         task_force_latitude = (TextView) headerLayout.findViewById(R.id.task_force_latitude);
         task_force_longitude = (TextView) headerLayout.findViewById(R.id.task_force_longitude);
 
-        task_force_name.setText(SESSION_DATA.getTeamName());
+        task_force_name.setText(SESSION_DATA.getActorName().replace("-", "\n"));
         task_element_name.setText(SESSION_DATA.getActorName().replace("-", "\n"));
         task_force_location.setText("CIUDAD DE MÉXICO");
 
@@ -289,7 +285,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } else {
 
             TasksDecode tasksDecode = new TasksDecode();
-            tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
 
             tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
             tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
@@ -310,12 +305,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         try {
                             if (!stopThread) {
                                 TasksDecode tasksDecode = new TasksDecode();
-                                tasksDecode.setTask_team_id(SESSION_DATA.getIdTeam());
 
                                 tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
                                 tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
                                 tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-                                //Ejecuta tu AsyncTask!
+
                                 AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
                                 wsLocation.execute();
                             }
@@ -337,7 +331,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         if (requestType == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             //cameraIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 54915200);//X MB*1048*1048= X MB
+            cameraIntent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, Constants.VIDEO_SIZE);
         }
 
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
@@ -452,7 +446,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 Marker marker = mMap.addMarker(mo);
                 marker.showInfoWindow();
 
-                LatLng cdMx = new LatLng(task.getTask_latitude(),task.getTask_longitude() - 0.002);
+                LatLng cdMx = new LatLng(task.getTask_latitude(), task.getTask_longitude() - 0.002);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
 
                 CameraPosition cameraPosition1 = new CameraPosition.Builder()
@@ -679,6 +673,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
 
+            connection = false;
+            callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT);
             ACTUAL_FRAGMENT = null;
             stopThread = true;
             handler.removeCallbacks(runnable);
@@ -842,7 +838,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     // TODO Auto-generated method stub
 
                     LatLng latLng = marker.getPosition();
-                    LatLng cdMx = new LatLng(latLng.latitude,latLng.longitude - 0.002);
+                    LatLng cdMx = new LatLng(latLng.latitude, latLng.longitude - 0.002);
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
                     marker.showInfoWindow();
 
@@ -1097,7 +1093,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             Boolean validOperation = false;
 
             try {
-                NotificationService.callNotification(NavigationDrawerActivity.this, SESSION_DATA.getIdTeam());
+                NotificationService.callNotification(NavigationDrawerActivity.this, SESSION_DATA.getIdUser());
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK:
 
@@ -1190,16 +1186,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
                         soapPrimitive = SoapServices.updateLocation(getApplicationContext()
-                                , webServiceTaskDecode.getTask_team_id()
                                 , webServiceTaskDecode.getTask_latitude()
                                 , webServiceTaskDecode.getTask_longitude()
-                                , webServiceTaskDecode.getTask_user_id());
+                                , webServiceTaskDecode.getTask_user_id()
+                                , connection);
 
                         validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_ALL_TASKS:
-                        soapObject = SoapServices.getServerAllTasks(getApplicationContext(), webServiceTaskDecode.getTask_team_id()
+                        soapObject = SoapServices.getServerAllTasks(getApplicationContext()
+                                , SESSION_DATA.getIdUser()
                                 , webServiceTaskDecode.getTask_status());
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
@@ -1378,7 +1376,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
                             t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
                             t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
-                            t.setIdTeam(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL).toString()));
 
                             try {
                                 Tasks tempTask = BDTasksManagerQuery.getTaskById(getApplicationContext(), t);

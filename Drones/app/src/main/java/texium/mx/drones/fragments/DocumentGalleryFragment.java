@@ -3,8 +3,6 @@ package texium.mx.drones.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -205,8 +202,6 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                                                 Constants.APP_DEFAULT_PATH);
 
                                         documentServer.setLocalURI(decodeDocument.getLocalURI());
-                                        documentServer.setPhoto_bitmap(decodeDocument.getPhoto_bitmap());
-                                        documentServer.setBase_package(FileServices.attachImgFromBitmap(documentServer.getPhoto_bitmap()));
 
                                         taskGalleries.add(documentServer);
                                     }
@@ -229,19 +224,8 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                             List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(
                                     getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
-                            for (TaskGallery document : allDocuments) {
 
-                                if (document.getBase_package() != null ) {
-
-                                    if (!document.getBase_package().isEmpty()) {
-                                        byte[] decodedString = Base64.decode(document.getBase_package(), Base64.DEFAULT);
-                                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                        document.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
-                                    }
-                                }
-
-                                tempGalleryList.add(document);
-                            }
+                            tempGalleryList.addAll(allDocuments);
                         }
 
                         validOperation = true;
@@ -260,6 +244,7 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                     if (!taskGallery.isEmpty()) {
                         List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
+                        /*
                         for (TaskGallery document : allDocuments) {
 
                             if (document.getBase_package() != null ) {
@@ -269,9 +254,10 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                                     document.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
                                 }
                             }
+                        }*/
 
-                            tempGalleryList.add(document);
-                        }
+                        tempGalleryList.addAll(allDocuments);
+
                     }
                     validOperation = (tempGalleryList.size() > 0);
                     textError = (tempGalleryList.size() > 0) ? textError

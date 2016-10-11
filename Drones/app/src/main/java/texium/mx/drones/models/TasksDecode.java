@@ -15,7 +15,6 @@ public class TasksDecode {
     private String task_longitude;
     private Integer task_user_id;
     private Integer task_update_to;
-    private Integer task_team_id;
     private Integer origin_button;
     private List<String> sendImgFiles;
     private List<FilesManager> sendVideoFiles;
@@ -84,14 +83,6 @@ public class TasksDecode {
 
     public void setTask_user_id(Integer task_user_id) {
         this.task_user_id = task_user_id;
-    }
-
-    public Integer getTask_team_id() {
-        return task_team_id;
-    }
-
-    public void setTask_team_id(Integer task_team_id) {
-        this.task_team_id = task_team_id;
     }
 
     public Integer getOrigin_button() {

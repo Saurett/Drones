@@ -36,7 +36,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String TASK_LONGITUDE = "task_longitude";
         public static final String TASK_STATUS = "task_status";
         public static final String TASK_USER_ID = "task_user_id";
-        public static final String TEAM_ID = "idTeam";
+        //public static final String TEAM_ID = "idTeam";
     }
 
     public static class ColumnUsers {
@@ -47,8 +47,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String ACTOR_NAME = "actorName";
         public static final String ACTOR_TYPE = "actorType";
         public static final String ACTOR_TYPE_NAME = "actorTypeName";
-        public static final String TEAM_ID = "idTeam";
-        public static final String TEAM_NAME = "teamName";
+        //public static final String TEAM_ID = "idTeam";
+        //public static final String TEAM_NAME = "teamName";
         public static final String LATITUDE = "latitude";
         public static final String LONGITUDE = "longitude";
         public static final String LAST_TEAM_CONNECTION = "lastTeamConnection";
@@ -111,8 +111,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTasks.TASK_LATITUDE + " " + REAL_TYPE + "," +
                     ColumnTasks.TASK_LONGITUDE  + " " + REAL_TYPE + "," +
                     ColumnTasks.TASK_STATUS + " " + STRING_TYPE + "," +
-                    ColumnTasks.TASK_USER_ID + " " + INT_TYPE + "," +
-                    ColumnTasks.TEAM_ID + " " + INT_TYPE +
+                    ColumnTasks.TASK_USER_ID + " " + INT_TYPE +
+                    //ColumnTasks.TEAM_ID + " " + INT_TYPE +
             ")";
 
     public static final String CREATE_USERS_TABLE_SCRIPT =
@@ -124,8 +124,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnUsers.ACTOR_NAME + " " + STRING_TYPE + "," +
                     ColumnUsers.ACTOR_TYPE + " " + STRING_TYPE + "," +
                     ColumnUsers.ACTOR_TYPE_NAME + " " + INT_TYPE + "," +
-                    ColumnUsers.TEAM_ID + " " + INT_TYPE + "," +
-                    ColumnUsers.TEAM_NAME  + " " + STRING_TYPE + "," +
+                    //ColumnUsers.TEAM_ID + " " + INT_TYPE + "," +
+                    //ColumnUsers.TEAM_NAME  + " " + STRING_TYPE + "," +
                     ColumnUsers.LATITUDE + " " + REAL_TYPE + "," +
                     ColumnUsers.LONGITUDE + " " + REAL_TYPE + "," +
                     ColumnUsers.LAST_TEAM_CONNECTION + " " + STRING_TYPE + "," +

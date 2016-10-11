@@ -56,7 +56,7 @@ public class SoapServices {
         return soapObject;
     }
 
-    public static SoapObject getServerAllTasks(Context context, Integer idTeam, Integer idStatus) throws Exception {
+    public static SoapObject getServerAllTasks(Context context, Integer idUser, Integer idStatus) throws Exception {
         SoapObject soapObject;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_TASKS;
@@ -66,7 +66,7 @@ public class SoapServices {
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_TEAM, idTeam);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, idUser);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, idStatus);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -355,6 +355,60 @@ public class SoapServices {
         return soapPrimitive;
     }
 
+    public static SoapPrimitive updateDocumentFiles(Context context,Integer task,Integer user, String encodeFile, Integer partNumber, Boolean lastOne, String description ) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_DOCUMENT;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_UPDATE_DOCUMENT;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_DESCRIPTION, description);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_CODE_FILE, encodeFile);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_VIDEO_PART_NUMBER, partNumber);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_VIDEO_LAST_ONE, lastOne);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+
+            HttpTransportSE transport = new HttpTransportSE(URL,2000000);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (EOFException e ) {
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapPrimitive;
+    }
+
     public static SoapPrimitive sendFile(Context context,Integer task, Integer user, List<String> encodedImage) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
@@ -412,7 +466,7 @@ public class SoapServices {
         return soapPrimitive;
     }
 
-    public static SoapPrimitive updateLocation(Context context,Integer team, String latitude, String longitude,Integer user) throws Exception {
+    public static SoapPrimitive updateLocation(Context context, String latitude, String longitude,Integer user, Boolean connection) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_LOCATION;
@@ -422,10 +476,10 @@ public class SoapServices {
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_TEAM, team);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LATITUDE, latitude);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LONGITUDE, longitude);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_CONNECTION, connection);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;

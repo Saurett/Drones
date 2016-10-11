@@ -18,17 +18,15 @@ public class Tasks implements Serializable {
     private Double task_longitude;
     private Integer task_status;
     private Integer task_user_id;
-
-
-    private Integer idTeam;
+    //private Integer idTeam;
 
     public Tasks() {
 
     }
 
-    public Tasks(Integer tTaskStatus, Integer tIdTeam) {
+    public Tasks(Integer tTaskStatus, Integer idUser) {
         task_status = tTaskStatus;
-        idTeam = tIdTeam;
+        task_user_id = idUser;
     }
 
     public Integer getTask_cve() {
@@ -117,13 +115,5 @@ public class Tasks implements Serializable {
 
     public void setTask_user_id(Integer task_user_id) {
         this.task_user_id = task_user_id;
-    }
-
-    public Integer getIdTeam() {
-        return idTeam;
-    }
-
-    public void setIdTeam(Integer idTeam) {
-        this.idTeam = idTeam;
     }
 }

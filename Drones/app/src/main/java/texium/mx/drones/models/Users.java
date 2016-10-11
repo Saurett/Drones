@@ -15,8 +15,6 @@ public class Users implements Serializable {
     private String actorName;
     private Integer actorType;
     private String actorTypeName;
-    private Integer idTeam;
-    private String teamName;
     private Double latitude;
     private Double longitude;
     private String lastTeamConnection;
@@ -88,22 +86,6 @@ public class Users implements Serializable {
 
     public void setActorTypeName(String actorTypeName) {
         this.actorTypeName = actorTypeName;
-    }
-
-    public Integer getIdTeam() {
-        return idTeam;
-    }
-
-    public void setIdTeam(Integer idTeam) {
-        this.idTeam = idTeam;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
     }
 
     public Double getLatitude() {

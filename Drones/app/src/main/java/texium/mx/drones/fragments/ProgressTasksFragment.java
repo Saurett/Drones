@@ -45,7 +45,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
     static {
         progressTaskTitle = new ArrayList<>();
-        progressTaskTitle.add(new TasksTitle("TAREAS EN PROCESO", "CUADRILLA"));
+        progressTaskTitle.add(new TasksTitle("TAREAS EN SEGUIMIENTO", "CUADRILLA"));
     }
 
     RecyclerView tasks_list, tasks_list_tittle;
@@ -79,7 +79,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
         SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
-        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_PROGRESS, Integer.valueOf(SESSION_DATA.getIdTeam().toString()), Constants.PROGRESS_TASK);
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_PROGRESS, Constants.PROGRESS_TASK);
         wsTaskList.execute();
 
     }
@@ -112,14 +112,12 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private Integer webServiceOperation;
-        private Integer idTeam;
         private Integer idStatus;
         private List<Tasks> tempTaskList;
         private String textError;
 
-        private AsyncCallWS(Integer wsOperation, Integer wsIdTeam, Integer wsIdStatus) {
+        private AsyncCallWS(Integer wsOperation, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
-            idTeam = wsIdTeam;
             idStatus = wsIdStatus;
             textError = "";
             tempTaskList = new ArrayList<>();
@@ -142,12 +140,12 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
             try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
-                        NotificationService.callNotification(getActivity(), idTeam);
-                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
+                        NotificationService.callNotification(getActivity(), SESSION_DATA.getIdUser());
+                        soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
-                            Tasks t = new Tasks(idStatus,idTeam);
+                            Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
                             tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
                             if (tempTaskList.size() > 0) validOperation = true;
                         }
@@ -159,7 +157,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                 textError = e.getMessage();
                 validOperation = false;
 
-                Tasks t = new Tasks(idStatus,idTeam);
+                Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
 
                 try {
                     tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
@@ -208,7 +206,6 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                             t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
                             t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
                             t.setTask_user_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
-                            t.setIdTeam(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_TEAM_ACTUAL).toString()));
 
                             progressTask.add(t);
 
@@ -237,7 +234,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                             }
                         }
 
-                        Tasks t = new Tasks(idStatus,idTeam);
+                        Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
                         tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
 
                         for (Tasks tempTask : tempTaskList) {

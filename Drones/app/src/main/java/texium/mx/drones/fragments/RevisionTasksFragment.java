@@ -81,7 +81,7 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
 
         SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
-        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_REVISION,Integer.valueOf(SESSION_DATA.getIdTeam().toString()),Constants.REVISION_TASK);
+        AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_REVISION,Constants.REVISION_TASK);
         wsTaskList.execute();
 
     }
@@ -114,12 +114,10 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
     private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private Integer webServiceOperation;
-        private Integer idTeam;
         private Integer idStatus;
 
-        private AsyncCallWS(Integer wsOperation,Integer wsIdTeam, Integer wsIdStatus) {
+        private AsyncCallWS(Integer wsOperation, Integer wsIdStatus) {
             webServiceOperation = wsOperation;
-            idTeam = wsIdTeam;
             idStatus = wsIdStatus;
         }
 
@@ -136,7 +134,7 @@ public class RevisionTasksFragment extends Fragment implements View.OnClickListe
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_REVISION:
 
-                        soapObject = SoapServices.getServerAllTasks(getContext(), idTeam, idStatus);
+                        soapObject = SoapServices.getServerAllTasks(getContext(),SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         break;

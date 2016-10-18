@@ -197,9 +197,8 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
 
                                     if (!exist) {
 
-                                        TaskGallery decodeDocument = FileServices.downloadFile(soItem.getProperty(
-                                                Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString(),
-                                                Constants.APP_DEFAULT_PATH);
+                                        TaskGallery decodeDocument = FileServices.downloadFile(getActivity(),soItem.getProperty(
+                                                Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
                                         documentServer.setLocalURI(decodeDocument.getLocalURI());
 

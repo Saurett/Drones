@@ -68,6 +68,52 @@ public class FileServices {
         return stringsPicture;
     }
 
+    public static String attachImg(Activity activity, Uri uri, int size) throws Exception {
+        String stringsPicture = new String();
+
+        Context context = activity.getApplicationContext();
+
+        try {
+            String imageEncoded;
+
+            InputStream is = activity.getContentResolver()
+                    .openInputStream(uri);
+            Bitmap img = BitmapFactory.decodeStream(is);
+            ByteArrayOutputStream convert = new ByteArrayOutputStream();
+            img.compress(Bitmap.CompressFormat.JPEG, size, convert);
+            byte[] b = convert.toByteArray();
+            imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+            stringsPicture = imageEncoded;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("AttachImg Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_img_error));
+        }
+
+        return stringsPicture;
+    }
+
+    public static Bitmap attachImgBitmap(Activity activity, Uri uri, int size) throws Exception {
+
+        Context context = activity.getApplicationContext();
+
+        try {
+            InputStream is = activity.getContentResolver()
+                    .openInputStream(uri);
+            Bitmap img = BitmapFactory.decodeStream(is);
+            ByteArrayOutputStream convert = new ByteArrayOutputStream();
+            img.compress(Bitmap.CompressFormat.JPEG, size, convert);
+
+
+            return img;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("AttachImg Exception", e.getMessage());
+            throw new Exception(context.getString(R.string.default_attaching_img_error));
+        }
+    }
+
     public static List<FilesManager> attachVideo(Activity activity, List<Uri> uriFileVideo) throws Exception {
         List<FilesManager> encodeVideos = new ArrayList<>();
 
@@ -315,11 +361,11 @@ public class FileServices {
         return myBitmap;
     }
 
-    public static String attachImgFromBitmap(Bitmap bitmap) throws Exception {
+    public static String attachImgFromBitmap(Bitmap bitmap, int resolution) throws Exception {
         String imageEncoded = null;
         try {
             ByteArrayOutputStream convert = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, convert);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, resolution, convert);
             byte[] b = convert.toByteArray();
             imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
 
@@ -372,9 +418,11 @@ public class FileServices {
         }
     }
 
-    public static TaskGallery downloadFile(String fileURL, String saveDir) throws IOException {
+    public static TaskGallery downloadFile(Activity activity,String fileURL) throws IOException {
         TaskGallery taskGallery = new TaskGallery();
         try {
+
+            Boolean isImage = false;
 
             String videoURIPath;
             fileURL = quitUrlBlackSpace(fileURL);
@@ -402,6 +450,8 @@ public class FileServices {
                     fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1,
                             fileURL.length());
                 }
+
+                isImage = (contentType.contains("image/"));
 
                 System.out.println("Content-Type = " + contentType);
                 System.out.println("Content-Disposition = " + disposition);
@@ -434,10 +484,12 @@ public class FileServices {
 
             httpConn.disconnect();
 
-            Uri videoURI = Uri.fromFile(new File(videoURIPath));
-            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(videoURIPath).getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+            Uri uri = Uri.fromFile(new File(videoURIPath));
 
-            taskGallery.setLocalURI(videoURI.toString());
+            Bitmap bitmap = (isImage) ? attachImgBitmap(activity,uri,100) :
+                    ThumbnailUtils.createVideoThumbnail(new File(videoURIPath).getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+
+            taskGallery.setLocalURI(uri.toString());
             taskGallery.setPhoto_bitmap(bitmap);
 
         } catch (Exception e) {

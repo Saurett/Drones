@@ -422,6 +422,7 @@ public class BDTasksManagerQuery {
                 pg.setDescription(taskGallery.getDescription());
                 pg.setCve_Task_Detail(task_detail_cve);
                 pg.setId(taskGallery.getId());
+                pg.setLocalURI(taskGallery.getLocalURI());
 
                 addTaskFiles(context, pg);
             }
@@ -485,6 +486,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
+            cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI,gallery.getLocalURI());
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
 

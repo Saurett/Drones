@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -947,6 +949,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                         break;
                     case Constants.WS_KEY_ITEM_ADD_PHOTO:
+                        /*
                         fileManager.setEncodePictureFiles(FileServices.attachImg(AllGalleryActivity.this, fileManager.getFilesPicture()));
 
                         BDTasksManagerQuery.updateCommonTask(getApplicationContext(), _TASK_INFO.getTask_id()
@@ -956,6 +959,39 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 , fileManager
                                 , textError.length() == 0);
                         validOperation = true;
+                        */
+
+
+                        List<Uri> uriPictures = fileManager.getFilesPicture();
+
+                        for (Uri uriPicture : uriPictures) {
+
+                            String basePicture = FileServices.attachImg(AllGalleryActivity.this,uriPicture,50);
+
+                            TaskGallery videoGallery = new TaskGallery();
+
+
+                            byte[] decodedString = Base64.decode(basePicture, Base64.DEFAULT);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                            videoGallery.setLocalURI(uriPicture.toString());
+                            videoGallery.setFile_type(Constants.PICTURE_FILE_TYPE);
+                            videoGallery.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                            videoGallery.setDescription(Constants.EMPTY_STRING);
+                            videoGallery.setPhoto_bitmap(decodedByte);
+                            videoGallery.setBase_package(basePicture);
+
+                            BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
+                                    , "Se añaden imagenes"
+                                    , _TASK_INFO.getTask_status()
+                                    , _TASK_INFO.getTask_user_id()
+                                    , videoGallery
+                                    , textError.length() == 0);
+                        }
+
+                        validOperation = true;
+
+
                         break;
                     case Constants.WS_KEY_ITEM_ADD_VIDEO:
 
@@ -972,7 +1008,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             videoGallery.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
                             videoGallery.setDescription(Constants.EMPTY_STRING);
                             videoGallery.setPhoto_bitmap(thumbnail);
-                            videoGallery.setBase_package(FileServices.attachImgFromBitmap(videoGallery.getPhoto_bitmap()));
+                            videoGallery.setBase_package(FileServices.attachImgFromBitmap(videoGallery.getPhoto_bitmap(), 100));
 
                             BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
                                     , "Se añaden videos"

@@ -21,7 +21,6 @@ import android.widget.VideoView;
 
 import org.ksoap2.serialization.SoapObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,9 +125,6 @@ public class VideoGalleryDescriptionFragment extends Fragment implements View.On
 
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
-
-                break;
-            case DialogInterface.BUTTON_NEGATIVE:
 
                 break;
         }

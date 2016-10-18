@@ -4,6 +4,8 @@ package texium.mx.drones.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +28,7 @@ import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
 import texium.mx.drones.models.TaskGallery;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -38,7 +42,7 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
 
     private static EditText description;
     private static ImageView taskPhoto;
-    private Button save, cancel;
+    private Button save, cancel, open;
 
 
     @Override
@@ -52,9 +56,11 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
 
         save = (Button) view.findViewById(R.id.savePhotoDescription);
         cancel = (Button) view.findViewById(R.id.cancelPhotoDescription);
+        open = (Button) view.findViewById(R.id.openPictureDescription);
 
         save.setOnClickListener(this);
         cancel.setOnClickListener(this);
+        open.setOnClickListener(this);
 
         description.setText(_DESCRIPTION.getDescription());
         taskPhoto.setImageBitmap(_DESCRIPTION.getPhoto_bitmap());
@@ -129,6 +135,17 @@ public class PhotoGalleryDescriptionFragment extends Fragment implements View.On
             case R.id.cancelPhotoDescription:
 
                 description.setText(_DESCRIPTION.getDescription());
+
+                break;
+            case R.id.openPictureDescription:
+
+                String realPath = FileServices.getPath(getContext(), Uri.parse(_DESCRIPTION.getLocalURI()));
+                File tempFile = new File(realPath);
+                Intent intent = new Intent();
+                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(tempFile), "image/*");
+                startActivity(intent);
+
 
                 break;
             case R.id.savePhotoDescription:

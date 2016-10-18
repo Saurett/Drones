@@ -202,13 +202,12 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                                     if (!exist) {
 
-                                        TaskGallery decodeVideo = FileServices.downloadFile(soItem.getProperty(
-                                                Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString(),
-                                                Constants.APP_DEFAULT_PATH);
+                                        TaskGallery decodeVideo = FileServices.downloadFile(getActivity(),soItem.getProperty(
+                                                Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
                                         videoServer.setLocalURI(decodeVideo.getLocalURI());
                                         videoServer.setPhoto_bitmap(decodeVideo.getPhoto_bitmap());
-                                        videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap()));
+                                        videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap(),100));
 
                                         taskGalleries.add(videoServer);
                                     }

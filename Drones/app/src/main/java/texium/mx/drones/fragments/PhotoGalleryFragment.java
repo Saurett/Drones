@@ -200,12 +200,14 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                                     Boolean exist = (photoLocal.getCve() != null);
 
                                     if (!exist) {
-                                        Bitmap serverPhoto = FileServices.getBitmapFromURL(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
-                                        if (serverPhoto == null) continue;
+                                        TaskGallery decodePhoto =  FileServices.downloadFile(getActivity(),soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
 
-                                        photoServer.setPhoto_bitmap(serverPhoto);
-                                        photoServer.setBase_package(FileServices.attachImgFromBitmap(photoServer.getPhoto_bitmap()));
+                                        if (decodePhoto.getPhoto_bitmap() == null) continue;
+
+                                        photoServer.setLocalURI(decodePhoto.getLocalURI());
+                                        photoServer.setPhoto_bitmap(decodePhoto.getPhoto_bitmap());
+                                        photoServer.setBase_package(FileServices.attachImgFromBitmap(photoServer.getPhoto_bitmap(), 50));
                                         photoGalleries.add(photoServer);
                                     }
                                 }

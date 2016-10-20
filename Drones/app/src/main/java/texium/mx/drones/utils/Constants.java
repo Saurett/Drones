@@ -142,6 +142,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
 
+
     public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.65/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
 

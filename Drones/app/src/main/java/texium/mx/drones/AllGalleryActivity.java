@@ -1110,6 +1110,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         @Override
         protected void onPostExecute(final Boolean success) {
             String textSync = (itemSync > 0) ? "Sincronizado correctamente" : "No hay archivos para sincronizar";
+            galleryBefore = new ArrayList<>();
+
             if (success) switch (webServiceOperation) {
                 case Constants.WS_KEY_ITEM_DELETE:
 
@@ -1162,7 +1164,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     if (emptyDescription) {
                         textSync = getString(R.string.default_alert_empty_descripcion);
                     } else {
-                        galleryBefore = new ArrayList<>();
                         finish();
                     }
 

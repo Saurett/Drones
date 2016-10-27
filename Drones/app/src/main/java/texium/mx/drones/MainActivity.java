@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -35,14 +36,16 @@ import java.util.Map;
 
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.models.AppVersion;
+import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener  {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
     private EditText usernameLogin, passwordLogin, linkLogin;
-    private View mLoginFormView,mProgressView;
+    private View mLoginFormView, mProgressView;
     private Button loginButton, cleanButton, forgetUsername, connectivity;
 
     private int actionFlag = Constants.LOGIN_FORM;
@@ -58,11 +61,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextView appVersion = (TextView) findViewById(R.id.app_version);
 
         try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(),0);
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             appVersion.setText(packageInfo.versionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
 
 
         mProgressView = findViewById(R.id.login_progress);
@@ -105,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-
         super.onStart();
     }
 
@@ -115,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ad.setTitle(getString(R.string.default_title_alert_dialog));
         ad.setMessage(getString(R.string.default_update_version));
         ad.setCancelable(false);
-        ad.setPositiveButton(getString(R.string.default_positive_button),this);
+        ad.setPositiveButton(getString(R.string.default_positive_button), this);
 
         ad.show();
 
@@ -230,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     if (perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                             && perms.get(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-                                && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                            && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         Log.d("Permission", "camera & write storage services permission granted");
                         // process the normal flow
                         //else any one or both the permissions are not granted
@@ -241,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //show the dialog or snackbar saying its necessary and try again otherwise proceed with setup.
                         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)
                                 || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)
-                                    || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                             showDialogOK("Camera actions Permission required for this app",
                                     new DialogInterface.OnClickListener() {
                                         @Override
@@ -294,21 +300,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String link = linkLogin.getText().toString();
 
         if (TextUtils.isEmpty(password) && ((actionFlag == Constants.LOGIN_FORM)
-            || (actionFlag == Constants.CONNECTIVITY_FORM))) {
-            passwordLogin.setError(getString(R.string.password_login_error),null);
+                || (actionFlag == Constants.CONNECTIVITY_FORM))) {
+            passwordLogin.setError(getString(R.string.password_login_error), null);
             passwordLogin.requestFocus();
             cancel = true;
         }
 
         if (TextUtils.isEmpty(username)) {
-            usernameLogin.setError(getString(R.string.username_login_error),null);
+            usernameLogin.setError(getString(R.string.username_login_error), null);
             usernameLogin.requestFocus();
             cancel = true;
         }
 
 
         if ((TextUtils.isEmpty(link)) && (actionFlag == Constants.CONNECTIVITY_FORM)) {
-            linkLogin.setError("Ingrese cadena de conecxión",null);
+            linkLogin.setError("Ingrese cadena de conecxión", null);
             linkLogin.requestFocus();
             cancel = true;
         }
@@ -321,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
 
                         if (localVersion.getVersion_msg().equals("Si")) {
-                            AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE,username,password);
+                            AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE, username, password);
                             wsLogin.execute();
                         } else {
                             AsyncCallWS wsVersion = new AsyncCallWS(Constants.WS_KEY_CHECK_VERSION);
@@ -333,11 +339,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     break;
                 case Constants.FORGET_USERNAME_FORM:
-                    AsyncCallWS wsForget = new AsyncCallWS(Constants.WS_KEY_FORGET_USERNAME_SERVICE,username,null);
+                    AsyncCallWS wsForget = new AsyncCallWS(Constants.WS_KEY_FORGET_USERNAME_SERVICE, username, null);
                     wsForget.execute();
                     break;
                 case Constants.CONNECTIVITY_FORM:
-                    AsyncCallWS wsConnection = new AsyncCallWS(Constants.WS_KEY_CONNECTION,username,password,link.trim());
+                    AsyncCallWS wsConnection = new AsyncCallWS(Constants.WS_KEY_CONNECTION, username, password, link.trim());
                     wsConnection.execute();
                     break;
                 default:
@@ -427,8 +433,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean>  {
+    private class AsyncCallWS extends AsyncTask<Void, Void, Boolean> {
 
         private SoapObject soapObject;
         private SoapPrimitive soapPrimitive;
@@ -444,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             textError = "";
         }
 
-        private AsyncCallWS(Integer wsOperation,String wsUsername, String wsPassword) {
+        private AsyncCallWS(Integer wsOperation, String wsUsername, String wsPassword) {
             webServiceOperation = wsOperation;
             username = wsUsername;
             password = wsPassword;
@@ -452,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             localAccess = false;
         }
 
-        private AsyncCallWS(Integer wsOperation,String wsUsername, String wsPassword, String wsTempLink) {
+        private AsyncCallWS(Integer wsOperation, String wsUsername, String wsPassword, String wsTempLink) {
             webServiceOperation = wsOperation;
             username = wsUsername;
             password = wsPassword;
@@ -471,14 +476,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Boolean validOperation;
 
-            try{
+            try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_PUBLIC_TEST:
                         SoapServices.calculate(username);
                         validOperation = true;
                         break;
                     case Constants.WS_KEY_LOGIN_SERVICE:
-                        soapObject = SoapServices.checkUser(getApplicationContext(),username,password);
+                        soapObject = SoapServices.checkUser(getApplicationContext(), username, password);
                         Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
                         validOperation = (id > 0);
@@ -492,9 +497,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         AppVersion localAV = BDTasksManagerQuery.getAppVersion(getApplicationContext());
 
                         if (!localAV.getApp_version().equals(serverAppVersion)) {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(),localAV.getApp_version(),"No");
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localAV.getApp_version(), "No");
                         } else {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(),localAV.getApp_version(),"Si");
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localAV.getApp_version(), "Si");
                         }
 
                         validOperation = true;
@@ -505,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
-                        soapPrimitive = SoapServices.forgetUsername(getApplicationContext(),username);
+                        soapPrimitive = SoapServices.forgetUsername(getApplicationContext(), username);
                         validOperation = (soapPrimitive != null);
                         break;
                     case Constants.WS_KEY_CONNECTION:
@@ -544,10 +549,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         validOperation = true;
 
                         if (null == cveLink) {
-                            BDTasksManagerQuery.addLink(getApplicationContext(),webServiceLink,u);
+                            BDTasksManagerQuery.addLink(getApplicationContext(), webServiceLink, u);
                         } else {
-                            BDTasksManagerQuery.updateLink(getApplicationContext(),cveLink,u);
-                            BDTasksManagerQuery.addLink(getApplicationContext(),webServiceLink,u);
+                            BDTasksManagerQuery.updateLink(getApplicationContext(), cveLink, u);
+                            BDTasksManagerQuery.addLink(getApplicationContext(), webServiceLink, u);
                         }
 
                         if (validOperation) {
@@ -558,9 +563,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             AppVersion lav = BDTasksManagerQuery.getAppVersion(getApplicationContext());
 
                             if (!lav.getApp_version().equals(sav)) {
-                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(),lav.getApp_version(),"No");
+                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(), lav.getApp_version(), "No");
                             } else {
-                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(),lav.getApp_version(),"Si");
+                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(), lav.getApp_version(), "Si");
                             }
 
                         }
@@ -570,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         validOperation = false;
                         break;
                 }
-            } catch (ConnectException e){
+            } catch (ConnectException e) {
 
                 textError = (e != null) ? e.getMessage() : "Unknown error";
                 validOperation = false;
@@ -619,9 +624,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(final Boolean success) {
             showProgress(false);
-            if(success) {
+            if (success) {
 
-                Intent intentNavigationDrawer = new Intent(MainActivity.this,NavigationDrawerActivity.class);
+                Intent intentNavigationDrawer = new Intent(MainActivity.this, NavigationDrawerActivity.class);
                 Users user = new Users();
 
                 switch (webServiceOperation) {
@@ -638,8 +643,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                 if (tempUser.getIdUser() != 0) {
 
-                                    if(Integer.valueOf(tempUser.getIdActor()) == 0) {
-                                        Toast.makeText(MainActivity.this,getString(R.string.no_user_team_login_error), Toast.LENGTH_LONG).show();
+                                    if (Integer.valueOf(tempUser.getIdActor()) == 0) {
+                                        Toast.makeText(MainActivity.this, getString(R.string.no_user_team_login_error), Toast.LENGTH_LONG).show();
                                         return;
                                     }
 
@@ -678,27 +683,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case Constants.WS_KEY_ALL_USERS:
 
-                        for (int i = 0; i < soapObject.getPropertyCount(); i ++) {
+                        for (int i = 0; i < soapObject.getPropertyCount(); i++) {
 
-                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                            SoapObject uLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+                            try {
 
-                            user.setIdUser(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
-                            user.setUserName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
-                            user.setIdActor(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
-                            user.setActorName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
-                            user.setActorType(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
-                            user.setActorTypeName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
-                            user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
-                            user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
-                            user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-                            user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_PASSWORD).toString());
+                                SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                                SoapObject uLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+
+                                user.setIdUser(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                                user.setUserName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
+                                user.setIdActor(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                                user.setActorName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
+                                user.setActorType(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                                user.setActorTypeName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
+                                user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
+                                user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+
+                                try {
+                                    user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+                                } catch (NullPointerException e) {
+                                    user.setLastTeamConnection("");
+                                    e.printStackTrace();
+                                }
+
+                                user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_PASSWORD).toString());
+
+                                TaskGallery decodePhoto =  FileServices.downloadFile(MainActivity.this,soTemp.getProperty(Constants.SOAP_OBJECT_KEY_PROFILE_PICTURE).toString());
+                                user.setProfilePicture(FileServices.attachImgFromBitmap(decodePhoto.getPhoto_bitmap(), 100));
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
 
                             try {
                                 Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
 
-                                if (tempUser.getIdUser() == null) BDTasksManagerQuery.addUser(getApplicationContext(), user);
-                                if (tempUser.getIdUser() != null) BDTasksManagerQuery.updateUser(getApplicationContext(), user);
+                                if (tempUser.getIdUser() == null)
+                                    BDTasksManagerQuery.addUser(getApplicationContext(), user);
+                                if (tempUser.getIdUser() != null)
+                                    BDTasksManagerQuery.updateUser(getApplicationContext(), user);
 
                             } catch (Exception ex) {
                                 ex.printStackTrace();
@@ -708,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
-                        Toast.makeText(MainActivity.this,soapPrimitive.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_CONNECTION:
                         Toast.makeText(MainActivity.this, "Cadena de conexión actualizada correctamente", Toast.LENGTH_LONG).show();
@@ -726,7 +750,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
 
 
                         break;
@@ -751,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             } else {
                 String tempTextMsg = (textError.isEmpty() ? getString(R.string.default_login_error) : textError);
-                Toast.makeText(MainActivity.this,tempTextMsg, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, tempTextMsg, Toast.LENGTH_LONG).show();
             }
         }
 

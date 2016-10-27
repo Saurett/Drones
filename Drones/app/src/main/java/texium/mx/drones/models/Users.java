@@ -18,6 +18,8 @@ public class Users implements Serializable {
     private Double latitude;
     private Double longitude;
     private String lastTeamConnection;
+    private String profilePictureURL;
+    private String profilePicture;
 
     public Users() {
 
@@ -110,5 +112,21 @@ public class Users implements Serializable {
 
     public void setLastTeamConnection(String lastTeamConnection) {
         this.lastTeamConnection = lastTeamConnection;
+    }
+
+    public String getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public void setProfilePictureURL(String profilePictureURL) {
+        this.profilePictureURL = profilePictureURL;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

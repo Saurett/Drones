@@ -17,6 +17,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static final String FILES_PACKAGES_TABLE_NAME = "Files_Packages";
     public static final String LINKS_TABLE_NAME = "Links";
     public static final String APP_VERSION_TABLE_NAME = "App_Version";
+    public static final String TASKS_MEMBERS_TABLE_NAME = "Tasks_Members";
 
     public static final String STRING_TYPE = "text";
     public static final String INT_TYPE = "integer";
@@ -47,12 +48,12 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String ACTOR_NAME = "actorName";
         public static final String ACTOR_TYPE = "actorType";
         public static final String ACTOR_TYPE_NAME = "actorTypeName";
-        //public static final String TEAM_ID = "idTeam";
-        //public static final String TEAM_NAME = "teamName";
         public static final String LATITUDE = "latitude";
         public static final String LONGITUDE = "longitude";
         public static final String LAST_TEAM_CONNECTION = "lastTeamConnection";
         public static final String PASSWORD = "password";
+        public static final String PROFILE_PICTURE = "profile_picture";
+        public static final String COMPLETE_ACTOR_NAME = "complete_actor_name";
 
     }
 
@@ -99,6 +100,12 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String VERSION_MSG = "version_msg";
     }
 
+    public static class ColumnTasksMembers {
+        public static final String TASK_MEMBER_CVE = "task_member_cve";
+        public static final String TASK_ID_USER = "task_user_id";
+        public static final String TASK_ID = "task_id";
+    }
+
     public static final String CREATE_TASKS_TABLE_SCRIPT =
             "create table " + TASKS_TABLE_NAME + "(" +
                     ColumnTasks.TASK_CVE + " " + INT_TYPE + " primary key autoincrement," +
@@ -129,7 +136,9 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnUsers.LATITUDE + " " + REAL_TYPE + "," +
                     ColumnUsers.LONGITUDE + " " + REAL_TYPE + "," +
                     ColumnUsers.LAST_TEAM_CONNECTION + " " + STRING_TYPE + "," +
-                    ColumnUsers.PASSWORD + " " + STRING_TYPE +
+                    ColumnUsers.PASSWORD + " " + STRING_TYPE + "," +
+                    ColumnUsers.PROFILE_PICTURE + " " + STRING_TYPE + "," +
+                    ColumnUsers.COMPLETE_ACTOR_NAME + " " + STRING_TYPE +
                     ")";
 
     public static final String CREATE_TASKS_FILES_TABLE_SCRIPT =
@@ -180,6 +189,13 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnAppVersion.VERSION_MSG + " " + STRING_TYPE +
                             ")";
 
+    public static final String CREATE_TASKS_MEMBERS_TABLE_SCRIPT =
+            "create table " + TASKS_MEMBERS_TABLE_NAME + "(" +
+                    ColumnTasksMembers.TASK_MEMBER_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnTasksMembers.TASK_ID + " " + INT_TYPE + "," +
+                    ColumnTasksMembers.TASK_ID_USER + " " + INT_TYPE +
+                    ")";
+
     public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -195,6 +211,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_FILES_PACKAGE_TABLE_SCRIPT);
         db.execSQL(CREATE_LINKS_TABLE_SCRIPT);
         db.execSQL(CREATE_APP_VERSION_TABLE_SCRIPT);
+        db.execSQL(CREATE_TASKS_MEMBERS_TABLE_SCRIPT);
     }
 
     @Override
@@ -207,6 +224,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.FILES_PACKAGES_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.LINKS_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.APP_VERSION_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_MEMBERS_TABLE_NAME);
 
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);
@@ -215,5 +233,6 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_FILES_PACKAGE_TABLE_SCRIPT);
         db.execSQL(CREATE_LINKS_TABLE_SCRIPT);
         db.execSQL(CREATE_APP_VERSION_TABLE_SCRIPT);
+        db.execSQL(CREATE_TASKS_MEMBERS_TABLE_SCRIPT);
     }
 }

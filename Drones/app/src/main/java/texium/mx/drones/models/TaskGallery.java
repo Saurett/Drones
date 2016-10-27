@@ -18,7 +18,8 @@ public class TaskGallery implements Serializable {
     private String description;
     private Integer sync_type;
     private String localURI;
-
+    private String member_name;
+    private String member_job;
 
     public TaskGallery() {
     }
@@ -98,5 +99,21 @@ public class TaskGallery implements Serializable {
 
     public void setLocalURI(String localURI) {
         this.localURI = localURI;
+    }
+
+    public String getMember_name() {
+        return member_name;
+    }
+
+    public void setMember_name(String member_name) {
+        this.member_name = member_name;
+    }
+
+    public String getMember_job() {
+        return member_job;
+    }
+
+    public void setMember_job(String member_job) {
+        this.member_job = member_job;
     }
 }

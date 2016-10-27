@@ -39,6 +39,15 @@
             android:background="@null"
             android:text="Documentos"
             android:textColor="@color/colorPrimaryDark" />
+
+        <Button
+            android:id="@+id/member_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:text="Miembros"
+            android:textColor="@color/colorPrimaryDark" />
     </LinearLayout>
 
     <FrameLayout
@@ -51,7 +60,7 @@
 
     <FrameLayout
         android:id="@+id/detail_gallery_container"
-        android:layout_width="640dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
@@ -62,12 +71,12 @@
         android:id="@+id/emptyPhotoGalleryDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="320dp"
+        android:layout_marginLeft="500dp"
         android:layout_marginTop="100dp"
         android:visibility="invisible">
 
         <LinearLayout
-            android:layout_width="640dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"

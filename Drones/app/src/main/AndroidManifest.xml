@@ -61,6 +61,11 @@
             android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
+        <activity android:name=".SearchMemberActivity"
+            android:label="@string/title_activity_search_member"
+            android:parentActivityName=".AllGalleryActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <provider android:name=".utils.MyProvider" android:authorities="texium.mx.drones" android:exported="true" />
     </application>
 

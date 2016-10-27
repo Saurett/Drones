@@ -40,6 +40,7 @@ import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.DocumentGalleryDescriptionFragment;
 import texium.mx.drones.fragments.DocumentGalleryFragment;
+import texium.mx.drones.fragments.MemberGalleryFragment;
 import texium.mx.drones.fragments.PhotoGalleryDescriptionFragment;
 import texium.mx.drones.fragments.PhotoGalleryFragment;
 import texium.mx.drones.fragments.VideoGalleryDescriptionFragment;
@@ -59,12 +60,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
     private static final int GALLERY_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int GALLERY_VIDEO_ACTIVITY_REQUEST_CODE = 200;
     private static final int GALLERY_PDF_ACTIVITY_REQUEST_CODE = 300;
+    private static final int GALLERY_MEMBER_ACTIVITY_REQUEST_CODE = 400;
 
     private static Tasks _TASK_INFO;
     private ProgressDialog pDialog;
     private static DecodeGallery _DECODE_GALLERY;
     private Integer ACTUAL_GALLERY;
-    private Button photoBtn, videoBtn, documentBtn;
+    private Button photoBtn, videoBtn, documentBtn, memberBtn;
 
     public static FragmentManager fragmentManager;
     public static FilesManager fileManager;
@@ -104,10 +106,12 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         photoBtn = (Button) findViewById(R.id.photos_gallery);
         videoBtn = (Button) findViewById(R.id.video_gallery);
         documentBtn = (Button) findViewById(R.id.document_gallery);
+        memberBtn = (Button) findViewById(R.id.member_gallery);
 
         photoBtn.setOnClickListener(this);
         videoBtn.setOnClickListener(this);
         documentBtn.setOnClickListener(this);
+        memberBtn.setOnClickListener(this);
 
     }
 
@@ -147,12 +151,22 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         }
 
 
-        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(galleryIntent, galleryType);
+        if (ACTUAL_GALLERY.equals(Constants.MEMBER_TYPE)) {
 
-        Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
-                        + getString(R.string.default_file_multiple_selection)
-                , Toast.LENGTH_LONG).show();
+            Intent intentSearchMember = new Intent(AllGalleryActivity.this, SearchMemberActivity.class);
+            intentSearchMember.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY, _TASK_INFO);
+            startActivity(intentSearchMember);
+
+        } else {
+
+            galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(galleryIntent, galleryType);
+
+            Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
+                            + getString(R.string.default_file_multiple_selection)
+                    , Toast.LENGTH_LONG).show();
+
+        }
 
         return true;
     }
@@ -175,42 +189,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                 return true;
             case R.id.action_add_item:
-
-                /*
-                if (_TASK_INFO.getTask_status() == Constants.NEWS_TASK) {
-                    showQuestion(R.id.action_add_item);
-                    return true;
-                }
-
-                int galleryType = GALLERY_IMAGE_ACTIVITY_REQUEST_CODE;
-
-                Intent galleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));
-
-                switch (ACTUAL_GALLERY) {
-                    case Constants.PICTURE_FILE_TYPE:
-                        galleryIntent.setType("image/*");
-                        galleryType = GALLERY_IMAGE_ACTIVITY_REQUEST_CODE;
-                        break;
-                    case Constants.VIDEO_FILE_TYPE:
-                        galleryIntent.setType("video/*");
-                        galleryType = GALLERY_VIDEO_ACTIVITY_REQUEST_CODE;
-                        break;
-                    case Constants.DOCUMENT_FILE_TYPE:
-                        galleryIntent.setType("application/pdf");
-                        galleryType = GALLERY_PDF_ACTIVITY_REQUEST_CODE;
-                        break;
-                    default:
-                        break;
-                }
-
-
-                galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(galleryIntent, galleryType);
-
-                Toast.makeText(this, getString(R.string.default_file_single_selection) + "\n"
-                                + getString(R.string.default_file_multiple_selection)
-                        , Toast.LENGTH_LONG).show();
-                return true;*/
                 return openGallery();
             case android.R.id.home:
 
@@ -394,6 +372,18 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         transaction.commit();
     }
 
+    @Override
+    public void replaceFragmentMemberFragment() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(R.id.list_gallery_container, new MemberGalleryFragment());
+        //transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
 
     @Override
     public void openDescriptionFragment(String tag) {
@@ -416,6 +406,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         mapFragment.put(Constants.FRAGMENT_PHOTO_GALLERY_LIST_TAG, new PhotoGalleryFragment());
         mapFragment.put(Constants.FRAGMENT_VIDEO_GALLERY_LIST_TAG, new VideoGalleryFragment());
         mapFragment.put(Constants.FRAGMENT_DOCUMENT_GALLERY_LIST_TAG, new DocumentGalleryFragment());
+        mapFragment.put(Constants.FRAGMENT_MEMBER_GALLERY_LIST_TAG, new MemberGalleryFragment());
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         // Replace whatever is in the fragment_container view with this fragment,
@@ -478,6 +469,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
             case R.id.item_photo_delete:
             case R.id.item_video_delete:
             case R.id.item_document_delete:
+            case R.id.item_member_delete:
 
                 if (syncType.equals(Constants.ITEM_SYNC_SERVER_DEFAULT)) {
                     ad.setTitle(getString(R.string.default_title_alert_dialog));
@@ -546,6 +538,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
             case R.id.item_photo_sync:
             case R.id.item_video_sync:
             case R.id.item_document_sync:
+            case R.id.item_member_sync:
 
                 switch (syncType) {
                     case Constants.ITEM_SYNC_SERVER_DEFAULT:
@@ -604,6 +597,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     case R.id.item_photo_delete:
                     case R.id.item_video_delete:
                     case R.id.item_document_delete:
+                    case R.id.item_member_delete:
                         AsyncGallery wsDeletePhoto = new AsyncGallery(Constants.WS_KEY_ITEM_DELETE);
                         wsDeletePhoto.execute();
                         break;
@@ -647,6 +641,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
         closeFragment(Constants.FRAGMENT_VIDEO_GALLERY_TAG);
         closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
+        closeFragment(Constants.FRAGMENT_MEMBER_GALLERY_TAG);
 
         switch (v.getId()) {
             case R.id.photos_gallery:
@@ -661,6 +656,10 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 ACTUAL_GALLERY = Constants.DOCUMENT_FILE_TYPE;
                 replaceFragmentDocumentFragment();
                 break;
+            case R.id.member_gallery:
+                ACTUAL_GALLERY = Constants.MEMBER_TYPE;
+                replaceFragmentMemberFragment();
+
         }
     }
 
@@ -743,14 +742,28 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                     case Constants.WS_KEY_ITEM_DELETE:
 
+
+                        Integer idView = _DECODE_GALLERY.getIdView();
+                        switch (idView) {
+                            case R.id.item_member_delete:
+
+                                //TODO eliminar en WS
+
+                                break;
+                            default:
+
+                                if (!_DECODE_GALLERY.getTaskGallery().getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
+                                    soapPrimitive = SoapServices.deletePhotoFile(getApplicationContext(),
+                                            _DECODE_GALLERY.getTaskGallery().getId(),
+                                            _TASK_INFO.getTask_user_id());
+                                    validOperation = (soapPrimitive != null);
+                                }
+                                break;
+                        }
+
                         validOperation = true;
 
-                        if (!_DECODE_GALLERY.getTaskGallery().getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
-                            soapPrimitive = SoapServices.deletePhotoFile(getApplicationContext(),
-                                    _DECODE_GALLERY.getTaskGallery().getId(),
-                                    _TASK_INFO.getTask_user_id());
-                            validOperation = (soapPrimitive != null);
-                        }
+
 
                         break;
                     case Constants.WS_KEY_ITEM_SYNC:
@@ -966,7 +979,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                         for (Uri uriPicture : uriPictures) {
 
-                            String basePicture = FileServices.attachImg(AllGalleryActivity.this,uriPicture,50);
+                            String basePicture = FileServices.attachImg(AllGalleryActivity.this, uriPicture, 50);
 
                             TaskGallery videoGallery = new TaskGallery();
 
@@ -1056,7 +1069,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         try {
 
                             validOperation = true;
-                            textError = "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
+                            textError =  (_DECODE_GALLERY.getIdView().equals(R.id.item_member_delete)) ? "Miembro eliminado correctamente, pendiente a sincronizar con el servidor."
+                                    : "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
 
                             switch (ACTUAL_GALLERY) {
                                 case Constants.PICTURE_FILE_TYPE:
@@ -1067,16 +1081,26 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             , fileManager
                                             , textError.length() == 0);
                                     break;
-                                case Constants.VIDEO_FILE_TYPE:
+                                /*case Constants.VIDEO_FILE_TYPE:
                                     TaskGallery videoGallery = new TaskGallery();
                                     videoGallery.setLocalURI(fileManager.getTitle());
                                     BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
-                                            , "Se elimina foto sin conexión desde la app móvil"
+                                            , "Se elimina video sin conexión desde la app móvil"
                                             , _TASK_INFO.getTask_status()
                                             , _TASK_INFO.getTask_user_id()
                                             , videoGallery
                                             , textError.length() == 0);
                                     break;
+                                case Constants.DOCUMENT_FILE_TYPE:
+                                    TaskGallery videoGalleryDoc = new TaskGallery();
+                                    videoGalleryDoc.setLocalURI(fileManager.getTitle());
+                                    BDTasksManagerQuery.updateCommonTaskVideo(getApplicationContext(), _TASK_INFO.getTask_id()
+                                            , "Se elimina documento sin conexión desde la app móvil"
+                                            , _TASK_INFO.getTask_status()
+                                            , _TASK_INFO.getTask_user_id()
+                                            , videoGalleryDoc
+                                            , textError.length() == 0);
+                                    break;*/
                             }
 
                         } catch (Exception e1) {
@@ -1155,6 +1179,10 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             DocumentGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
                             closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
                             break;
+                        case Constants.MEMBER_TYPE:
+                            MemberGalleryFragment.removeAt(_DECODE_GALLERY.getPosition());
+                            //closeFragment(Constants.FRAGMENT_MEMBER_GALLERY_TAG);
+                            break;
                     }
 
 
@@ -1191,6 +1219,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
                             openListFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_LIST_TAG);
                             Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
+                            break;
                     }
 
                     break;

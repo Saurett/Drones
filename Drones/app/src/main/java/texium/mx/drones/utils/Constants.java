@@ -16,7 +16,6 @@ public final class Constants {
 
     //region SYS CONSTANTS//
     //region SYS CONSTANTS//
-    public static final String APP_DEFAULT_PATH = "/data/data/texium.mx.drones/";
     public static final String EMPTY_STRING = "";
     public static final String NUMBER_ZERO = "0";
     public static final Integer SERVER_SYNC_FALSE = 0;
@@ -29,6 +28,7 @@ public final class Constants {
     public static final int PICTURE_FILE_TYPE = 1;
     public static final int VIDEO_FILE_TYPE = 2;
     public static final int DOCUMENT_FILE_TYPE = 3;
+    public static final int MEMBER_TYPE = 4;
 
     //endregion SYS CONSTANTS//
 
@@ -67,9 +67,13 @@ public final class Constants {
     public static final String FRAGMENT_PHOTO_GALLERY_LIST_TAG = "fragment_photo_gallery_list";
     public static final String FRAGMENT_VIDEO_GALLERY_LIST_TAG = "fragment_video_gallery_list";
     public static final String FRAGMENT_DOCUMENT_GALLERY_LIST_TAG = "fragment_document_gallery_list";
+    public static final String FRAGMENT_MEMBER_GALLERY_LIST_TAG = "fragment_member_gallery_list";
     public static final String FRAGMENT_PHOTO_GALLERY_TAG = "fragment_photo_gallery";
     public static final String FRAGMENT_VIDEO_GALLERY_TAG = "fragment_video_gallery";
     public static final String FRAGMENT_DOCUMENT_GALLERY_TAG = "fragment_document_gallery";
+    public static final String FRAGMENT_MEMBER_GALLERY_TAG = "fragment_member_gallery";
+    public static final String FRAGMENT_SEARCH_MEMBER_GALLERY_TAG = "fragment_search_member_gallery";
+    public static final String FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG = "fragment_preview_member_gallery";
     //endregion FRAGMENT TAGS//
 
     //region WEB SERVICE ID //
@@ -104,6 +108,13 @@ public final class Constants {
     public static final int WS_KEY_ITEM_DOCUMENT_GALLERY = 29;
     public static final int WS_KEY_ITEM_ADD_DOCUMENT = 30;
     public static final int WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT = 31;
+    public static final int WS_KEY_ITEM_MEMBER_GALLERY = 32;
+    public static final int WS_KEY_ITEM_SEARCH_GALLERY = 33;
+    public static final int WS_KEY_ITEM_PREVIEW_GALLERY = 34;
+    public static final int WS_KEY_ITEM_ADD_PREVIEW_MEMBER = 35;
+    public static final int WS_KEY_ITEM_DELETE_PREVIEW_MEMBER = 36;
+    public static final int WS_KEY_ITEM_ADD_MEMBER = 37;
+    public static final int WS_KEY_ITEM_SAVE_MEMBER = 38;
     //endregion WEB SERVICE ID//
 
     //region SOAP CONFIGURATION//
@@ -218,6 +229,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_LOGIN_LONGITUDE = "Longitud";
     public static final String SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION = "ultimaconexion";
     public static final String SOAP_OBJECT_KEY_LOGIN_PASSWORD = "contrasenausuario";
+    public static final String SOAP_OBJECT_KEY_PROFILE_PICTURE = "imagen";
     public static final String SOAP_OBJECT_KEY_ID = "ID";
     public static final String SOAP_OBJECT_KEY_TASK_TITTLE = "Nombre";
     public static final String SOAP_OBJECT_KEY_TASK_CONTENT = "Descripcion";

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".AllGalleryActivity"
+tools:showIn="@layout/activity_search_member">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    >
+
+    <FrameLayout
+        android:id="@+id/list_member_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_toStartOf="@+id/detail_gallery_container"></FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/list_preview_member_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_weight="1"></FrameLayout>
+
+</LinearLayout>
+
+
+
+</RelativeLayout>

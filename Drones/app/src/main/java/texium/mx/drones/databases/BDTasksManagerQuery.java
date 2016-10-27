@@ -27,7 +27,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 39;
+    static Integer BDVersion = 41;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -654,6 +654,8 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnUsers.LONGITUDE, u.getLongitude());
             cv.put(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION, u.getLastTeamConnection());
             cv.put(BDTasksManager.ColumnUsers.PASSWORD, u.getPassword());
+            cv.put(BDTasksManager.ColumnUsers.PROFILE_PICTURE, u.getProfilePicture());
+            cv.put(BDTasksManager.ColumnUsers.COMPLETE_ACTOR_NAME, u.getActorName().replaceAll("-"," ").trim());
 
             bd.insert(BDTasksManager.USERS_TABLE_NAME, null, cv);
             bd.close();
@@ -663,6 +665,76 @@ public class BDTasksManagerQuery {
             e.printStackTrace();
             throw new Exception("Database error");
         }
+    }
+
+    public static void addMember(Context context, Integer idUser, Integer idTask) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID, idTask);
+            cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID_USER, idUser);
+
+            bd.insert(BDTasksManager.TASKS_MEMBERS_TABLE_NAME, null, cv);
+            bd.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+    }
+
+    public static List<Users> getMembers(Context context, Integer idTask) throws Exception {
+        List<Users> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from  " + BDTasksManager.TASKS_MEMBERS_TABLE_NAME
+                    + " where " + BDTasksManager.ColumnTasksMembers.TASK_ID + " = " + idTask
+                    + " order by 1 ASC", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    Cursor resultTwo = bd.rawQuery("select * from  " + BDTasksManager.USERS_TABLE_NAME
+                            + " where " + BDTasksManager.ColumnUsers.USER_ID + " = " + result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID_USER))
+                            + " order by 1 ASC", null);
+
+                    if (resultTwo.moveToFirst()) {
+                        do {
+
+                            Users temp = new Users();
+
+                            temp.setCve_user(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USER_CVE)));
+                            temp.setIdUser(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USER_ID)));
+                            temp.setUserName(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USERNAME)));
+                            temp.setIdActor(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_ID)));
+                            temp.setActorName(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_NAME)));
+                            temp.setActorType(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE)));
+                            temp.setActorTypeName(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME)));
+                            temp.setLatitude(resultTwo.getDouble(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.LATITUDE)));
+                            temp.setLongitude(resultTwo.getDouble(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.LONGITUDE)));
+                            temp.setLastTeamConnection(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION)));
+                            temp.setPassword(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PASSWORD)));
+                            temp.setProfilePicture(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
+
+                            data.add(temp);
+
+                        } while (resultTwo.moveToNext());
+                    }
+
+                } while (result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+        return data;
     }
 
     public static Tasks getTaskById(Context context, Tasks t) throws Exception {
@@ -940,6 +1012,51 @@ public class BDTasksManagerQuery {
         return data;
     }
 
+    public static List<Users> getUsers(Context context, String searchName) throws Exception {
+        List<Users> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+
+            String extraQuery = (searchName.isEmpty() ? searchName
+                    : "where " + BDTasksManager.ColumnUsers.ACTOR_NAME + " LIKE '%" + searchName + "%'" );
+
+            Cursor result = bd.rawQuery("select * from users "
+                    + extraQuery
+                    + "order by 1 ASC", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    Users temp = new Users();
+
+                    temp.setCve_user(result.getInt(result.getColumnIndex(BDTasksManager.ColumnUsers.USER_CVE)));
+                    temp.setIdUser(result.getInt(result.getColumnIndex(BDTasksManager.ColumnUsers.USER_ID)));
+                    temp.setUserName(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.USERNAME)));
+                    temp.setIdActor(result.getInt(result.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_ID)));
+                    temp.setActorName(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_NAME)));
+                    temp.setActorType(result.getInt(result.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE)));
+                    temp.setActorTypeName(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME)));
+                    temp.setLatitude(result.getDouble(result.getColumnIndex(BDTasksManager.ColumnUsers.LATITUDE)));
+                    temp.setLongitude(result.getDouble(result.getColumnIndex(BDTasksManager.ColumnUsers.LONGITUDE)));
+                    temp.setLastTeamConnection(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION)));
+                    temp.setPassword(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.PASSWORD)));
+                    temp.setProfilePicture(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
+
+                    data.add(temp);
+
+                } while (result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+        return data;
+    }
+
     public static Users getUserByCredentials(Context context, Users u) throws Exception {
         Users data = new Users();
         try {
@@ -963,6 +1080,7 @@ public class BDTasksManagerQuery {
                     data.setLongitude(result.getDouble(8));
                     data.setLastTeamConnection(result.getString(9));
                     data.setPassword(result.getString(10));
+                    data.setProfilePicture(result.getString(result.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
 
                     Log.i("SQLite: ", "Get user in the bd with idUser :" + data.getIdUser()
                             + " username : " + data.getUserName() + " password :" + data.getPassword());
@@ -1078,8 +1196,10 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnUsers.PASSWORD, user.getPassword());
             cv.put(BDTasksManager.ColumnUsers.ACTOR_NAME, user.getActorName());
             cv.put(BDTasksManager.ColumnUsers.ACTOR_TYPE, user.getActorType());
-            cv.put(BDTasksManager.ColumnUsers.ACTOR_NAME, user.getActorTypeName());
+            cv.put(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME, user.getActorTypeName());
             cv.put(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION, user.getLastTeamConnection());
+            cv.put(BDTasksManager.ColumnUsers.PROFILE_PICTURE, user.getProfilePicture());
+            cv.put(BDTasksManager.ColumnUsers.COMPLETE_ACTOR_NAME, user.getActorName().replaceAll("-"," ").trim());
 
             bd.update(BDTasksManager.USERS_TABLE_NAME, cv, BDTasksManager.ColumnUsers.USER_ID + " = " + user.getIdUser(), null);
             bd.close();

@@ -112,9 +112,8 @@ public class PreviewMemberFragment extends Fragment implements View.OnClickListe
         //Move to preview list
         if (position > 0) {
             activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(((position > 0) ? position - 1 : 0)));
-            //activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
         } else {
-            activityListener.closeFragment(Constants.FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG);
+            //activityListener.closeFragment(Constants.FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG);
         }
         setEmptyView(null);
     }

@@ -104,6 +104,9 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String TASK_MEMBER_CVE = "task_member_cve";
         public static final String TASK_ID_USER = "task_user_id";
         public static final String TASK_ID = "task_id";
+        public static final String SERVER_SYNC = "server_sync";
+        public static final String SERVER_STATUS = "server_status";
+
     }
 
     public static final String CREATE_TASKS_TABLE_SCRIPT =
@@ -193,7 +196,9 @@ public class BDTasksManager extends SQLiteOpenHelper {
             "create table " + TASKS_MEMBERS_TABLE_NAME + "(" +
                     ColumnTasksMembers.TASK_MEMBER_CVE + " " + INT_TYPE + " primary key autoincrement, " +
                     ColumnTasksMembers.TASK_ID + " " + INT_TYPE + "," +
-                    ColumnTasksMembers.TASK_ID_USER + " " + INT_TYPE +
+                    ColumnTasksMembers.TASK_ID_USER + " " + INT_TYPE + "," +
+                    ColumnTasksMembers.SERVER_SYNC + " " + INT_TYPE + "," +
+                    ColumnTasksMembers.SERVER_STATUS + " " + INT_TYPE +
                     ")";
 
     public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";

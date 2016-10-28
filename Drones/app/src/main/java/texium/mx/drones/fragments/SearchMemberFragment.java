@@ -115,11 +115,10 @@ public class SearchMemberFragment extends Fragment implements View.OnClickListen
         member_search_adapter.removeItem(position);
 
         //Move to preview list
-        if (position > 0) {
-            //activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(((position > 0) ? position - 1 : 0)));
-            //activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
+        if (taskGallery.size() > 0) {
+            activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(((position > 0) ? position - 1 : 0)));
         } else {
-            activityListener.closeFragment(Constants.FRAGMENT_SEARCH_MEMBER_GALLERY_TAG);
+            //activityListener.closeFragment(Constants.FRAGMENT_SEARCH_MEMBER_GALLERY_TAG);
         }
         setEmptyView(null);
     }

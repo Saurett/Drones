@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.fragments.MemberGalleryFragment;
 import texium.mx.drones.fragments.PreviewMemberFragment;
 import texium.mx.drones.fragments.SearchMemberFragment;
 import texium.mx.drones.fragments.inetrface.FragmentSearchListener;
@@ -80,12 +81,20 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
         previewMembers = new ArrayList<>();
 
         try {
-            List<Users> members = BDTasksManagerQuery.getMembers(getApplicationContext(),_TASK_INFO.getTask_id());
 
-            for (Users user :
-                    members) {
-                actualMembers.add(user.getIdUser());
+            List<Integer> serverSync = new ArrayList<>();
+
+            serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+            serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+            serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
+            List<TaskGallery> members = BDTasksManagerQuery.getMembers(getApplicationContext(),
+                    _TASK_INFO.getTask_id(), serverSync, null);
+
+            for (TaskGallery user : members) {
+                actualMembers.add(user.getId());
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -333,7 +342,10 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
                         for (TaskGallery taskGallery : _PREVIEW_MEMBERS) {
                             //TODO WEB SERVICE
                             previewMembers.remove(taskGallery.getId());
-                            BDTasksManagerQuery.addMember(getApplicationContext(),taskGallery.getId(),_TASK_INFO.getTask_id());
+                            BDTasksManagerQuery.addMember(getApplicationContext(),
+                                    taskGallery.getId(), _TASK_INFO.getTask_id(),
+                                    Constants.ITEM_SYNC_LOCAL_TABLET,
+                                    Constants.SERVER_SYNC_FALSE);
                         }
 
                         validOperation = true;
@@ -381,13 +393,15 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
                             String tempText = (textError.isEmpty() ? "Guardado correctamente" : textError);
                             Toast.makeText(getApplicationContext(), tempText, Toast.LENGTH_SHORT).show();
 
+                            MemberGalleryFragment.reloadMembers(true);
+
                             finish();
 
                             break;
                         case Constants.WS_KEY_ITEM_ADD_PREVIEW_MEMBER:
 
                             SearchMemberFragment.removeAt(_DECODE_GALLERY.getPosition());
-                            closeFragment(Constants.FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG);
+                            //closeFragment(Constants.FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG);
                             replaceFragmentPreviewFragment();
 
                             break;

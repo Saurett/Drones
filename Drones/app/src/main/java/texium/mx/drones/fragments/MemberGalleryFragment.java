@@ -56,6 +56,8 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
 
     private static Button memberGalleryBtn;
 
+    static Boolean reload = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -91,6 +93,13 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onStart() {
+
+        if (reload) {
+            activityListener.closeFragment(Constants.FRAGMENT_MEMBER_GALLERY_TAG);
+            activityListener.replaceFragmentMemberFragment();
+            reload = false;
+        }
+
         super.onStart();
     }
 
@@ -128,6 +137,11 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
     }
 
 
+    public static void reloadMembers(Boolean callWs) {
+        reload = callWs;
+    }
+
+
     public static void removeAt(int position) {
         taskGallery.remove(position);
         member_gallery_adapter.removeItem(position);
@@ -135,7 +149,6 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
         //Move to preview list
         if (position > 0) {
             activityListener.getDecodeGallery().setTaskGallery(taskGallery.get(((position > 0) ? position - 1 : 0)));
-            activityListener.openDescriptionFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
         } else {
             activityListener.closeFragment(Constants.FRAGMENT_PHOTO_GALLERY_TAG);
         }
@@ -267,22 +280,28 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
 
                 try {
 
+                    List<Integer> serverSync = new ArrayList<>();
 
-                    List<Users> allMembers = BDTasksManagerQuery.getMembers(getContext(),
-                            _TASK_INFO.getTask_id());
+                    serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                    serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                    serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
 
-                    for (Users user : allMembers) {
+                    List<TaskGallery> allMembers = BDTasksManagerQuery.getMembers(getContext(),
+                            _TASK_INFO.getTask_id(), serverSync, null);
+
+                    for (TaskGallery memberGallery : allMembers) {
                         TaskGallery member = new TaskGallery();
 
-                        member.setId(user.getIdActor());
-                        member.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
-                        member.setMember_name(user.getActorName().replaceAll("-"," ").trim());
-                        member.setMember_job(user.getActorTypeName());
+                        member.setCve(memberGallery.getCve());
+                        member.setId(memberGallery.getId());
+                        member.setSync_type(memberGallery.getSync_type());
+                        member.setMember_name(memberGallery.getMember_name().replaceAll("-"," ").trim());
+                        member.setMember_job(memberGallery.getMember_job());
 
                         member.setPhoto_bitmap(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.empty_member_profile));
 
-                        if (user.getProfilePicture() != null) {
-                            byte[] decodedString = Base64.decode(user.getProfilePicture(), Base64.DEFAULT);
+                        if (memberGallery.getBase_package() != null) {
+                            byte[] decodedString = Base64.decode(memberGallery.getBase_package(), Base64.DEFAULT);
                             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                             member.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 650, 650, true));
                         }
@@ -321,13 +340,6 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                         member_list.setLayoutManager(linearLayoutManager);
 
                         activityListener.setExtraDecodeGallery(taskGallery.get(0));
-
-                        /*
-                        FragmentManager fmDescription = getActivity().getSupportFragmentManager();
-                        FragmentTransaction description = fmDescription.beginTransaction();
-                        description.add(R.id.detail_gallery_container, new MemberGalleryDescriptionFragment(), Constants.FRAGMENT_MEMBER_GALLERY_TAG);
-                        description.commit();
-                        */
 
                     } else {
                         Toast.makeText(getActivity(), "La galeria de miembros se encuentra vacía", Toast.LENGTH_SHORT).show();

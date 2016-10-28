@@ -715,7 +715,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 e.printStackTrace();
                             }
 
-
                             try {
                                 Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
 

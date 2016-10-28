@@ -145,8 +145,15 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
+
+                            List<Integer> serverSync = new ArrayList<>();
+
+                            serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                            serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                            serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
                             Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
-                            tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                            tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
                             if (tempTaskList.size() > 0) validOperation = true;
                         }
 
@@ -160,7 +167,13 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                 Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
 
                 try {
-                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                    List<Integer> serverSync = new ArrayList<>();
+
+                    serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                    serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                    serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
+                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync);
                     validOperation = (tempTaskList.size() > 0);
                     textError =  (tempTaskList.size() > 0) ? textError
                             : getString(R.string.default_empty_task_list);
@@ -233,8 +246,14 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                             }
                         }
 
+                        List<Integer> serverSync = new ArrayList<>();
+
+                        serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
                         Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
-                        tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t);
+                        tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync);
 
                         for (Tasks tempTask : tempTaskList) {
                             Boolean contain = false;

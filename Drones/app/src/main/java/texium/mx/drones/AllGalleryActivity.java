@@ -50,6 +50,7 @@ import texium.mx.drones.models.DecodeGallery;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
+import texium.mx.drones.models.Users;
 import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.FileSoapServices;
 import texium.mx.drones.services.SoapServices;
@@ -63,6 +64,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
     private static final int GALLERY_MEMBER_ACTIVITY_REQUEST_CODE = 400;
 
     private static Tasks _TASK_INFO;
+    private static Users _SESSION_DATA;
     private ProgressDialog pDialog;
     private static DecodeGallery _DECODE_GALLERY;
     private Integer ACTUAL_GALLERY;
@@ -81,9 +83,11 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
         try {
             _TASK_INFO = (Tasks) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY);
+            _SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
         } catch (Exception e) {
             e.printStackTrace();
             getIntent().putExtra(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY, _TASK_INFO);
+            getIntent().putExtra(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY, _SESSION_DATA);
         }
 
         _DECODE_GALLERY = new DecodeGallery();
@@ -471,19 +475,30 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
             case R.id.item_document_delete:
             case R.id.item_member_delete:
 
-                if (syncType.equals(Constants.ITEM_SYNC_SERVER_DEFAULT)) {
-                    ad.setTitle(getString(R.string.default_title_alert_dialog));
-                    ad.setMessage(getString(R.string.default_no_delete_msg));
-                    ad.setCancelable(false);
-                    ad.setNeutralButton(getString(R.string.default_positive_button), this);
+                if (_TASK_INFO.getTask_user_id().equals(_SESSION_DATA.getIdUser())) {
 
+                    if (syncType.equals(Constants.ITEM_SYNC_SERVER_DEFAULT)) {
+                        ad.setTitle(getString(R.string.default_title_alert_dialog));
+                        ad.setMessage(getString(R.string.default_no_delete_msg));
+                        ad.setCancelable(false);
+                        ad.setNeutralButton(getString(R.string.default_positive_button), this);
+
+                    } else {
+                        ad.setTitle(getString(R.string.default_title_alert_dialog));
+                        ad.setMessage(getString(R.string.default_profile_delete_msg));
+                        ad.setCancelable(false);
+                        ad.setPositiveButton(getString(R.string.default_positive_button), this);
+                        ad.setNegativeButton(getString(R.string.default_negative_button), this);
+                    }
                 } else {
                     ad.setTitle(getString(R.string.default_title_alert_dialog));
-                    ad.setMessage(getString(R.string.default_profile_delete_msg));
+                    ad.setMessage("Solo el propietario de la tarea puede realizar esta acción.");
                     ad.setCancelable(false);
-                    ad.setPositiveButton(getString(R.string.default_positive_button), this);
-                    ad.setNegativeButton(getString(R.string.default_negative_button), this);
+                    ad.setNeutralButton(getString(R.string.default_positive_button), this);
                 }
+
+
+
 
                 break;
             case R.id.item_photo_description:
@@ -747,9 +762,17 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         switch (idView) {
                             case R.id.item_member_delete:
 
-                                //TODO eliminar en WS
+                                TaskGallery memberGallery = _DECODE_GALLERY.getTaskGallery();
+
+                                if (!memberGallery.getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
+                                    //TODO webService
+                                    throw new ConnectException("No hay internet");
+                                }
+
+                                validOperation = true;
 
                                 break;
+
                             default:
 
                                 if (!_DECODE_GALLERY.getTaskGallery().getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
@@ -762,7 +785,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         }
 
                         validOperation = true;
-
 
 
                         break;
@@ -1069,8 +1091,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         try {
 
                             validOperation = true;
-                            textError =  (_DECODE_GALLERY.getIdView().equals(R.id.item_member_delete)) ? "Miembro eliminado correctamente, pendiente a sincronizar con el servidor."
-                                    : "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
+                            textError = "Archivo eliminado correctamente, pendiente a sincronizar con el servidor.";
+
 
                             switch (ACTUAL_GALLERY) {
                                 case Constants.PICTURE_FILE_TYPE:
@@ -1080,6 +1102,20 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             , _TASK_INFO.getTask_user_id()
                                             , fileManager
                                             , textError.length() == 0);
+                                    break;
+                                case Constants.MEMBER_TYPE:
+
+                                    TaskGallery memberGallery = _DECODE_GALLERY.getTaskGallery();
+                                    memberGallery.setSync_type(Constants.ITEM_SYNC_SERVER_DELETE);
+                                    memberGallery.setSyncStatus(Constants.SERVER_SYNC_FALSE);
+
+                                    Integer syncType = _DECODE_GALLERY.getTaskGallery().getSync_type();
+
+                                    if (!syncType.equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
+                                        BDTasksManagerQuery.updateMember(getApplicationContext(), memberGallery);
+                                        textError = textError.replaceAll("Archivo","Miembro");
+                                    }
+
                                     break;
                                 /*case Constants.VIDEO_FILE_TYPE:
                                     TaskGallery videoGallery = new TaskGallery();
@@ -1143,16 +1179,29 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                     if (textError.isEmpty()) {
 
+                        txtDelete = (null != soapPrimitive) ? soapPrimitive.toString() : "Archivo borrado correctamente.";
+
                         try {
-                            BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
+
+                            if (_DECODE_GALLERY.getIdView().equals(R.id.item_member_delete)) {
+
+                                BDTasksManagerQuery.deleteMember(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
+                                txtDelete = txtDelete.replaceAll("Archivo","Miembro");
+                            } else {
+
+                                BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
+                            }
+
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        txtDelete = (null != soapPrimitive) ? soapPrimitive.toString() : "Archivo borrado correctamente";
+
                     } else {
 
                         try {
+
                             TaskGallery photoDelete = _DECODE_GALLERY.getTaskGallery();
                             photoDelete.setSync_type(Constants.ITEM_SYNC_SERVER_DELETE);
                             BDTasksManagerQuery.updateTaskFile(getApplicationContext(), photoDelete);

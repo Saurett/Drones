@@ -428,6 +428,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 Intent intentAG = new Intent(NavigationDrawerActivity.this, AllGalleryActivity.class);
                 intentAG.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_TASK_GALLERY, task);
+                intentAG.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, SESSION_DATA);
                 startActivity(intentAG);
 
                 break;

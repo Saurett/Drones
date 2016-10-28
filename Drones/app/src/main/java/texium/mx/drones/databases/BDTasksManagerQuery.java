@@ -27,7 +27,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 41;
+    static Integer BDVersion = 42;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -667,7 +667,7 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static void addMember(Context context, Integer idUser, Integer idTask) throws Exception {
+    public static void addMember(Context context, Integer idUser, Integer idTask, Integer serverSync, Integer serverStatus) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -676,6 +676,8 @@ public class BDTasksManagerQuery {
 
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID, idTask);
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID_USER, idUser);
+            cv.put(BDTasksManager.ColumnTasksMembers.SERVER_STATUS, serverStatus);
+            cv.put(BDTasksManager.ColumnTasksMembers.SERVER_SYNC, serverSync);
 
             bd.insert(BDTasksManager.TASKS_MEMBERS_TABLE_NAME, null, cv);
             bd.close();
@@ -686,14 +688,59 @@ public class BDTasksManagerQuery {
         }
     }
 
-    public static List<Users> getMembers(Context context, Integer idTask) throws Exception {
-        List<Users> data = new ArrayList<>();
+    public static void deleteMember(Context context, TaskGallery gallery) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
+            bd.delete(BDTasksManager.TASKS_MEMBERS_TABLE_NAME,
+                    BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE + " = " + gallery.getCve(), null);
+            bd.close();
+
+            Log.i("SQLite: ", "Update task_file in the bd ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+    }
+
+    public static void updateMember(Context context, TaskGallery memberGallery) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID, memberGallery.getIdTask());
+            cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID_USER, memberGallery.getId());
+            cv.put(BDTasksManager.ColumnTasksMembers.SERVER_STATUS, memberGallery.getSyncStatus());
+            cv.put(BDTasksManager.ColumnTasksMembers.SERVER_SYNC, memberGallery.getSync_type());
+
+            bd.update(BDTasksManager.TASKS_MEMBERS_TABLE_NAME, cv,
+                    BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE + " = " + memberGallery.getCve(),null) ;
+            bd.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+    }
+
+    public static List<TaskGallery> getMembers(Context context, Integer idTask, List<Integer> serverSync, Integer serverStatus) throws Exception {
+        List<TaskGallery> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            String querySync = (null != serverSync) ? " and " + BDTasksManager.ColumnTasksMembers.SERVER_SYNC + " in (" + serverSync + ")" : "";
+            querySync = querySync.replace("[", "");
+            querySync = querySync.replace("]", "");
+
+            String queryStatus = (null != serverStatus) ? " and " + BDTasksManager.ColumnTasksMembers.SERVER_STATUS + " = " + serverStatus : "";
+
             Cursor result = bd.rawQuery("select * from  " + BDTasksManager.TASKS_MEMBERS_TABLE_NAME
                     + " where " + BDTasksManager.ColumnTasksMembers.TASK_ID + " = " + idTask
+                    + querySync + queryStatus
                     + " order by 1 ASC", null);
 
             if (result.moveToFirst()) {
@@ -706,20 +753,73 @@ public class BDTasksManagerQuery {
                     if (resultTwo.moveToFirst()) {
                         do {
 
-                            Users temp = new Users();
+                            TaskGallery temp = new TaskGallery();
 
-                            temp.setCve_user(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USER_CVE)));
-                            temp.setIdUser(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USER_ID)));
-                            temp.setUserName(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USERNAME)));
-                            temp.setIdActor(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_ID)));
-                            temp.setActorName(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_NAME)));
-                            temp.setActorType(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE)));
-                            temp.setActorTypeName(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME)));
-                            temp.setLatitude(resultTwo.getDouble(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.LATITUDE)));
-                            temp.setLongitude(resultTwo.getDouble(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.LONGITUDE)));
-                            temp.setLastTeamConnection(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION)));
-                            temp.setPassword(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PASSWORD)));
-                            temp.setProfilePicture(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
+                            temp.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE)));
+                            temp.setId(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USER_ID)));
+                            temp.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.SERVER_SYNC)));
+                            temp.setMember_name(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_NAME)));
+                            temp.setMember_job(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME)));
+                            temp.setBase_package(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
+                            temp.setIdTask(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID)));
+
+                            data.add(temp);
+
+                        } while (resultTwo.moveToNext());
+                    }
+
+                } while (result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+        return data;
+    }
+
+    public static List<Tasks> getMemberTasks(Context context, Tasks tasks, List<Integer> serverSync, Integer serverStatus) throws Exception {
+        List<Tasks> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            String querySync = (null != serverSync) ? " and " + BDTasksManager.ColumnTasksMembers.SERVER_SYNC + " in (" + serverSync + ")" : "";
+            querySync = querySync.replace("[", "");
+            querySync = querySync.replace("]", "");
+
+            String queryStatus = (null != serverStatus) ? " and " + BDTasksManager.ColumnTasksMembers.SERVER_STATUS + " = " + serverStatus : "";
+
+            Cursor result = bd.rawQuery("select * from  " + BDTasksManager.TASKS_MEMBERS_TABLE_NAME
+                    + " where " + BDTasksManager.ColumnTasksMembers.TASK_ID_USER + " = " + tasks.getTask_user_id()
+                    + querySync + queryStatus
+                    + " order by 1 ASC", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    Cursor resultTwo = bd.rawQuery("select * from  " + BDTasksManager.TASKS_TABLE_NAME
+                            + " where " + BDTasksManager.ColumnTasks.TASK_ID + " = " + result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID))
+                            + " and " + BDTasksManager.ColumnTasks.TASK_STATUS + " = " + tasks.getTask_status()
+                            + " order by 1 ASC", null);
+
+                    if (resultTwo.moveToFirst()) {
+                        do {
+
+                            Tasks temp = new Tasks();
+
+                            temp.setTask_cve(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_CVE)));
+                            temp.setTask_tittle(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_TITLE)));
+                            temp.setTask_content(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_CONTENT)));
+                            temp.setTask_priority(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_PRIORITY)));
+                            temp.setTask_begin_date(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_BEGIN_DATE)));
+                            temp.setTask_end_date(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_END_DATE)));
+                            temp.setTask_id(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_ID)));
+                            temp.setTask_latitude(resultTwo.getDouble(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_LATITUDE)));
+                            temp.setTask_longitude(resultTwo.getDouble(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_LONGITUDE)));
+                            temp.setTask_status(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_STATUS)));
+                            temp.setTask_user_id(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnTasks.TASK_USER_ID)));
 
                             data.add(temp);
 
@@ -1095,7 +1195,7 @@ public class BDTasksManagerQuery {
         return data;
     }
 
-    public static List<Tasks> getListTaskByStatus(Context context, Tasks t) throws Exception {
+    public static List<Tasks> getListTaskByStatus(Context context, Tasks t, List<Integer> serverSync) throws Exception {
         List<Tasks> dataList = new ArrayList<>();
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
@@ -1126,6 +1226,8 @@ public class BDTasksManagerQuery {
                     Log.i("SQLite: ", "Get task in the bd with task_id :" + data.getTask_id());
                 } while (result.moveToNext());
             }
+
+            dataList.addAll(getMemberTasks(context,t,serverSync,null));
 
             bd.close();
         } catch (Exception e) {

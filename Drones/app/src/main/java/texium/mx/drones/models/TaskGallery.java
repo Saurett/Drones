@@ -17,9 +17,11 @@ public class TaskGallery implements Serializable {
     private Integer file_type;
     private String description;
     private Integer sync_type;
+    private Integer syncStatus;
     private String localURI;
     private String member_name;
     private String member_job;
+    private Integer idTask;
 
     public TaskGallery() {
     }
@@ -115,5 +117,21 @@ public class TaskGallery implements Serializable {
 
     public void setMember_job(String member_job) {
         this.member_job = member_job;
+    }
+
+    public Integer getIdTask() {
+        return idTask;
+    }
+
+    public void setIdTask(Integer idTask) {
+        this.idTask = idTask;
+    }
+
+    public Integer getSyncStatus() {
+        return syncStatus;
+    }
+
+    public void setSyncStatus(Integer syncStatus) {
+        this.syncStatus = syncStatus;
     }
 }

@@ -22,6 +22,7 @@ public class TaskGallery implements Serializable {
     private String member_name;
     private String member_job;
     private Integer idTask;
+    private Integer idMember;
 
     public TaskGallery() {
     }
@@ -133,5 +134,13 @@ public class TaskGallery implements Serializable {
 
     public void setSyncStatus(Integer syncStatus) {
         this.syncStatus = syncStatus;
+    }
+
+    public Integer getIdMember() {
+        return idMember;
+    }
+
+    public void setIdMember(Integer idMember) {
+        this.idMember = idMember;
     }
 }

@@ -34,6 +34,7 @@ import texium.mx.drones.models.DecodeGallery;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
+import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 
 
@@ -187,91 +188,63 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                     case Constants.WS_KEY_ITEM_MEMBER_GALLERY:
 
                         tempGalleryList = new ArrayList<>();
-                        List<TaskGallery> memberGalleries = new ArrayList<>();
 
-                        throw new ConnectException("Aqui va la cosa");
+                        soapObject = SoapServices.getServerAllMembers(getContext(), _TASK_INFO.getTask_id());
 
-                        /*
+                        for (int i = 0; i < soapObject.getPropertyCount(); i++) {
 
-                        soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0, Constants.PICTURE_FILE_TYPE);
+                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
 
-                        if (soapObject.hasProperty(Constants.SOAP_PROPERTY_DIFFGRAM)) {
-                            SoapObject soDiffGram = (SoapObject) soapObject.getProperty(Constants.SOAP_PROPERTY_DIFFGRAM);
-                            if (soDiffGram.hasProperty(Constants.SOAP_PROPERTY_NEW_DATA_SET)) {
-                                SoapObject soNewDataSet = (SoapObject) soDiffGram.getProperty(Constants.SOAP_PROPERTY_NEW_DATA_SET);
+                            TaskGallery member = new TaskGallery();
 
-                                for (int i = 0; i < soNewDataSet.getPropertyCount(); i++) {
-                                    SoapObject soItem = (SoapObject) soNewDataSet.getProperty(i);
+                            member.setId(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                            member.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
+                            member.setIdMember(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                            member.setIdTask(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
 
-                                    TaskGallery photoServer = new TaskGallery();
+                            TaskGallery memberLocal = BDTasksManagerQuery.getTaskMember(getContext(), member);
 
-                                    Integer systemType = (Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SYSTEM_ID).toString()).
-                                            equals(Constants.ITEM_SYNC_SERVER_DEFAULT)
-                                            ? Constants.ITEM_SYNC_SERVER_DEFAULT : Constants.ITEM_SYNC_SERVER_CLOUD);
+                            Boolean exist = (memberLocal.getCve() != null);
 
-                                    photoServer.setId(Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
-                                    photoServer.setSync_type(systemType);
-
-                                    if (soItem.hasProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT)) {
-                                        photoServer.setDescription(soItem.getPrimitiveProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                                    }
-
-                                    photoServer.setFile_type(Constants.PICTURE_FILE_TYPE);
-
-                                    TaskGallery photoLocal = BDTasksManagerQuery.getFileByServerId(getContext(), photoServer);
-
-                                    Boolean exist = (photoLocal.getCve() != null);
-
-                                    if (!exist) {
-
-                                        TaskGallery decodePhoto =  FileServices.downloadFile(getActivity(),soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS).toString());
-
-                                        if (decodePhoto.getPhoto_bitmap() == null) continue;
-
-                                        photoServer.setLocalURI(decodePhoto.getLocalURI());
-                                        photoServer.setPhoto_bitmap(decodePhoto.getPhoto_bitmap());
-                                        photoServer.setBase_package(FileServices.attachImgFromBitmap(photoServer.getPhoto_bitmap(), 50));
-                                        memberGalleries.add(photoServer);
-                                    }
-                                }
+                            if (!exist) {
+                                BDTasksManagerQuery.addMember(getContext(),member.getIdMember(),member.getIdTask(),Constants.ITEM_SYNC_SERVER_CLOUD, member.getSync_type());
                             }
                         }
 
-                        if (!memberGalleries.isEmpty()) {
+                        List<Integer> serverSync = new ArrayList<>();
 
-                            FilesManager filesManager = new FilesManager();
-                            filesManager.setTaskGalleries(memberGalleries);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                        serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
 
-                            BDTasksManagerQuery.addTaskDetailPhotoGallery(getContext(), _TASK_INFO.getTask_id(),
-                                    "Se agregan imagenes por ws", _TASK_INFO.getTask_status(), _TASK_INFO.getTask_user_id(),
-                                    filesManager, true);
-                        }
+                        List<TaskGallery> allMembers = BDTasksManagerQuery.getMembers(getContext(),
+                                _TASK_INFO.getTask_id(), serverSync, null);
 
-                        List<Integer> taskGallery = BDTasksManagerQuery.getListTaskDetail(getContext(), _TASK_INFO.getTask_id());
+                        for (TaskGallery memberGallery : allMembers) {
+                            TaskGallery member = new TaskGallery();
 
-                        if (!taskGallery.isEmpty()) {
-                            List<TaskGallery> allPhotos = BDTasksManagerQuery.getGalleryFiles(
-                                    getContext(), taskGallery, Constants.PICTURE_FILE_TYPE, null, Constants.ACTIVE);
+                            member.setCve(memberGallery.getCve());
+                            member.setId(memberGallery.getId());
+                            member.setSync_type(memberGallery.getSync_type());
+                            member.setMember_name(memberGallery.getMember_name().replaceAll("-"," ").trim());
+                            member.setMember_job(memberGallery.getMember_job());
+                            member.setIdMember(memberGallery.getIdMember());
+                            member.setIdTask(memberGallery.getIdTask());
 
-                            for (TaskGallery photo : allPhotos) {
+                            member.setPhoto_bitmap(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.empty_member_profile));
 
-                                if (photo.getBase_package() == null) continue;
-
-                                byte[] decodedString = Base64.decode(photo.getBase_package(), Base64.DEFAULT);
+                            if (memberGallery.getBase_package() != null) {
+                                byte[] decodedString = Base64.decode(memberGallery.getBase_package(), Base64.DEFAULT);
                                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                photo.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 800, 500, true));
-
-                                tempGalleryList.add(photo);
+                                member.setPhoto_bitmap(Bitmap.createScaledBitmap(decodedByte, 650, 650, true));
                             }
-                        }
 
+                            tempGalleryList.add(member);
+                        }
 
                         validOperation = true;
 
-
                         break;
-
-                        */
                 }
             } catch (ConnectException e) {
 
@@ -297,6 +270,8 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                         member.setSync_type(memberGallery.getSync_type());
                         member.setMember_name(memberGallery.getMember_name().replaceAll("-"," ").trim());
                         member.setMember_job(memberGallery.getMember_job());
+                        member.setIdMember(memberGallery.getIdMember());
+                        member.setIdTask(memberGallery.getIdTask());
 
                         member.setPhoto_bitmap(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.empty_member_profile));
 

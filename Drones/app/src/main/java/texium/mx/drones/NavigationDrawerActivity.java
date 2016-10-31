@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +28,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -85,13 +87,14 @@ import texium.mx.drones.utils.Constants;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, View.OnClickListener, FragmentTaskListener, LocationListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
+        View.OnClickListener, FragmentTaskListener, LocationListener, DialogInterface.OnClickListener {
 
     //Google Maps manager//
     private GoogleMap mMap;
 
     //Principal Buttons//
-    private FloatingActionButton fab, chat_fab, camera_fab, video_fab;
+    private FloatingActionButton fab, direction_fab, camera_fab, video_fab;
 
     //Dynamic Header//
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
@@ -165,13 +168,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         //Principal floatingButtons//
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        chat_fab = (FloatingActionButton) findViewById(R.id.chat_fab);
+        direction_fab = (FloatingActionButton) findViewById(R.id.direction_fab);
         camera_fab = (FloatingActionButton) findViewById(R.id.camera_fab);
         video_fab = (FloatingActionButton) findViewById(R.id.video_fab);
 
         //Button listeners//
         fab.setOnClickListener(this);
-        chat_fab.setOnClickListener(this);
+        direction_fab.setOnClickListener(this);
         camera_fab.setOnClickListener(this);
         video_fab.setOnClickListener(this);
 
@@ -261,7 +264,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case R.id.fab:
                 callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION);
                 break;
-            case R.id.chat_fab:
+            case R.id.direction_fab:
+
+                // Directions
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(
+                        "http://maps.google.com/maps?saddr=51.5, 0.125&daddr=51.5, 0.15"));
+                startActivity(intent);
+
                 Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
@@ -339,6 +348,24 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
+    public void showQuestion() {
+
+        AlertDialog.Builder ad = new AlertDialog.Builder(this);
+
+        ad.setTitle(getString(R.string.default_title_alert_dialog));
+        ad.setMessage(getString(R.string.default_no_action));
+        ad.setCancelable(false);
+        ad.setNeutralButton(getString(R.string.default_positive_button), this);
+
+        ad.show();
+
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+    }
+
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
@@ -377,49 +404,80 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 */
             case R.id.agree_task_button:
 
-                tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
-                tasksDecode.setTask_comment(getString(R.string.default_task_agree_msg));
-                tasksDecode.setOrigin_button(v.getId());
-                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                if (task.getTask_user_id().equals(SESSION_DATA.getIdUser())) {
 
-                AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
-                wsAgree.execute();
+                    tasksDecode.setTask_update_to(Constants.PROGRESS_TASK);
+                    tasksDecode.setTask_comment(getString(R.string.default_task_agree_msg));
+                    tasksDecode.setOrigin_button(v.getId());
+                    tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+
+                    AsyncCallWS wsAgree = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
+                    wsAgree.execute();
+
+                } else {
+                    showQuestion();
+                }
 
                 break;
             case R.id.decline_task_button:
 
-                tasksDecode.setOrigin_button(v.getId());
-                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-                setToken(v, taskListAdapter, task, tasksDecode, null);
+                if (task.getTask_user_id().equals(SESSION_DATA.getIdUser())) {
 
-                closeActiveTaskFragment(v);
+                    tasksDecode.setOrigin_button(v.getId());
+                    tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                    setToken(v, taskListAdapter, task, tasksDecode, null);
 
-                FragmentTransaction declineFragment = fragmentManager.beginTransaction();
-                declineFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
-                declineFragment.commit();
+                    closeActiveTaskFragment(v);
+
+                    FragmentTransaction declineFragment = fragmentManager.beginTransaction();
+                    declineFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
+                    declineFragment.commit();
+
+                } else {
+                    showQuestion();
+                }
+
 
                 break;
             case R.id.finish_task_button:
 
-                tasksDecode.setOrigin_button(v.getId());
-                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-                setToken(v, taskListAdapter, task, tasksDecode, null);
+                if (task.getTask_user_id().equals(SESSION_DATA.getIdUser())) {
 
-                closeActiveTaskFragment(v);
+                    tasksDecode.setOrigin_button(v.getId());
+                    tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                    setToken(v, taskListAdapter, task, tasksDecode, null);
 
-                FragmentTransaction finishFragment = fragmentManager.beginTransaction();
-                finishFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
-                finishFragment.commit();
+                    closeActiveTaskFragment(v);
+
+                    FragmentTransaction finishFragment = fragmentManager.beginTransaction();
+                    finishFragment.add(R.id.tasks_finish_fragment_container, new FinishTasksFragment(), Constants.FRAGMENT_FINISH_TAG);
+                    finishFragment.commit();
+
+                } else {
+
+                    showQuestion();
+
+                }
+
 
                 break;
             case R.id.send_task_button:
-                closeActiveTaskFragment(v);
 
-                tasksDecode.setTask_update_to((tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
-                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                if (task.getTask_user_id().equals(SESSION_DATA.getIdUser())) {
 
-                AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
-                wsClose.execute();
+                    closeActiveTaskFragment(v);
+
+                    tasksDecode.setTask_update_to((tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
+                    tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+
+                    AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
+                    wsClose.execute();
+
+                } else {
+                    showQuestion();
+                }
+
+
                 break;
             case R.id.gallery_task_button:
             case R.id.gallery_task_gallery:
@@ -799,7 +857,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
 
             mMap = googleMap;
-            mMap.setMyLocationEnabled(true);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
             mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
@@ -811,6 +868,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
 
         }
+        mMap.getUiSettings().setMapToolbarEnabled(true);
 
     }
 
@@ -831,32 +889,26 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 //mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
                 mo.icon(BitmapDescriptorFactory.fromResource(Constants.MAP_STATUS_ICON.get(actualTask.getTask_priority())));
                 mMap.addMarker(mo);
+
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        // TODO Auto-generated method stub
+
+                        LatLng latLng = marker.getPosition();
+                        LatLng cdMx = new LatLng(latLng.latitude, latLng.longitude - 0.002);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
+
+                        //TODO EN CASO QUE PIDAN LA DIRECCIÓN
+                        //direction_fab.setVisibility(View.VISIBLE);
+
+                        marker.showInfoWindow();
+                        return true;
+                    }
+                });
             }
 
-            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    // TODO Auto-generated method stub
-
-                    LatLng latLng = marker.getPosition();
-                    LatLng cdMx = new LatLng(latLng.latitude, latLng.longitude - 0.002);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
-                    marker.showInfoWindow();
-
-                    /*
-                    LatLng point = marker.getPosition();
-                    CameraPosition cameraPosition1 = new CameraPosition.Builder()
-                            .target(point)
-                            .tilt(900)
-                            .zoom(10)
-                            .build();
-
-                    mMap.animateCamera(CameraUpdateFactory
-                            .newCameraPosition(cameraPosition1));
-                            */
-                    return true;
-                }
-            });
+            mMap.getUiSettings().setMapToolbarEnabled(true);
         }
     }
 
@@ -1022,6 +1074,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
     }
+
 
     //WEB SERVICE CLASS CALL//
     private class AsyncCallWS extends AsyncTask<Void, String, Boolean> {

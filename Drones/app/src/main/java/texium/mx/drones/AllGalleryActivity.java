@@ -492,7 +492,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                     }
                 } else {
                     ad.setTitle(getString(R.string.default_title_alert_dialog));
-                    ad.setMessage("Solo el propietario de la tarea puede realizar esta acción.");
+                    ad.setMessage(getString(R.string.default_no_action));
                     ad.setCancelable(false);
                     ad.setNeutralButton(getString(R.string.default_positive_button), this);
                 }
@@ -765,11 +765,10 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 TaskGallery memberGallery = _DECODE_GALLERY.getTaskGallery();
 
                                 if (!memberGallery.getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
-                                    //TODO webService
-                                    throw new ConnectException("No hay internet");
+                                    soapPrimitive = SoapServices.deleteTaskMember(getApplicationContext(),memberGallery,_SESSION_DATA.getIdUser());
+                                    BDTasksManagerQuery.deleteMember(getApplicationContext(),memberGallery);
+                                    validOperation = (soapPrimitive != null);
                                 }
-
-                                validOperation = true;
 
                                 break;
 
@@ -784,9 +783,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 break;
                         }
 
-                        validOperation = true;
-
-
                         break;
                     case Constants.WS_KEY_ITEM_SYNC:
 
@@ -794,6 +790,38 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         Integer idUser = _TASK_INFO.getTask_user_id();
 
                         switch (ACTUAL_GALLERY) {
+                            case Constants.MEMBER_TYPE:
+
+                                List<Integer> serverSync = new ArrayList<>();
+
+                                serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                                serverSync.add(Constants.ITEM_SYNC_SERVER_DELETE);
+
+                                List<TaskGallery> galleryMembers = BDTasksManagerQuery.getMembers(getApplicationContext(),_TASK_INFO.getTask_id(),serverSync,null);
+
+                                for (TaskGallery memberGallery : galleryMembers) {
+
+                                    if (memberGallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DELETE)) {
+
+                                        soapPrimitive = SoapServices.deleteTaskMember(getApplicationContext(),memberGallery,_SESSION_DATA.getIdUser());
+                                        BDTasksManagerQuery.deleteMember(getApplicationContext(), memberGallery);
+
+                                    } else {
+
+                                        //SYNC WITH THE SERVER
+
+                                        soapPrimitive = SoapServices.addTaskMember(getApplicationContext(),memberGallery,_SESSION_DATA.getIdUser());
+                                        memberGallery.setId(Integer.valueOf(soapPrimitive.toString()));
+                                        memberGallery.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
+                                        BDTasksManagerQuery.updateMember(getApplicationContext(), memberGallery);
+
+                                    }
+
+                                }
+
+                                validOperation = true;
+
+                                break;
                             case Constants.PICTURE_FILE_TYPE:
                                 itemSync = FileSoapServices.syncAllFiles(getApplicationContext(), _TASK_INFO.getTask_id(), _TASK_INFO.getTask_user_id());
                                 validOperation = true;
@@ -1085,6 +1113,9 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 }
             } catch (ConnectException e) {
 
+                textError = e.getMessage();
+                validOperation = false;
+
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_ITEM_DELETE:
 
@@ -1267,6 +1298,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                         case Constants.DOCUMENT_FILE_TYPE:
                             closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
                             openListFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_LIST_TAG);
+                            Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
+                            break;
+                        case Constants.MEMBER_TYPE:
+
+                            textSync = "Sincronizado correctamente ...";
+
+                            replaceFragmentMemberFragment();
                             Toast.makeText(AllGalleryActivity.this, textSync, Toast.LENGTH_LONG).show();
                             break;
                     }

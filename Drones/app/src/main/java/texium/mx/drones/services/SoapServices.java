@@ -567,7 +567,7 @@ public class SoapServices {
     public static SoapObject getTaskFiles(Context context, Integer idTask, Integer idSystem, Integer extension) throws Exception {
         SoapObject soapObject;
         try {
-            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_TASK_FILES;
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_TASK_FILES;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_TASK_FILES;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
             String URL = BDTasksManagerQuery.getServer(context);
@@ -762,5 +762,152 @@ public class SoapServices {
         }
 
         return soapPrimitive;
+    }
+
+    public static SoapPrimitive addTaskMember(Context context, TaskGallery taskGallery, Integer idUser) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ADD_MEMBER;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ADD_MEMBER;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_ID, taskGallery.getIdTask());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID, taskGallery.getIdMember());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_ACTUAL_USER_ID, idUser);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (EOFException e ) {
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapPrimitive deleteTaskMember(Context context, TaskGallery taskGallery, Integer idUser) throws Exception {
+        SoapPrimitive soapPrimitive;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_DELETE_MEMBER;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_DELETE_MEMBER;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_ID, taskGallery.getId());
+            Request.addProperty(Constants.SOAP_OBJECT_KEY_TASK_ACTUAL_USER_ID, idUser);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapPrimitive = (SoapPrimitive) soapEnvelope.getResponse();
+
+        } catch (EOFException e ) {
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapPrimitive;
+    }
+
+    public static SoapObject getServerAllMembers(Context context, Integer idTask) throws Exception {
+        SoapObject soapObject;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_TASKS_MEMBERS;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ALL_TASKS_MEMBERS;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, idTask);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapObject = (SoapObject) soapEnvelope.getResponse();
+
+        } catch (EOFException e ) {
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapObject;
     }
 }

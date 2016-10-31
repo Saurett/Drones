@@ -254,10 +254,10 @@ public class SearchMemberFragment extends Fragment implements View.OnClickListen
                             allUsers) {
                         TaskGallery member = new TaskGallery();
 
-                        member.setId(user.getIdActor());
                         member.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
                         member.setMember_name(user.getActorName().replaceAll("-"," ").trim());
                         member.setMember_job(user.getActorTypeName());
+                        member.setIdMember(user.getIdActor());
 
                         member.setPhoto_bitmap(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.empty_member_profile));
 

@@ -30,7 +30,6 @@ import texium.mx.drones.fragments.inetrface.FragmentSearchListener;
 import texium.mx.drones.models.DecodeGallery;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
-import texium.mx.drones.models.Users;
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -92,7 +91,7 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
                     _TASK_INFO.getTask_id(), serverSync, null);
 
             for (TaskGallery user : members) {
-                actualMembers.add(user.getId());
+                actualMembers.add(user.getIdMember());
             }
 
         } catch (Exception e) {
@@ -229,7 +228,7 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
         Integer idMember = 0;
 
         try {
-            idMember = _DECODE_GALLERY.getTaskGallery().getId();
+            idMember = _DECODE_GALLERY.getTaskGallery().getIdMember();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -341,9 +340,9 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
 
                         for (TaskGallery taskGallery : _PREVIEW_MEMBERS) {
                             //TODO WEB SERVICE
-                            previewMembers.remove(taskGallery.getId());
+                            previewMembers.remove(taskGallery.getIdMember());
                             BDTasksManagerQuery.addMember(getApplicationContext(),
-                                    taskGallery.getId(), _TASK_INFO.getTask_id(),
+                                    taskGallery.getIdMember(), _TASK_INFO.getTask_id(),
                                     Constants.ITEM_SYNC_LOCAL_TABLET,
                                     Constants.SERVER_SYNC_FALSE);
                         }
@@ -358,7 +357,7 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
 
                         TaskGallery taskGallery = _DECODE_GALLERY.getTaskGallery();
 
-                        previewMembers.add(taskGallery.getId());
+                        previewMembers.add(taskGallery.getIdMember());
                         _PREVIEW_MEMBERS.add(taskGallery);
 
                         validOperation = true;
@@ -366,7 +365,7 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
                         break;
                     case Constants.WS_KEY_ITEM_DELETE_PREVIEW_MEMBER:
 
-                        previewMembers.remove(_DECODE_GALLERY.getTaskGallery().getId());
+                        previewMembers.remove(_DECODE_GALLERY.getTaskGallery().getIdMember());
                         _PREVIEW_MEMBERS.remove(_DECODE_GALLERY.getTaskGallery());
 
                         validOperation = true;

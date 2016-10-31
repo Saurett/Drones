@@ -147,18 +147,22 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_SAVE_PHOTO_FILE = "192.168.12.10/AgregarArchivo";
     public static final String WEB_SERVICE_SOAP_ACTION_UPDATE_PHOTO_FILE = "192.168.12.10/ModificarArchivo";
     public static final String WEB_SERVICE_SOAP_ACTION_APP_VERSION = "192.168.12.10/ObtenerVersionMovil";
-    public static final String WEB_SERVICE_SOAP_TASK_FILES = "192.168.12.10/ArchivosTareas";
+    public static final String WEB_SERVICE_SOAP_ACTION_TASK_FILES = "192.168.12.10/ArchivosTareas";
+    public static final String WEB_SERVICE_SOAP_ACTION_ADD_MEMBER = "192.168.12.10/AgregarMiembro";
+    public static final String WEB_SERVICE_SOAP_ACTION_DELETE_MEMBER = "192.168.12.10/EliminarMiembro";
+    public static final String WEB_SERVICE_SOAP_ACTION_ALL_TASKS_MEMBERS   = "192.168.12.10/ConsultarMiembrosTarea";
+
 
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
-    /*
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.65/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    */
 
+    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://170.0.12.51/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
+    */
 
     //endregion SOAP CONFIGURATION//
 
@@ -180,8 +184,13 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_DELETE_PHOTO_FILE = "EliminarArchivo";
     public static final String WEB_SERVICE_METHOD_NAME_SAVE_PHOTO_FILE = "AgregarArchivo";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_PHOTO_FILE = "ModificarArchivo";
-    public static final String WEB_SERVICE_METHOD_NAME_APP_VERSION= "ObtenerVersionMovil";
-    public static final String WEB_SERVICE_METHOD_NAME_TASK_FILES= "ArchivosTareas";
+    public static final String WEB_SERVICE_METHOD_NAME_APP_VERSION = "ObtenerVersionMovil";
+    public static final String WEB_SERVICE_METHOD_NAME_TASK_FILES = "ArchivosTareas";
+    public static final String WEB_SERVICE_METHOD_NAME_ADD_MEMBER = "AgregarMiembro";
+    public static final String WEB_SERVICE_METHOD_NAME_DELETE_MEMBER = "EliminarMiembro";
+    public static final String WEB_SERVICE_METHOD_NAME_ALL_TASKS_MEMBERS = "ConsultarMiembrosTarea";
+
+
     //endregion SOAP OPERATION//
 
     //region WEB SERVICE PARAMS//
@@ -246,6 +255,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_TASK_ID = "IDTarea";
     public static final String SOAP_OBJECT_KEY_DECODE_BASE_64 = "Base64";
     public static final String SOAP_OBJECT_KEY_FILE_DESCRIPTION = "Descripcion";
+    public static final String SOAP_OBJECT_KEY_TASK_ACTUAL_USER_ID = "IDUsuarioActual";
     //endregion SOAP KEYS//
 
     //region ACTIVITY PARAMS//

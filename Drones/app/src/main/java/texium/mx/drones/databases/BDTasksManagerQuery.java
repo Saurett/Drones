@@ -27,7 +27,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 42;
+    static Integer BDVersion = 43;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -712,9 +712,11 @@ public class BDTasksManagerQuery {
             ContentValues cv = new ContentValues();
 
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID, memberGallery.getIdTask());
-            cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID_USER, memberGallery.getId());
+            cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID_USER, memberGallery.getIdMember());
             cv.put(BDTasksManager.ColumnTasksMembers.SERVER_STATUS, memberGallery.getSyncStatus());
             cv.put(BDTasksManager.ColumnTasksMembers.SERVER_SYNC, memberGallery.getSync_type());
+            cv.put(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_ID, memberGallery.getId());
+
 
             bd.update(BDTasksManager.TASKS_MEMBERS_TABLE_NAME, cv,
                     BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE + " = " + memberGallery.getCve(),null) ;
@@ -756,12 +758,16 @@ public class BDTasksManagerQuery {
                             TaskGallery temp = new TaskGallery();
 
                             temp.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE)));
-                            temp.setId(resultTwo.getInt(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.USER_ID)));
+                            temp.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_ID)));
+                            temp.setIdMember(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID_USER)));
                             temp.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.SERVER_SYNC)));
                             temp.setMember_name(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_NAME)));
                             temp.setMember_job(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME)));
                             temp.setBase_package(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
                             temp.setIdTask(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID)));
+                            temp.setSyncStatus(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.SERVER_STATUS)));
+
+
 
                             data.add(temp);
 
@@ -776,6 +782,54 @@ public class BDTasksManagerQuery {
             e.printStackTrace();
             throw new Exception("Database error");
         }
+        return data;
+    }
+
+    public static TaskGallery getTaskMember(Context context, TaskGallery member) throws Exception {
+        TaskGallery data = new TaskGallery();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from  " + BDTasksManager.TASKS_MEMBERS_TABLE_NAME
+                    + " where " + BDTasksManager.ColumnTasksMembers.TASK_MEMBER_ID + " = " + member.getId()
+                    + " and " + BDTasksManager.ColumnTasksMembers.TASK_ID_USER + " = " + member.getIdMember()
+                    + " and " + BDTasksManager.ColumnTasksMembers.TASK_ID + " = " + member.getIdTask()
+                    + " order by 1 ASC", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    Cursor resultTwo = bd.rawQuery("select * from  " + BDTasksManager.USERS_TABLE_NAME
+                            + " where " + BDTasksManager.ColumnUsers.USER_ID + " = " + result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID_USER))
+                            + " order by 1 ASC", null);
+
+                    if (resultTwo.moveToFirst()) {
+                        do {
+
+
+                            data.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE)));
+                            data.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_ID)));
+                            data.setIdMember(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID_USER)));
+                            data.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.SERVER_SYNC)));
+                            data.setMember_name(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_NAME)));
+                            data.setMember_job(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME)));
+                            data.setBase_package(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
+                            data.setIdTask(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID)));
+                            data.setSyncStatus(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.SERVER_STATUS)));
+
+                        } while (resultTwo.moveToNext());
+                    }
+
+                } while (result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+
         return data;
     }
 
@@ -1341,10 +1395,12 @@ public class BDTasksManagerQuery {
             bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_TABLE_NAME);
             bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASK_DETAILS_TABLE_NAME);
             bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_FILES_TABLE_NAME);
+            bd.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_MEMBERS_TABLE_NAME);
 
             bd.execSQL(BDTasksManager.CREATE_TASKS_TABLE_SCRIPT);
             bd.execSQL(BDTasksManager.CREATE_TASK_DETAILS_TABLE_SCRIPT);
             bd.execSQL(BDTasksManager.CREATE_TASKS_FILES_TABLE_SCRIPT);
+            bd.execSQL(BDTasksManager.CREATE_TASKS_MEMBERS_TABLE_SCRIPT);
 
             bd.close();
         } catch (Exception e) {
@@ -1380,4 +1436,6 @@ public class BDTasksManagerQuery {
 
         return data;
     }
+
+
 }

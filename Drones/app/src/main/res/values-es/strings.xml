@@ -98,6 +98,7 @@
     <string name="default_no_add_member_three">El miembro no puede ser agregado a la tarea, El es el responsable.</string>
     <string name="default_member_msg">"Cargando miembros ... "</string>
     <string name="default_save_members">Asignando miembros a la tarea ...</string>
+    <string name="default_no_action">Solo el propietario de la tarea puede realizar esta acción.</string>
 
 
 </resources>

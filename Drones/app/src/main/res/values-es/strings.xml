@@ -99,6 +99,8 @@
     <string name="default_member_msg">"Cargando miembros ... "</string>
     <string name="default_save_members">Asignando miembros a la tarea ...</string>
     <string name="default_no_action">Solo el propietario de la tarea puede realizar esta acción.</string>
+    <string name="title_activity_tab">Galeria Adjunta</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 
 </resources>

@@ -150,7 +150,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
 
         try {
-            ACTUAL_FRAGMENT = (String) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_NEW_TASK);
+            ACTUAL_FRAGMENT = (String) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_ACTUAL_FRAGMENT);
         } catch (Exception e) {
             e.printStackTrace();
         }

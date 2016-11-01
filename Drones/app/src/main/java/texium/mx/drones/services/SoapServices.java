@@ -202,7 +202,7 @@ public class SoapServices {
         return soapPrimitive;
     }
 
-    public static SoapObject getServerAllUsers(Context context) throws Exception {
+    public static SoapObject getServerAllUsers(Context context,String name) throws Exception {
         SoapObject soapObject;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_USERS;
@@ -211,6 +211,8 @@ public class SoapServices {
             String URL = BDTasksManagerQuery.getServer(context);
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_NAME, name);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;

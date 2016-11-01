@@ -156,13 +156,13 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
+    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    */
 
-    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://170.0.12.51/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
-    */
 
     //endregion SOAP CONFIGURATION//
 
@@ -177,7 +177,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_TASK = "ActualizarTarea";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_LOCATION = "SincronizarCoordenadas";
     public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
-    public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "LoginMovil";
+    public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "ListadoUsuarios";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_DOCUMENT = "AgregarPDF";
     public static final String WEB_SERVICE_METHOD_NAME_FORGET_USERNAME = "RecuperarContrasena";
@@ -214,6 +214,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_VIDEO_LAST_ONE = "Ultimo";
     public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "CorreoElectronico";
     public static final String WEB_SERVICE_PARAM_DESCRIPTION = "Descripcion";
+    public static final String WEB_SERVICE_PARAM_NAME = "Nombre";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//
@@ -262,7 +263,7 @@ public final class Constants {
     public static final String ACTIVITY_EXTRA_PARAMS_LOGIN = "data";
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY = "task_gallery_info";
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY_DESCRIPTION = "task_gallery_description";
-    public static final String ACTIVITY_EXTRA_PARAMS_NEW_TASK = "new_task";
+    public static final String ACTIVITY_EXTRA_PARAMS_ACTUAL_FRAGMENT = "actual_fragment";
     //endregion ACTIVITY PARAMS//
 
     //region ACCESS TO MAP TASK PRIORITY//
@@ -313,6 +314,16 @@ public final class Constants {
         MAP_STATUS_COLOR.put(TASK_PRIORITY_TOP_ID,R.color.colorPriorityTop);
         MAP_STATUS_COLOR.put(TASK_PRIORITY_EXPRESS_ID,R.color.colorPriorityExpress);
     }
+
+    public static Map<Integer,String> MAP_STATUS_FRAGMENT;
+    static {
+        MAP_STATUS_FRAGMENT = new HashMap<>();
+        MAP_STATUS_FRAGMENT.put(NEWS_TASK,FRAGMENT_NEWS_TAG);
+        MAP_STATUS_FRAGMENT.put(PROGRESS_TASK,FRAGMENT_PROGRESS_TAG);
+        MAP_STATUS_FRAGMENT.put(PENDING_TASK,FRAGMENT_PENDING_TAG);
+        MAP_STATUS_FRAGMENT.put(CLOSE_TASK,FRAGMENT_CLOSE_TAG);
+    }
+
 
     //endregion ACCESS TO MAP PRIORITY//
 

@@ -15,6 +15,7 @@ import org.ksoap2.serialization.SoapObject;
 
 import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.utils.Constants;
@@ -43,7 +44,7 @@ public class NotificationService {
         Users user = (Users) activity.getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
         Intent resultIntent = new Intent(context, activity.getClass());
-        resultIntent.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_NEW_TASK, Constants.FRAGMENT_NEWS_TAG);
+        resultIntent.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_ACTUAL_FRAGMENT, Constants.MAP_STATUS_FRAGMENT.get(task.getTask_status()));
         resultIntent.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
@@ -104,9 +105,95 @@ public class NotificationService {
                     }
                 }
             }
+
+            soapObject = SoapServices.getServerAllMembers(context, 0);
+
+            for (int i = 0; i < soapObject.getPropertyCount(); i++) {
+
+                SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+
+                TaskGallery memberServer = new TaskGallery();
+
+                memberServer.setId(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                memberServer.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
+                memberServer.setServerSync(Constants.SERVER_SYNC_TRUE);
+                memberServer.setIdMember(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
+                memberServer.setIdTask(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
+
+                Integer idTaskUser = Integer.valueOf(soTemp.getPropertyAsString(Constants.SOAP_OBJECT_KEY_TASK_ACTUAL_USER_ID));
+
+                if (!idUser.equals(memberServer.getIdMember())) continue;
+
+                TaskGallery memberLocal = BDTasksManagerQuery.getTaskMember(context, memberServer);
+
+                Boolean exist = (memberLocal.getCve() != null);
+
+                if (!memberLocal.getNotification()) {
+
+                    Tasks tasks = new Tasks(memberServer.getIdTask());
+                    Tasks tempTask = BDTasksManagerQuery.getTaskById(context, tasks);
+
+                    if (tempTask.getTask_cve() == null) {
+                        tempTask = getTaskServerByUser(context, idTaskUser, memberServer.getIdTask());
+                        BDTasksManagerQuery.addTask(context, tempTask);
+                    }
+
+                    if (!exist) {
+                        BDTasksManagerQuery.addMember(context, memberServer);
+                        memberLocal = BDTasksManagerQuery.getTaskMember(context, memberServer);
+                    }
+
+                    memberLocal.setNotification(true);
+
+                    NotificationService.taskNotification(activity, memberLocal.getIdTask(), "Te han agregado como miembro", tempTask);
+                    BDTasksManagerQuery.updateMember(context, memberLocal);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Tasks getTaskServerByUser(Context context, Integer idUser, Integer idTask) {
+
+        Tasks t = null;
+        try {
+
+            SoapObject soapObject = SoapServices.getServerAllTasks(context, idUser, Constants.ALL_TASK);
+
+            if (soapObject.getPropertyCount() > 0) {
+
+                for (int i = 0; i < soapObject.getPropertyCount(); i++) {
+
+                    t = new Tasks();
+
+                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+
+                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+
+                    if (!t.getTask_id().equals(idTask)) {
+                        continue;
+                    }
+
+                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+
+                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                    t.setTask_user_id(idUser);
+
+                    break;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        return t;
     }
 }

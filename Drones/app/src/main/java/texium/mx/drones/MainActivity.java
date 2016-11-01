@@ -506,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         break;
                     case Constants.WS_KEY_ALL_USERS:
-                        soapObject = SoapServices.getServerAllUsers(getApplicationContext());
+                        soapObject = SoapServices.getServerAllUsers(getApplicationContext(),"");
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:

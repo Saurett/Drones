@@ -339,12 +339,19 @@ public class SearchMemberActivity extends AppCompatActivity implements SearchVie
                     case Constants.WS_KEY_ITEM_SAVE_MEMBER:
 
                         for (TaskGallery taskGallery : _PREVIEW_MEMBERS) {
-                            //TODO WEB SERVICE
+
+                            taskGallery.setIdTask(_TASK_INFO.getTask_id());
+                            taskGallery.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                            taskGallery.setServerSync(Constants.SERVER_SYNC_FALSE);
+
                             previewMembers.remove(taskGallery.getIdMember());
-                            BDTasksManagerQuery.addMember(getApplicationContext(),
+                            BDTasksManagerQuery.addMember(getApplicationContext(), taskGallery);
+
+                            /*BDTasksManagerQuery.addMember(getApplicationContext(),
                                     taskGallery.getIdMember(), _TASK_INFO.getTask_id(),
                                     Constants.ITEM_SYNC_LOCAL_TABLET,
                                     Constants.SERVER_SYNC_FALSE);
+                                    */
                         }
 
                         validOperation = true;

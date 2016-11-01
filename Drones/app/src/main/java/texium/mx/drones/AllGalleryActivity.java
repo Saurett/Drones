@@ -810,7 +810,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                                         //SYNC WITH THE SERVER
 
-                                        soapPrimitive = SoapServices.addTaskMember(getApplicationContext(),memberGallery,_SESSION_DATA.getIdUser());
+                                        soapPrimitive = SoapServices.addTaskMember(getApplicationContext(),memberGallery,_TASK_INFO.getTask_user_id());
                                         memberGallery.setId(Integer.valueOf(soapPrimitive.toString()));
                                         memberGallery.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
                                         BDTasksManagerQuery.updateMember(getApplicationContext(), memberGallery);
@@ -1138,7 +1138,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                                     TaskGallery memberGallery = _DECODE_GALLERY.getTaskGallery();
                                     memberGallery.setSync_type(Constants.ITEM_SYNC_SERVER_DELETE);
-                                    memberGallery.setSyncStatus(Constants.SERVER_SYNC_FALSE);
+                                    memberGallery.setServerSync(Constants.SERVER_SYNC_FALSE);
 
                                     Integer syncType = _DECODE_GALLERY.getTaskGallery().getSync_type();
 

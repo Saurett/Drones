@@ -17,14 +17,16 @@ public class TaskGallery implements Serializable {
     private Integer file_type;
     private String description;
     private Integer sync_type;
-    private Integer syncStatus;
+    private Integer serverSync;
     private String localURI;
     private String member_name;
     private String member_job;
     private Integer idTask;
     private Integer idMember;
+    private Boolean notification;
 
     public TaskGallery() {
+        notification = false;
     }
 
     public TaskGallery(String description, Integer sync_type) {
@@ -128,12 +130,12 @@ public class TaskGallery implements Serializable {
         this.idTask = idTask;
     }
 
-    public Integer getSyncStatus() {
-        return syncStatus;
+    public Integer getServerSync() {
+        return serverSync;
     }
 
-    public void setSyncStatus(Integer syncStatus) {
-        this.syncStatus = syncStatus;
+    public void setServerSync(Integer syncStatus) {
+        this.serverSync = syncStatus;
     }
 
     public Integer getIdMember() {
@@ -142,5 +144,13 @@ public class TaskGallery implements Serializable {
 
     public void setIdMember(Integer idMember) {
         this.idMember = idMember;
+    }
+
+    public Boolean getNotification() {
+        return notification;
+    }
+
+    public void setNotification(Boolean notification) {
+        this.notification = notification;
     }
 }

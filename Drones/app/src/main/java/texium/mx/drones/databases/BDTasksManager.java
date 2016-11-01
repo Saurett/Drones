@@ -107,6 +107,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String TASK_ID = "task_id";
         public static final String SERVER_SYNC = "server_sync";
         public static final String SERVER_STATUS = "server_status";
+        public static final String NOTIFICATION = "notification";
 
     }
 
@@ -200,7 +201,8 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTasksMembers.TASK_ID + " " + INT_TYPE + "," +
                     ColumnTasksMembers.TASK_ID_USER + " " + INT_TYPE + "," +
                     ColumnTasksMembers.SERVER_SYNC + " " + INT_TYPE + "," +
-                    ColumnTasksMembers.SERVER_STATUS + " " + INT_TYPE +
+                    ColumnTasksMembers.SERVER_STATUS + " " + INT_TYPE + "," +
+                    ColumnTasksMembers.NOTIFICATION + " " +
                     ")";
 
     public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";

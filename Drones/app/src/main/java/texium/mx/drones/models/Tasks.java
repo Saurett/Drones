@@ -24,6 +24,10 @@ public class Tasks implements Serializable {
 
     }
 
+    public Tasks(Integer tempIdTask) {
+        task_id = tempIdTask;
+    }
+
     public Tasks(Integer tTaskStatus, Integer idUser) {
         task_status = tTaskStatus;
         task_user_id = idUser;

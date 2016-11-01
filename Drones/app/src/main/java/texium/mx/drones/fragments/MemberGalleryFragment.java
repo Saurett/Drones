@@ -199,6 +199,7 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
 
                             member.setId(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
                             member.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
+                            member.setServerSync(Constants.SERVER_SYNC_TRUE);
                             member.setIdMember(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_USER_ID).toString()));
                             member.setIdTask(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_ID).toString()));
 
@@ -207,7 +208,7 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                             Boolean exist = (memberLocal.getCve() != null);
 
                             if (!exist) {
-                                BDTasksManagerQuery.addMember(getContext(),member.getIdMember(),member.getIdTask(),Constants.ITEM_SYNC_SERVER_CLOUD, member.getSync_type());
+                                BDTasksManagerQuery.addMember(getContext(),member);
                             }
                         }
 

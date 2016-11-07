@@ -3,6 +3,7 @@ package texium.mx.drones;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int actionFlag = Constants.LOGIN_FORM;
     private String _URL_ACTUAL_VERSION = "";
 
+    private ProgressDialog pDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         forgetUsername.setOnClickListener(this);
         connectivity.setOnClickListener(this);
 
-        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_CHECK_VERSION);
+        AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
         wsAllTask.execute();
 
         checkAndRequestPermissions();
@@ -99,19 +102,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onStart() {
-
-        try {
-            AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-            if (localVersion.getVersion_msg().equals("Si")) {
-                AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_USERS);
-                wsAllTask.execute();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
         super.onStart();
     }
 
@@ -443,6 +433,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private String webServiceLink;
         private String textError;
         private Boolean localAccess;
+        private Boolean updateVersion;
 
         private AsyncCallWS(Integer wsOperation) {
             webServiceOperation = wsOperation;
@@ -455,6 +446,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             password = wsPassword;
             textError = "";
             localAccess = false;
+            updateVersion = false;
         }
 
         private AsyncCallWS(Integer wsOperation, String wsUsername, String wsPassword, String wsTempLink) {
@@ -464,11 +456,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             webServiceLink = wsTempLink;
             textError = "";
             localAccess = false;
+            updateVersion = false;
         }
 
         @Override
         protected void onPreExecute() {
-            showProgress(true);
+
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage(getString(R.string.server_sync));
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+
         }
 
         @Override
@@ -483,6 +483,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         validOperation = true;
                         break;
                     case Constants.WS_KEY_LOGIN_SERVICE:
+
+                        soapObject = SoapServices.checkAppVersion(getApplicationContext());
+
+                        String versionLogin = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
+
+                        AppVersion localVersionLogin = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                        if (!localVersionLogin.getApp_version().equals(versionLogin)) {
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersionLogin.getApp_version(), "No");
+                            validOperation = true;
+                            updateVersion = true;
+                            break;
+                        } else {
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersionLogin.getApp_version(), "Si");
+
+                        }
+
                         soapObject = SoapServices.checkUser(getApplicationContext(), username, password);
                         Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
 
@@ -506,7 +523,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         break;
                     case Constants.WS_KEY_ALL_USERS:
-                        soapObject = SoapServices.getServerAllUsers(getApplicationContext(),"");
+
+                        soapObject = SoapServices.checkAppVersion(getApplicationContext());
+
+                        String version = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
+
+                        AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                        if (!localVersion.getApp_version().equals(version)) {
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersion.getApp_version(), "No");
+                            validOperation = true;
+                            break;
+                        } else {
+                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersion.getApp_version(), "Si");
+
+                        }
+
+                        soapObject = SoapServices.getServerAllUsers(getApplicationContext(), "");
+
+
+                        for (int i = 0; i < soapObject.getPropertyCount(); i++) {
+
+                            Users user = new Users();
+
+                            try {
+
+                                SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                                SoapObject uLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
+
+                                user.setIdUser(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                                user.setUserName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
+                                user.setIdActor(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                                user.setActorName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
+                                user.setActorType(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                                user.setActorTypeName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
+                                user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
+                                user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+
+                                try {
+                                    user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
+                                } catch (NullPointerException e) {
+                                    user.setLastTeamConnection("");
+                                    e.printStackTrace();
+                                }
+
+                                user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_PASSWORD).toString());
+
+                                TaskGallery decodePhoto = FileServices.downloadFile(MainActivity.this, soTemp.getProperty(Constants.SOAP_OBJECT_KEY_PROFILE_PICTURE).toString());
+                                user.setProfilePicture(FileServices.attachImgFromBitmap(decodePhoto.getPhoto_bitmap(), 100));
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            try {
+                                Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
+
+                                if (tempUser.getIdUser() == null)
+                                    BDTasksManagerQuery.addUser(getApplicationContext(), user);
+                                if (tempUser.getIdUser() != null)
+                                    BDTasksManagerQuery.updateUser(getApplicationContext(), user);
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                Log.e("SQLite Exception ", ex.getMessage());
+                            }
+                        }
+
+
                         validOperation = (soapObject.getPropertyCount() > 0);
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
@@ -623,7 +707,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            showProgress(false);
+            pDialog.dismiss();
             if (success) {
 
                 Intent intentNavigationDrawer = new Intent(MainActivity.this, NavigationDrawerActivity.class);
@@ -658,77 +742,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         } else {
 
-                            SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
-
-                            user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
-                            user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
-                            user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
-                            user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
-                            user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
-                            user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
-                            user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
-                            user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
-                            user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-
-
-                        }
-
-
-                        usernameLogin.clearFocus();
-                        passwordLogin.clearFocus();
-
-                        intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
-                        cleanAllLogin();
-                        startActivity(intentNavigationDrawer);
-                        break;
-                    case Constants.WS_KEY_ALL_USERS:
-
-                        for (int i = 0; i < soapObject.getPropertyCount(); i++) {
-
-                            try {
-
-                                SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                                SoapObject uLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
-
-                                user.setIdUser(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
-                                user.setUserName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
-                                user.setIdActor(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
-                                user.setActorName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
-                                user.setActorType(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
-                                user.setActorTypeName(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
-                                user.setLatitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
-                                user.setLongitude(Double.valueOf(uLocation.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+                            if (updateVersion) {
 
                                 try {
-                                    user.setLastTeamConnection(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-                                } catch (NullPointerException e) {
-                                    user.setLastTeamConnection("");
+                                    AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+                                    if (appVersion.getVersion_msg().equals("No")) {
+                                        _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
+                                        showQuestion();
+                                    }
+
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
 
-                                user.setPassword(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_PASSWORD).toString());
+                            } else {
 
-                                TaskGallery decodePhoto =  FileServices.downloadFile(MainActivity.this,soTemp.getProperty(Constants.SOAP_OBJECT_KEY_PROFILE_PICTURE).toString());
-                                user.setProfilePicture(FileServices.attachImgFromBitmap(decodePhoto.getPhoto_bitmap(), 100));
+                                SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
 
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                                user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
+                                user.setUserName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_USERNAME).toString());
+                                user.setIdActor(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID_ACTOR).toString()));
+                                user.setActorName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_NAME).toString());
+                                user.setActorType(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPE).toString()));
+                                user.setActorTypeName(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ACTOR_TYPENAME).toString());
+                                user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
+                                user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
+                                user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
 
-                            try {
-                                Users tempUser = BDTasksManagerQuery.getUserById(getApplicationContext(), user);
+                                usernameLogin.clearFocus();
+                                passwordLogin.clearFocus();
 
-                                if (tempUser.getIdUser() == null)
-                                    BDTasksManagerQuery.addUser(getApplicationContext(), user);
-                                if (tempUser.getIdUser() != null)
-                                    BDTasksManagerQuery.updateUser(getApplicationContext(), user);
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                                Log.e("SQLite Exception ", ex.getMessage());
+                                intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
+                                cleanAllLogin();
+                                startActivity(intentNavigationDrawer);
                             }
                         }
-
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
                         Toast.makeText(MainActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
@@ -752,7 +801,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                         break;
-                    case Constants.WS_KEY_CHECK_VERSION:
+                    case Constants.WS_KEY_CHECK_VERSION: case Constants.WS_KEY_ALL_USERS:
 
                         try {
                             AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
@@ -772,6 +821,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                 }
             } else {
+
                 String tempTextMsg = (textError.isEmpty() ? getString(R.string.default_login_error) : textError);
                 Toast.makeText(MainActivity.this, tempTextMsg, Toast.LENGTH_LONG).show();
             }

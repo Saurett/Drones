@@ -141,20 +141,23 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_NEWS:
 
+                        List<Integer> serverSync = new ArrayList<>();
+
+                        serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
+                        Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
+
                         soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
 
-                            List<Integer> serverSync = new ArrayList<>();
-
-                            serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
-                            serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
-                            serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
-
-                            Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
                             tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
                             if (tempTaskList.size() > 0) validOperation = true;
+                        } else {
+                            tempTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
                         }
 
                         break;
@@ -270,6 +273,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                     } else newsTask.addAll(tempTaskList);
 
                     if (newsTask.size() > 0 ) {
+
                         task_list_adapter.addAll(newsTask);
                         task_list_title_adapter.addAll(newsTaskTitle);
 
@@ -279,8 +283,11 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                         tasks_list.setLayoutManager(linearLayoutManager);
 
+                        tasks_list.scrollToPosition(1);
+
                         LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                         tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);
+
                     } else {
                         Toast.makeText(getActivity(), getString(R.string.default_empty_task_list), Toast.LENGTH_LONG).show();
                     }

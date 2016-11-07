@@ -142,21 +142,23 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_CLOSE:
 
+                        List<Integer> serverSync = new ArrayList<>();
+
+                        serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
+                        Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
+
                         NotificationService.callNotification(getActivity(), SESSION_DATA.getIdUser());
                         soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
-
-                            List<Integer> serverSync = new ArrayList<>();
-
-                            serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
-                            serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
-                            serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
-
-                            Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
                             tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
                             if (tempTaskList.size() > 0) validOperation = true;
+                        }  else {
+                            tempTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
                         }
 
                         break;

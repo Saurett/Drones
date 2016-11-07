@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +29,6 @@ import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
-import texium.mx.drones.services.NotificationService;
 import texium.mx.drones.utils.Constants;
 
 
@@ -38,6 +38,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
     // private static Button send_task_button,close_window_button,next_task_button,back_task_button,picture_task_button,video_task_button;
     private static Button send_task_button, close_window_button, next_task_button, back_task_button, gallery_task_gallery;
+    private static CheckBox checkBoxCause, checkBoxClosure, checkBoxFile;
 
     //private TextView title_task_window, content_task_window,comment_task_window,number_photos,number_videos;
     private TextView title_task_window, content_task_window, comment_task_window;
@@ -74,6 +75,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
         task_window_icon = (ImageView) view.findViewById(R.id.task_window_icon);
 
+        checkBoxFile = (CheckBox) view.findViewById(R.id.checkBoxFile);
+        checkBoxClosure = (CheckBox) view.findViewById(R.id.checkBoxClosure);
+        checkBoxCause = (CheckBox) view.findViewById(R.id.checkBoxCause);
+
         back_task_button.setOnClickListener(this);
         send_task_button.setOnClickListener(this);
         close_window_button.setOnClickListener(this);
@@ -81,6 +86,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         //picture_task_button.setOnClickListener(this);
         ///video_task_button.setOnClickListener(this);
         gallery_task_gallery.setOnClickListener(this);
+
+        checkBoxFile.setOnClickListener(this);
+        checkBoxClosure.setOnClickListener(this);
+        checkBoxCause.setOnClickListener(this);
 
         View tokenView = (View) taskToken.get(1L);
         TaskListAdapter tokenAdapter = (TaskListAdapter) taskToken.get(2L);
@@ -264,6 +273,48 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, nextDecode);
                 break;
             default:
+
+                boolean checked = ((CheckBox) v).isChecked();
+
+                switch (v.getId()) {
+                    case R.id.checkBoxFile:
+
+                        if (checked) {
+                            checkBoxCause.setChecked(false);
+                            checkBoxClosure.setChecked(false);
+                        } else {
+                            checkBoxFile.setChecked(true);
+                        }
+
+                        Toast.makeText(getContext(), "Cargando Fragmento de Archivos", Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case R.id.checkBoxClosure:
+
+                        if (checked) {
+                            checkBoxCause.setChecked(false);
+                            checkBoxFile.setChecked(false);
+                        } else {
+                            checkBoxClosure.setChecked(true);
+                        }
+
+                        Toast.makeText(getContext(), "Cargando Fragmento de Clausura", Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case R.id.checkBoxCause:
+
+                        if (checked) {
+                            checkBoxClosure.setChecked(false);
+                            checkBoxFile.setChecked(false);
+                        } else {
+                            checkBoxCause.setChecked(true);
+                        }
+
+                        Toast.makeText(getContext(), "Cargando Fragmento de Caussas", Toast.LENGTH_SHORT).show();
+
+                        break;
+                }
+
                 break;
         }
     }

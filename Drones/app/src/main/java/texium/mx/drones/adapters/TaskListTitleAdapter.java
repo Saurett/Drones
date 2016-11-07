@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import texium.mx.drones.R;
-import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksTitle;
 
 /**

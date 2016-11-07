@@ -114,6 +114,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
         private Integer webServiceOperation;
         private Integer idStatus;
         private List<Tasks> tempTaskList;
+        private List<Tasks> memberTaskList;
         private String textError;
 
         private AsyncCallWS(Integer wsOperation, Integer wsIdStatus) {
@@ -121,6 +122,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
             idStatus = wsIdStatus;
             textError = "";
             tempTaskList = new ArrayList<>();
+            memberTaskList = new ArrayList<>();
         }
 
         @Override
@@ -140,19 +142,23 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
             try {
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_TASK_SERVICE_PROGRESS:
+                        Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
+
+                        List<Integer> serverSync = new ArrayList<>();
+
+                        serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
+                        serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
+
                         NotificationService.callNotification(getActivity(), SESSION_DATA.getIdUser());
                         soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
-                            Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
-
-                            List<Integer> serverSync = new ArrayList<>();
-
-                            serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
-
                             tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
                             if (tempTaskList.size() > 0) validOperation = true;
+                        } else {
+                            memberTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
                         }
 
                         break;
@@ -255,6 +261,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
                         Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
                         tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
+                        tempTaskList.addAll(memberTaskList);
 
                         for (Tasks tempTask : tempTaskList) {
                             Boolean contain = false;

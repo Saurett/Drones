@@ -201,4 +201,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         return tasks_list == null ? 0 : tasks_list.size();
     }
 
+    public int scrollByIdTask(int idTask) {
+        int position = 0;
+        for (Tasks task: tasks_list) {
+
+
+            if (task.getTask_id().equals(idTask)) {
+                return position;
+            }
+            position++;
+        }
+
+        return position;
+    }
+
 }

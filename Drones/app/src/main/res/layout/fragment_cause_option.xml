@@ -1,0 +1,31 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="450dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:background="@color/colorPrimary"
+    tools:context="texium.mx.drones.fragments.CauseOptionFragment">
+
+    <LinearLayout
+        android:id="@+id/cause_option_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp">
+
+        <EditText
+            android:id="@+id/cause_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryGray"
+            android:hint="Causas de Imposibilidad"
+            android:inputType="textMultiLine"
+            android:paddingBottom="10dp"
+            android:paddingLeft="28dp"
+            android:paddingTop="10dp"
+            android:textColor="@color/colorPrimaryWhite"
+            android:textColorHint="@color/colorPrimaryWhite"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+</FrameLayout>

@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 
 import java.util.ArrayList;
 
@@ -22,6 +24,9 @@ public class LegalFragment extends Fragment implements View.OnClickListener {
 
     static FragmentTaskListener activityListener;
 
+    private static Switch closure;
+    private static RadioGroup radioGroup;
+
     private static Users SESSION_DATA;
     private ProgressDialog pDialog;
 
@@ -30,6 +35,11 @@ public class LegalFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_legal, container, false);
+
+        closure = (Switch) view.findViewById(R.id.switch_closure);
+        radioGroup = (RadioGroup) view.findViewById(R.id.radio_group);
+
+        closure.setOnClickListener(this);
 
         return view;
     }
@@ -56,6 +66,15 @@ public class LegalFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+
+            case R.id.switch_closure:
+
+                boolean checked = ((Switch) v).isChecked();
+
+                radioGroup.setVisibility((checked) ? View.VISIBLE : View.INVISIBLE);
+
+                break;
+
             default:
                 break;
         }

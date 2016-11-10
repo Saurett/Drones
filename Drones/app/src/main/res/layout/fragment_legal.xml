@@ -13,6 +13,19 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:hint="Número de Expediente"
+            android:inputType="text"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:textColor="@color/colorPrimaryWhite"
+            android:textColorHint="@color/colorPrimaryWhite"
+            android:textSize="15sp" />
+
         <EditText
             android:id="@+id/file_number"
             android:layout_width="match_parent"
@@ -23,7 +36,7 @@
             android:inputType="text"
             android:paddingBottom="10dp"
             android:paddingLeft="20dp"
-            android:paddingTop="10dp"
+            android:paddingTop="5dp"
             android:textColor="@color/colorPrimaryWhite"
             android:textColorHint="@color/colorPrimaryWhite"
             android:textSize="15sp" />
@@ -35,8 +48,8 @@
             android:layout_marginTop="10dp"
             android:checked="false"
             android:paddingBottom="5dp"
-            android:paddingRight="20dp"
             android:paddingLeft="20dp"
+            android:paddingRight="40dp"
             android:paddingTop="5dp"
             android:text="Clausurado"
             android:textColor="@color/colorPrimaryWhite" />
@@ -48,6 +61,7 @@
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
             android:paddingBottom="5dp"
+            android:visibility="invisible"
             android:paddingLeft="20dp"
             android:paddingTop="5dp">
 
@@ -61,7 +75,7 @@
                 android:paddingLeft="20dp"
                 android:paddingTop="5dp"
                 android:text="Total"
-                android:textColor="@color/colorPrimaryWhite" />
+                android:textColor="@color/colorPrimaryWhite"/>
 
             <RadioButton
                 android:id="@+id/radio_partial"

@@ -757,7 +757,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
 
                             } else {
-
                                 SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
 
                                 user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
@@ -769,15 +768,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
                                 user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
                                 user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-
-                                usernameLogin.clearFocus();
-                                passwordLogin.clearFocus();
-
-                                intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
-                                cleanAllLogin();
-                                startActivity(intentNavigationDrawer);
                             }
+
                         }
+
+                        if (user.getIdUser() != null) {
+
+                            usernameLogin.clearFocus();
+                            passwordLogin.clearFocus();
+
+                            intentNavigationDrawer.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
+                            cleanAllLogin();
+                            startActivity(intentNavigationDrawer);
+
+                        }
+
                         break;
                     case Constants.WS_KEY_FORGET_USERNAME_SERVICE:
                         Toast.makeText(MainActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();

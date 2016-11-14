@@ -75,6 +75,7 @@ public final class Constants {
     public static final String FRAGMENT_SEARCH_MEMBER_GALLERY_TAG = "fragment_search_member_gallery";
     public static final String FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG = "fragment_preview_member_gallery";
     public static final String FRAGMENT_LEGAL = "fragment_legal";
+    public static final String FRAGMENT_LEGAL_DESCRIPTION = "fragment_legal_description";
     //endregion FRAGMENT TAGS//
 
     //region WEB SERVICE ID //

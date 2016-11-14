@@ -166,7 +166,7 @@ public class FileServices {
 
         Context context = activity.getApplicationContext();
         try {
-            /*
+
             InputStream is = activity.getContentResolver().openInputStream(uriFileVideo);
 
             ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
@@ -184,8 +184,8 @@ public class FileServices {
             String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
             data.setEncodeSingleFile(tempData);
             data.setTitle(uriFileVideo.toString());
-            */
 
+/*
             String realPath = FileServices.getPath(activity.getApplicationContext(), Uri.parse(uriFileVideo.toString()));
             InputStream is = new BufferedInputStream(new FileInputStream(realPath));
 
@@ -197,7 +197,7 @@ public class FileServices {
 
             String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
             data.setEncodeSingleFile(tempData);
-            data.setTitle(uriFileVideo.toString());
+            data.setTitle(uriFileVideo.toString());*/
 
         } catch (OutOfMemoryError e) {
             e.printStackTrace();

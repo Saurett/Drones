@@ -278,11 +278,25 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 if (checked) {
 
-                    Toast.makeText(getContext(), "Quitar Expediente", Toast.LENGTH_SHORT).show();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    // Replace whatever is in the fragment_container view with this fragment,
+                    // and add the transaction to the back stack so the user can navigate back
+                    transaction.replace(R.id.legal_fragment_container, new LegalDescriptionFragment());
+                    //transaction.addToBackStack(null);
+
+                    // Commit the transaction
+                    transaction.commit();
 
                 } else {
 
-                    Toast.makeText(getContext(), "Poner Expediente", Toast.LENGTH_SHORT).show();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    // Replace whatever is in the fragment_container view with this fragment,
+                    // and add the transaction to the back stack so the user can navigate back
+                    transaction.replace(R.id.legal_fragment_container, new LegalFragment());
+                    //transaction.addToBackStack(null);
+
+                    // Commit the transaction
+                    transaction.commit();
 
                 }
 

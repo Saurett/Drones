@@ -209,7 +209,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-    }
+    } 
 
     @Override
     public void onCreate(SQLiteDatabase db) {

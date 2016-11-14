@@ -498,8 +498,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                 }
 
 
-
-
                 break;
             case R.id.item_photo_description:
             case R.id.item_video_description:
@@ -757,28 +755,31 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                     case Constants.WS_KEY_ITEM_DELETE:
 
-
                         Integer idView = _DECODE_GALLERY.getIdView();
+                        TaskGallery deleteGallery = _DECODE_GALLERY.getTaskGallery();
                         switch (idView) {
                             case R.id.item_member_delete:
 
-                                TaskGallery memberGallery = _DECODE_GALLERY.getTaskGallery();
 
-                                if (!memberGallery.getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
-                                    soapPrimitive = SoapServices.deleteTaskMember(getApplicationContext(),memberGallery,_SESSION_DATA.getIdUser());
-                                    BDTasksManagerQuery.deleteMember(getApplicationContext(),memberGallery);
+                                if (!deleteGallery.getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
+                                    soapPrimitive = SoapServices.deleteTaskMember(getApplicationContext(), deleteGallery, _SESSION_DATA.getIdUser());
+                                    BDTasksManagerQuery.deleteMember(getApplicationContext(), deleteGallery);
                                     validOperation = (soapPrimitive != null);
+                                } else {
+                                    validOperation = true;
                                 }
 
                                 break;
 
                             default:
 
-                                if (!_DECODE_GALLERY.getTaskGallery().getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
+                                if (!deleteGallery.getSync_type().equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
                                     soapPrimitive = SoapServices.deletePhotoFile(getApplicationContext(),
                                             _DECODE_GALLERY.getTaskGallery().getId(),
                                             _TASK_INFO.getTask_user_id());
                                     validOperation = (soapPrimitive != null);
+                                } else {
+                                    validOperation = true;
                                 }
                                 break;
                         }
@@ -797,20 +798,20 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 serverSync.add(Constants.ITEM_SYNC_LOCAL_TABLET);
                                 serverSync.add(Constants.ITEM_SYNC_SERVER_DELETE);
 
-                                List<TaskGallery> galleryMembers = BDTasksManagerQuery.getMembers(getApplicationContext(),_TASK_INFO.getTask_id(),serverSync,null);
+                                List<TaskGallery> galleryMembers = BDTasksManagerQuery.getMembers(getApplicationContext(), _TASK_INFO.getTask_id(), serverSync, null);
 
                                 for (TaskGallery memberGallery : galleryMembers) {
 
                                     if (memberGallery.getSync_type().equals(Constants.ITEM_SYNC_SERVER_DELETE)) {
 
-                                        soapPrimitive = SoapServices.deleteTaskMember(getApplicationContext(),memberGallery,_SESSION_DATA.getIdUser());
+                                        soapPrimitive = SoapServices.deleteTaskMember(getApplicationContext(), memberGallery, _SESSION_DATA.getIdUser());
                                         BDTasksManagerQuery.deleteMember(getApplicationContext(), memberGallery);
 
                                     } else {
 
                                         //SYNC WITH THE SERVER
 
-                                        soapPrimitive = SoapServices.addTaskMember(getApplicationContext(),memberGallery,_TASK_INFO.getTask_user_id());
+                                        soapPrimitive = SoapServices.addTaskMember(getApplicationContext(), memberGallery, _TASK_INFO.getTask_user_id());
                                         memberGallery.setId(Integer.valueOf(soapPrimitive.toString()));
                                         memberGallery.setSync_type(Constants.ITEM_SYNC_SERVER_CLOUD);
                                         BDTasksManagerQuery.updateMember(getApplicationContext(), memberGallery);
@@ -1144,7 +1145,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
 
                                     if (!syncType.equals(Constants.ITEM_SYNC_LOCAL_TABLET)) {
                                         BDTasksManagerQuery.updateMember(getApplicationContext(), memberGallery);
-                                        textError = textError.replaceAll("Archivo","Miembro");
+                                        textError = textError.replaceAll("Archivo", "Miembro");
                                     }
 
                                     break;
@@ -1217,7 +1218,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                             if (_DECODE_GALLERY.getIdView().equals(R.id.item_member_delete)) {
 
                                 BDTasksManagerQuery.deleteMember(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
-                                txtDelete = txtDelete.replaceAll("Archivo","Miembro");
+                                txtDelete = txtDelete.replaceAll("Archivo", "Miembro");
                             } else {
 
                                 BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());

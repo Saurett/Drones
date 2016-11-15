@@ -133,6 +133,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
             return true;
         }
 
+        fileManager = new FilesManager();
+
         int galleryType = GALLERY_IMAGE_ACTIVITY_REQUEST_CODE;
 
         Intent galleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT, Uri.parse(Intent.CATEGORY_OPENABLE));

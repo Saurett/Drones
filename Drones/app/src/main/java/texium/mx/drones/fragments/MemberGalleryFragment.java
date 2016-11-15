@@ -124,7 +124,7 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
 
-            case R.id.internal_gallery_photo_button:
+            case R.id.internal_gallery_member_button:
                 activityListener.openGallery();
                 break;
             default:

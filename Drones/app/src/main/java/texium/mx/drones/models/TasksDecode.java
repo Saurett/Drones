@@ -18,10 +18,12 @@ public class TasksDecode {
     private Integer origin_button;
     private List<String> sendImgFiles;
     private List<FilesManager> sendVideoFiles;
+    private LegalManager legalInformation;
 
     public TasksDecode() {
         sendImgFiles = new ArrayList<>();
         sendVideoFiles = new ArrayList<>();
+        legalInformation = new LegalManager();
     }
 
     public TasksDecode(Integer tk_user_id, Integer tk_origin_button) {
@@ -107,5 +109,13 @@ public class TasksDecode {
 
     public void setSendVideoFiles(List<FilesManager> sendVideoFiles) {
         this.sendVideoFiles = sendVideoFiles;
+    }
+
+    public LegalManager getLegalInformation() {
+        return legalInformation;
+    }
+
+    public void setLegalInformation(LegalManager legalInformation) {
+        this.legalInformation = legalInformation;
     }
 }

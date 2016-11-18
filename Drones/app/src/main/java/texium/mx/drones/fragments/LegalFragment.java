@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 
 import texium.mx.drones.R;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
 import texium.mx.drones.utils.Constants;
@@ -26,6 +28,7 @@ public class LegalFragment extends Fragment implements View.OnClickListener {
 
     private static Switch closure;
     private static RadioGroup radioGroup;
+    private static EditText fileNumber;
 
     private static Users SESSION_DATA;
     private ProgressDialog pDialog;
@@ -38,6 +41,7 @@ public class LegalFragment extends Fragment implements View.OnClickListener {
 
         closure = (Switch) view.findViewById(R.id.switch_closure);
         radioGroup = (RadioGroup) view.findViewById(R.id.radio_group);
+        fileNumber = (EditText) view.findViewById(R.id.file_number);
 
         closure.setOnClickListener(this);
 
@@ -78,6 +82,28 @@ public class LegalFragment extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
+    }
+
+    public static LegalManager getLegalInformation(LegalManager legalManager) {
+
+        Integer checkClosure = (closure.isChecked()) ? Constants.ACTIVE : Constants.INACTIVE;
+        String number = fileNumber.getText().toString();
+
+        if (checkClosure.equals(Constants.ACTIVE)) {
+            int radioID = radioGroup.getCheckedRadioButtonId();
+
+            legalManager.setClosureTotal((radioID == R.id.radio_total) ? Constants.ACTIVE : Constants.INACTIVE);
+            legalManager.setClosurePartial((radioID == R.id.radio_partial) ? Constants.ACTIVE : Constants.INACTIVE);
+        }
+
+        legalManager.setClosure(checkClosure);
+        legalManager.setFileNumber(number);
+
+        return  legalManager;
+    }
+
+    public static void setRequited() {
+        fileNumber.requestFocus();
     }
 
 }

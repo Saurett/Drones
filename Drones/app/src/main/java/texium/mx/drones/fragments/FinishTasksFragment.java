@@ -29,6 +29,7 @@ import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.utils.Constants;
@@ -238,6 +239,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualBackTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, backDecode);
+
+                moveLegalFragment();
                 break;
             case R.id.next_task_button:
 
@@ -271,6 +274,10 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS, actualNextTask);
                 taskToken.put(Constants.TOKEN_KEY_ACCESS_TASK_CLASS_DECODE, nextDecode);
+
+                moveLegalFragment();
+
+
                 break;
             case R.id.switch_causes:
 
@@ -306,6 +313,15 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    public static LegalManager getLegalInformation(LegalManager legalManager) {
+
+        Integer checkCauses = (causes.isChecked()) ? Constants.ACTIVE : Constants.INACTIVE;
+
+        legalManager.setCauses(checkCauses);
+
+        return  legalManager;
+    }
+
     private void clearActualFiles() {
         if (TASK_FILES.containsKey(_ACTUAL_POSITION)) {
 
@@ -320,6 +336,22 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             */
         }
     }
+
+    private void moveLegalFragment() {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(R.id.legal_fragment_container, new LegalFragment());
+        //transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+
+        comment_task_window.setText("");
+        causes.setChecked(false);
+
+    }
+
 
     private class AsyncSendTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -380,7 +412,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
             pDialog.dismiss();
             if (success) {
 
-                taskToken = new HashMap<>();
+                //taskToken = new HashMap<>();
                 activityListener.taskActions(webServiceView, webServiceAdapter
                         , webServiceTask, webServiceTaskDecode);
 

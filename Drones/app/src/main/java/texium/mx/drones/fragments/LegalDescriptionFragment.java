@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import texium.mx.drones.R;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.Tasks;
 
 
@@ -40,6 +41,15 @@ public class LegalDescriptionFragment extends Fragment{
 
         activityListener.addTasksListMarkers(new ArrayList<Tasks>());
 
+    }
+
+    public static LegalManager getLegalInformation(LegalManager legalManager) {
+        legalManager.setDescriptionCauses(description.getText().toString());
+        return  legalManager;
+    }
+
+    public static void setRequited() {
+        description.requestFocus();
     }
 
     @Override

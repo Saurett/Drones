@@ -35,6 +35,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,8 @@ import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.CloseTasksFragment;
 import texium.mx.drones.fragments.FinishTasksFragment;
+import texium.mx.drones.fragments.LegalDescriptionFragment;
+import texium.mx.drones.fragments.LegalFragment;
 import texium.mx.drones.fragments.NewsTasksFragment;
 import texium.mx.drones.fragments.PendingTasksFragment;
 import texium.mx.drones.fragments.ProgressTasksFragment;
@@ -75,6 +78,7 @@ import texium.mx.drones.fragments.RestoreFragment;
 import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
@@ -132,6 +136,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private Handler handler;
     private Runnable runnable;
     private Boolean connection = true;
+
+    private Integer legalRequired;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -348,14 +354,44 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
-    public void showQuestion() {
+    public void showQuestion(Integer id) {
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this);
 
-        ad.setTitle(getString(R.string.default_title_alert_dialog));
-        ad.setMessage(getString(R.string.default_no_action));
-        ad.setCancelable(false);
-        ad.setNeutralButton(getString(R.string.default_positive_button), this);
+        switch (id) {
+            case R.id.file_number:
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage("Es requerido capturar el número de expediente ...");
+                ad.setCancelable(false);
+                ad.setNeutralButton(getString(R.string.default_positive_button), this);
+
+                LegalFragment.setRequited();
+
+                break;
+            case R.id.cause_description:
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage("Es requerido capturar las causas ...");
+                ad.setCancelable(false);
+                ad.setNeutralButton(getString(R.string.default_positive_button), this);
+
+                LegalDescriptionFragment.setRequited();
+
+                break;
+            default:
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage(getString(R.string.default_no_action));
+                ad.setCancelable(false);
+                ad.setNeutralButton(getString(R.string.default_positive_button), this);
+
+                break;
+        }
+
+
+
+
 
         ad.show();
 
@@ -415,7 +451,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     wsAgree.execute();
 
                 } else {
-                    showQuestion();
+                    showQuestion(0);
                 }
 
                 break;
@@ -434,7 +470,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     declineFragment.commit();
 
                 } else {
-                    showQuestion();
+                    showQuestion(0);
                 }
 
 
@@ -455,7 +491,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 } else {
 
-                    showQuestion();
+                    showQuestion(0);
 
                 }
 
@@ -465,16 +501,23 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 if (task.getTask_user_id().equals(SESSION_DATA.getIdUser())) {
 
-                    closeActiveTaskFragment(v);
-
                     tasksDecode.setTask_update_to((tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
                     tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+                    tasksDecode.setLegalInformation(getLegalInformation());
+
+                    if (legalRequired != null) {
+                        showQuestion(legalRequired);
+                        return;
+                    }
+
+                    closeActiveTaskFragment(v);
 
                     AsyncCallWS wsClose = new AsyncCallWS(Constants.WS_KEY_UPDATE_TASK, task, tasksDecode);
                     wsClose.execute();
 
+
                 } else {
-                    showQuestion();
+                    showQuestion(0);
                 }
 
 
@@ -528,6 +571,33 @@ public class NavigationDrawerActivity extends AppCompatActivity
             closeActiveTaskFragment(v);
             Toast.makeText(this, getString(R.string.default_empty_task_list), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private LegalManager getLegalInformation() {
+
+        legalRequired = null;
+
+        LegalManager legalManager = new LegalManager();
+
+        legalManager = FinishTasksFragment.getLegalInformation(legalManager);
+
+        if (legalManager.getCauses().equals(Constants.ACTIVE)) {
+            legalManager = LegalDescriptionFragment.getLegalInformation(legalManager);
+
+            if (legalManager.getDescriptionCauses().isEmpty()) {
+                legalRequired = R.id.cause_description;
+            }
+
+
+        } else {
+            legalManager = LegalFragment.getLegalInformation(legalManager);
+
+            if (legalManager.getFileNumber().isEmpty()){
+                legalRequired = R.id.file_number;
+            }
+        }
+
+        return  legalManager;
     }
 
 

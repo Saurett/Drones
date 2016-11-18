@@ -1,10 +1,5 @@
 package texium.mx.drones.models;
 
-import android.net.Uri;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import texium.mx.drones.utils.Constants;
 
 /**
@@ -18,12 +13,16 @@ public class LegalManager {
     private Integer closure;
     private Integer closureTotal;
     private Integer closurePartial;
+    private String legalClosure;
 
     public LegalManager() {
         this.causes = Constants.INACTIVE;
         this.closure = Constants.INACTIVE;
         this.closureTotal = Constants.INACTIVE;
         this.closurePartial = Constants.INACTIVE;
+        this.fileNumber = "";
+        this.descriptionCauses = "";
+        this.legalClosure = "";
     }
 
 
@@ -73,5 +72,13 @@ public class LegalManager {
 
     public void setClosurePartial(Integer closurePartial) {
         this.closurePartial = closurePartial;
+    }
+
+    public String getLegalClosure() {
+        return legalClosure;
+    }
+
+    public void setLegalClosure(String legalClosure) {
+        this.legalClosure = legalClosure;
     }
 }

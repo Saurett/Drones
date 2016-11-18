@@ -48,6 +48,7 @@ import texium.mx.drones.fragments.VideoGalleryFragment;
 import texium.mx.drones.fragments.inetrface.FragmentGalleryListener;
 import texium.mx.drones.models.DecodeGallery;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
@@ -1135,7 +1136,8 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                             , _TASK_INFO.getTask_status()
                                             , _TASK_INFO.getTask_user_id()
                                             , fileManager
-                                            , textError.length() == 0);
+                                            , textError.length() == 0
+                                            , new LegalManager());
                                     break;
                                 case Constants.MEMBER_TYPE:
 

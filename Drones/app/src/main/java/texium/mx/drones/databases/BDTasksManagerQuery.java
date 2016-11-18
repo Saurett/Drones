@@ -14,6 +14,7 @@ import java.util.List;
 
 import texium.mx.drones.models.AppVersion;
 import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
@@ -292,7 +293,7 @@ public class BDTasksManagerQuery {
     }
 
     public static void addTaskDetail(Context context, Integer task, String comment
-            , Integer status, Integer user, FilesManager encodedFile, Boolean serverSync) throws Exception {
+            , Integer status, Integer user, FilesManager encodedFile, Boolean serverSync, LegalManager legalInformation) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -305,6 +306,9 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTaskDetails.SERVER_SYNC, (serverSync)
                     ? Constants.SERVER_SYNC_TRUE : Constants.SERVER_SYNC_FALSE);
             cv.put(BDTasksManager.ColumnTaskDetails.TASK_COMMENT, comment);
+            cv.put(BDTasksManager.ColumnTaskDetails.LEGAL_CAUSES, legalInformation.getDescriptionCauses());
+            cv.put(BDTasksManager.ColumnTaskDetails.LEGAL_FILE_NUMBER, legalInformation.getFileNumber());
+            cv.put(BDTasksManager.ColumnTaskDetails.LEGAL_CLOSURES, legalInformation.getLegalClosure());
 
             bd.insert(BDTasksManager.TASK_DETAILS_TABLE_NAME, null, cv);
 
@@ -1014,6 +1018,9 @@ public class BDTasksManagerQuery {
                     sync.setServer_sync(result.getInt(4));
                     sync.setSendPictureFiles(getPictureFiles(context, sync.getTask_detail_cve()));
                     sync.setSendVideoFiles(getVideoFiles(context, sync.getTask_detail_cve()));
+                    sync.setLegal_causes(result.getString(result.getColumnIndex(BDTasksManager.ColumnTaskDetails.LEGAL_CAUSES)));
+                    sync.setLegal_file_number(result.getString(result.getColumnIndex(BDTasksManager.ColumnTaskDetails.LEGAL_FILE_NUMBER)));
+                    sync.setLegal_closures(result.getString(result.getColumnIndex(BDTasksManager.ColumnTaskDetails.LEGAL_CLOSURES)));
 
                     data.add(sync);
 
@@ -1339,7 +1346,7 @@ public class BDTasksManagerQuery {
     }
 
     public static void updateCommonTask(Context context, Integer task, String comment
-            , Integer status, Integer user, FilesManager encodedFile, Boolean serverSync) throws Exception {
+            , Integer status, Integer user, FilesManager encodedFile, Boolean serverSync, LegalManager legalInformation) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
@@ -1353,7 +1360,7 @@ public class BDTasksManagerQuery {
 
             Log.i("SQLite: ", "Update task in the bd with task_id : " + task);
 
-            addTaskDetail(context, task, comment, status, user, encodedFile, serverSync);
+            addTaskDetail(context, task, comment, status, user, encodedFile, serverSync, legalInformation);
 
             bd.close();
 

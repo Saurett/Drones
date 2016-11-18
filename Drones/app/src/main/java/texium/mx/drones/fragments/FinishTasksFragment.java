@@ -40,7 +40,7 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     static FragmentTaskListener activityListener;
 
     private static Button send_task_button, close_window_button, next_task_button, back_task_button, gallery_task_gallery;
-    private static TextView title_task_window, content_task_window, comment_task_window;
+    private static TextView title_task_window, content_task_window, comment_task_window, label_legal;
     private static Switch causes;
     private static ImageView task_window_icon;
 
@@ -73,6 +73,8 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
         comment_task_window = (TextView) view.findViewById(R.id.comment_task_window);
         //number_photos = (TextView) view.findViewById(R.id.number_photos);
         //number_videos = (TextView) view.findViewById(R.id.number_videos);
+
+        label_legal = (TextView) view.findViewById(R.id.label_legal);
 
         task_window_icon = (ImageView) view.findViewById(R.id.task_window_icon);
 
@@ -122,9 +124,18 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
 
         fragmentManager = getActivity().getSupportFragmentManager();
 
-        FragmentTransaction fileFragment = fragmentManager.beginTransaction();
-        fileFragment.add(R.id.legal_fragment_container, new LegalFragment(), Constants.FRAGMENT_LEGAL);
-        fileFragment.commit();
+        causes.setVisibility(View.INVISIBLE);
+        label_legal.setVisibility(View.INVISIBLE);
+
+        if (tokenTaskDecode.getOrigin_button().equals(R.id.finish_task_button)) {
+
+            causes.setVisibility(View.VISIBLE);
+            label_legal.setVisibility(View.VISIBLE);
+
+            FragmentTransaction fileFragment = fragmentManager.beginTransaction();
+            fileFragment.add(R.id.legal_fragment_container, new LegalFragment(), Constants.FRAGMENT_LEGAL);
+            fileFragment.commit();
+        }
 
         return view;
     }
@@ -338,18 +349,24 @@ public class FinishTasksFragment extends Fragment implements View.OnClickListene
     }
 
     private void moveLegalFragment() {
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.legal_fragment_container, new LegalFragment());
-        //transaction.addToBackStack(null);
 
-        // Commit the transaction
-        transaction.commit();
+        TasksDecode tokenTaskDecode = (TasksDecode) taskToken.get(4L);
 
-        comment_task_window.setText("");
-        causes.setChecked(false);
+        if (tokenTaskDecode.getOrigin_button() == R.id.finish_task_button) {
 
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+            transaction.replace(R.id.legal_fragment_container, new LegalFragment());
+            //transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+
+            comment_task_window.setText("");
+            causes.setChecked(false);
+
+        }
     }
 
 

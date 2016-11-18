@@ -64,6 +64,9 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String TASK_USER_ID = "task_user_id";
         public static final String SERVER_SYNC = "server_sync";
         public static final String TASK_COMMENT = "task_comment";
+        public static final String LEGAL_CAUSES = "legal_causes";
+        public static final String LEGAL_FILE_NUMBER = "legal_file_number";
+        public static final String LEGAL_CLOSURES  = "legal_closures";
     }
 
     public static class ColumnTasksFiles {
@@ -166,7 +169,10 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTaskDetails.TASK_STATUS + " " + INT_TYPE + "," +
                     ColumnTaskDetails.TASK_USER_ID + " " + INT_TYPE + "," +
                     ColumnTaskDetails.SERVER_SYNC + " " + INT_TYPE + "," +
-                    ColumnTaskDetails.TASK_COMMENT + " " + STRING_TYPE + " " +
+                    ColumnTaskDetails.TASK_COMMENT + " " + STRING_TYPE + "," +
+                    ColumnTaskDetails.LEGAL_CAUSES + " " + STRING_TYPE + "," +
+                    ColumnTaskDetails.LEGAL_FILE_NUMBER + " " + STRING_TYPE + "," +
+                    ColumnTaskDetails.LEGAL_CLOSURES + " " + STRING_TYPE + " " +
             ")";
 
     public static final String CREATE_FILES_PACKAGE_TABLE_SCRIPT =

@@ -17,6 +17,9 @@ public class SyncTaskServer {
     private List<String> sendPictureFiles;
     private List<String> sendVideoFiles;
     private List<TaskGallery> taskGallery;
+    private String legal_causes;
+    private String legal_file_number;
+    private String legal_closures;
 
     public SyncTaskServer() {
         taskGallery = new ArrayList<>();
@@ -92,5 +95,29 @@ public class SyncTaskServer {
 
     public void setTaskGallery(List<TaskGallery> taskGallery) {
         this.taskGallery = taskGallery;
+    }
+
+    public String getLegal_causes() {
+        return legal_causes;
+    }
+
+    public void setLegal_causes(String legal_causes) {
+        this.legal_causes = legal_causes;
+    }
+
+    public String getLegal_file_number() {
+        return legal_file_number;
+    }
+
+    public void setLegal_file_number(String legal_file_number) {
+        this.legal_file_number = legal_file_number;
+    }
+
+    public String getLegal_closures() {
+        return legal_closures;
+    }
+
+    public void setLegal_closures(String legal_closures) {
+        this.legal_closures = legal_closures;
     }
 }

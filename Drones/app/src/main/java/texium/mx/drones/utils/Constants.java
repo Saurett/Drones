@@ -158,13 +158,13 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
-    /*
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.67/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.64/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    */
 
+    /*
     public static final String WEB_SERVICE_COMPLETE_URL = "http://170.0.12.51/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
+    */
 
     //endregion SOAP CONFIGURATION//
 
@@ -205,6 +205,9 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_SYSTEM_ID = "IDSistema";
     public static final String WEB_SERVICE_PARAM_SYSTEM_EXTENSION = "IDTipo";
     public static final String WEB_SERVICE_PARAM_TASK_COMMENT = "Observacion";
+    public static final String WEB_SERVICE_PARAM_TASK_CAUSE = "CausasImposibilidad";
+    public static final String WEB_SERVICE_PARAM_TASK_FILE_NUMBER = "Expediente";
+    public static final String WEB_SERVICE_PARAM_TASK_CLOSURE = "Clausurado";
     public static final String WEB_SERVICE_PARAM_TASK_ID_USER = "IDUsuario";
     public static final String WEB_SERVICE_PARAM_TASK_LATITUDE = "Latitud";
     public static final String WEB_SERVICE_PARAM_TASK_LONGITUDE = "Longitud";

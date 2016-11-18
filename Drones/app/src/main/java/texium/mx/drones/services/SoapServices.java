@@ -244,7 +244,9 @@ public class SoapServices {
         return soapObject;
     }
 
-    public static SoapPrimitive updateTask(Context context,Integer task, String comment,Integer status,Integer user,List<String> encodedFile) throws Exception {
+    public static SoapPrimitive updateTask(Context context,Integer task, String comment,Integer status,
+                                           Integer user,List<String> encodedFile,
+                                           String causes, String fileNumber , String closures ) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_TASK;
@@ -256,6 +258,9 @@ public class SoapServices {
 
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, task);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_COMMENT, comment);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_CAUSE, causes);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_FILE_NUMBER, fileNumber);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_CLOSURE, closures);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, status);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
 

@@ -35,7 +35,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -1145,6 +1144,27 @@ public class NavigationDrawerActivity extends AppCompatActivity
         client.disconnect();
     }
 
+    private LegalManager getLegalInformation(LegalManager legalManager) {
+
+        LegalManager legalInformation = new LegalManager();
+
+        if (legalManager.getCauses().equals(Constants.ACTIVE)) {
+            legalInformation.setDescriptionCauses(legalManager.getDescriptionCauses());
+        } else {
+
+            if (!legalManager.getFileNumber().isEmpty()) {
+
+                legalInformation.setFileNumber(legalManager.getFileNumber());
+
+                if (legalManager.getClosure().equals(Constants.ACTIVE)) {
+                    legalInformation.setLegalClosure(legalManager.getClosureTotal().equals(Constants.ACTIVE) ? "Total" : "Parcial");
+                }
+            }
+        }
+
+        return legalInformation;
+    }
+
 
     //WEB SERVICE CLASS CALL//
     private class AsyncCallWS extends AsyncTask<Void, String, Boolean> {
@@ -1235,7 +1255,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , syncTaskServer.getTask_comment()
                                     , syncTaskServer.getTask_status()
                                     , syncTaskServer.getTask_user_id()
-                                    , syncTaskServer.getSendPictureFiles());
+                                    , syncTaskServer.getSendPictureFiles()
+                                    , syncTaskServer.getLegal_causes()
+                                    , syncTaskServer.getLegal_file_number()
+                                    , syncTaskServer.getLegal_closures());
 
                             //validOperation = (soapPrimitive != null);
 
@@ -1252,11 +1275,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     + " comment " + syncTaskServer.getTask_comment());
                         }
 
+                        LegalManager legalInformation = getLegalInformation(webServiceTaskDecode.getLegalInformation());
+
                         soapPrimitive = SoapServices.updateTask(getApplicationContext(), webServiceTask.getTask_id()
                                 , webServiceTaskDecode.getTask_comment()
                                 , webServiceTaskDecode.getTask_update_to()
                                 , webServiceTaskDecode.getTask_user_id()
-                                , webServiceTaskDecode.getSendImgFiles());
+                                , webServiceTaskDecode.getSendImgFiles()
+                                , legalInformation.getDescriptionCauses()
+                                , legalInformation.getFileNumber()
+                                , legalInformation.getLegalClosure());
                         validOperation = (soapPrimitive != null);
 
                         List<FilesManager> filesManager = webServiceTaskDecode.getSendVideoFiles();
@@ -1341,7 +1369,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                     , syncTaskServer.getTask_comment()
                                     , syncTaskServer.getTask_status()
                                     , syncTaskServer.getTask_user_id()
-                                    , syncTaskServer.getSendPictureFiles());
+                                    , syncTaskServer.getSendPictureFiles()
+                                    , ""
+                                    , ""
+                                    , "");
 
                             validOperation = (soapPrimitive != null);
 
@@ -1425,13 +1456,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         try {
 
                             FilesManager filesManager = new FilesManager(webServiceTaskDecode.getSendImgFiles());
+                            LegalManager legalInformation = getLegalInformation(webServiceTaskDecode.getLegalInformation());
 
                             BDTasksManagerQuery.updateCommonTask(getApplicationContext(), webServiceTask.getTask_id()
                                     , webServiceTaskDecode.getTask_comment()
                                     , webServiceTaskDecode.getTask_update_to()
                                     , webServiceTaskDecode.getTask_user_id()
                                     , filesManager
-                                    , textError.length() == 0); //if textError is > 0, update is not server sync
+                                    , textError.length() == 0
+                                    , legalInformation); //if textError is > 0, update is not server sync
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("UpdateTaskException", e.getMessage());

@@ -69,9 +69,10 @@ public class BDTasksManagerQuery {
     public static AppVersion getAppVersion(Context context) throws Exception {
         AppVersion appVersion = new AppVersion();
         PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),0);
-        String data = "";
+        //String data = "";
 
         try {
+            /*
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
@@ -106,9 +107,13 @@ public class BDTasksManagerQuery {
                 appVersion.setVersion_msg("Si");
             }
 
-            Log.i("SQLite: ", "cve 2:" + appVersion.getApp_version_cve());
+            */
+
+            appVersion.setApp_version(packageInfo.versionName);
+
             Log.i("SQLite: ", "app version 2 :" + appVersion.getApp_version());
-            Log.i("SQLite: ", "msg 2 :" + appVersion.getVersion_msg());
+
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Database error");
@@ -334,20 +339,19 @@ public class BDTasksManagerQuery {
                 addTaskFiles(context, pg);
             }
 
-            if (!encodedVideoFile.isEmpty()) {
-                TaskGallery pg = new TaskGallery();
+            if (null != encodedVideoFile) {
+                if (!encodedVideoFile.isEmpty()) {
+                    TaskGallery pg = new TaskGallery();
 
-                pg.setFile_type(Constants.VIDEO_FILE_TYPE);
-                pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
-                pg.setBase_package(encodedVideoFile);
-                pg.setDescription(Constants.EMPTY_STRING);
-                pg.setCve_Task_Detail(task_detail_cve);
+                    pg.setFile_type(Constants.VIDEO_FILE_TYPE);
+                    pg.setSync_type(Constants.ITEM_SYNC_LOCAL_TABLET);
+                    pg.setBase_package(encodedVideoFile);
+                    pg.setDescription(Constants.EMPTY_STRING);
+                    pg.setCve_Task_Detail(task_detail_cve);
 
-                addTaskFiles(context, pg);
+                    addTaskFiles(context, pg);
+                }
             }
-
-
-
 
             bd.close();
 

@@ -314,15 +314,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             switch (actionFlag) {
                 case Constants.LOGIN_FORM:
                     try {
-                        AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                        if (localVersion.getVersion_msg().equals("Si")) {
-                            AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE, username, password);
-                            wsLogin.execute();
-                        } else {
-                            AsyncCallWS wsVersion = new AsyncCallWS(Constants.WS_KEY_CHECK_VERSION);
-                            wsVersion.execute();
-                        }
+                        AsyncCallWS wsLogin = new AsyncCallWS(Constants.WS_KEY_LOGIN_SERVICE, username, password);
+                        wsLogin.execute();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -484,21 +477,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case Constants.WS_KEY_LOGIN_SERVICE:
 
-                        soapObject = SoapServices.checkAppVersion(getApplicationContext());
-
-                        String versionLogin = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
-
-                        AppVersion localVersionLogin = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                        if (!localVersionLogin.getApp_version().equals(versionLogin)) {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersionLogin.getApp_version(), "No");
-                            validOperation = true;
-                            updateVersion = true;
-                            break;
-                        } else {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersionLogin.getApp_version(), "Si");
-
-                        }
+                        if (checkVersion()) return  true;
 
                         soapObject = SoapServices.checkUser(getApplicationContext(), username, password);
                         Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
@@ -507,40 +486,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case Constants.WS_KEY_CHECK_VERSION:
 
-                        soapObject = SoapServices.checkAppVersion(getApplicationContext());
-
-                        String serverAppVersion = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
-
-                        AppVersion localAV = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                        if (!localAV.getApp_version().equals(serverAppVersion)) {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localAV.getApp_version(), "No");
-                        } else {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localAV.getApp_version(), "Si");
-                        }
+                        if (checkVersion()) return  true;
 
                         validOperation = true;
 
                         break;
                     case Constants.WS_KEY_ALL_USERS:
 
-                        soapObject = SoapServices.checkAppVersion(getApplicationContext());
-
-                        String version = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
-
-                        AppVersion localVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                        if (!localVersion.getApp_version().equals(version)) {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersion.getApp_version(), "No");
-                            validOperation = true;
-                            break;
-                        } else {
-                            BDTasksManagerQuery.updateAppVersion(getApplicationContext(), localVersion.getApp_version(), "Si");
-
-                        }
+                        if (checkVersion()) return  true;
 
                         soapObject = SoapServices.getServerAllUsers(getApplicationContext(), "");
-
 
                         for (int i = 0; i < soapObject.getPropertyCount(); i++) {
 
@@ -639,20 +594,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             BDTasksManagerQuery.addLink(getApplicationContext(), webServiceLink, u);
                         }
 
-
                         if (validOperation) {
-                            soapObject = SoapServices.checkAppVersion(getApplicationContext());
-
-                            String sav = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
-
-                            AppVersion lav = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                            if (!lav.getApp_version().equals(sav)) {
-                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(), lav.getApp_version(), "No");
-                            } else {
-                                BDTasksManagerQuery.updateAppVersion(getApplicationContext(), lav.getApp_version(), "Si");
-                            }
-
+                            if (checkVersion()) return  true;
                         }
 
                         break;
@@ -706,6 +649,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return validOperation;
         }
 
+        private Boolean checkVersion()  {
+
+            Boolean version = false;
+
+           try {
+
+               soapObject = SoapServices.checkAppVersion(getApplicationContext());
+
+               String serverAppVersion = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
+
+               AppVersion localAV = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+
+               if (!localAV.getApp_version().equals(serverAppVersion)) {
+                   _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
+                   updateVersion = true;
+                   version = true;
+               }
+
+           } catch (Exception e) {
+               e.printStackTrace();
+
+           }
+
+            return  version;
+        }
+
         @Override
         protected void onPostExecute(final Boolean success) {
 
@@ -749,21 +718,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         } else {
 
-                            if (updateVersion) {
-
-                                try {
-                                    AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                                    if (appVersion.getVersion_msg().equals("No")) {
-                                        _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
-                                        showQuestion();
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                            } else {
+                            if (!updateVersion) {
                                 SoapObject location = (SoapObject) soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_TEAM_LOCATION);
 
                                 user.setIdUser(Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString()));
@@ -775,7 +730,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
                                 user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
                                 user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-                            }
+                            } else  showQuestion();
 
                         }
 
@@ -801,31 +756,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         try {
                             BDTasksManagerQuery.cleanTables(getApplicationContext());
 
-                            AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                            if (appVersion.getVersion_msg().equals("No")) {
-                                _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
-                                showQuestion();
-                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
 
                         break;
-                    case Constants.WS_KEY_CHECK_VERSION: case Constants.WS_KEY_ALL_USERS:
+                    case Constants.WS_KEY_CHECK_VERSION:
+                    case Constants.WS_KEY_ALL_USERS:
 
-                        try {
-                            AppVersion appVersion = BDTasksManagerQuery.getAppVersion(getApplicationContext());
-
-                            if (appVersion.getVersion_msg().equals("No")) {
-                                _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
-                                showQuestion();
-                            }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if (updateVersion) {
+                            showQuestion();
                         }
+
 
                         break;
                     default:

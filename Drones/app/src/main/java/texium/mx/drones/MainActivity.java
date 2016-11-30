@@ -431,6 +431,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private AsyncCallWS(Integer wsOperation) {
             webServiceOperation = wsOperation;
             textError = "";
+            updateVersion = false;
         }
 
         private AsyncCallWS(Integer wsOperation, String wsUsername, String wsPassword) {
@@ -756,6 +757,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         try {
                             BDTasksManagerQuery.cleanTables(getApplicationContext());
 
+                            if (updateVersion) showQuestion();
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -765,9 +768,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case Constants.WS_KEY_CHECK_VERSION:
                     case Constants.WS_KEY_ALL_USERS:
 
-                        if (updateVersion) {
-                            showQuestion();
-                        }
+                        if (updateVersion) showQuestion();
 
 
                         break;

@@ -43,7 +43,8 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
     private static Users SESSION_DATA;
 
     static FragmentGalleryListener activityListener;
-    static List<TaskGallery> documentGallery;
+    private static List<TaskGallery> documentGallery;
+    private static List<Integer> deleteFiles;
 
     private static RecyclerView document_list;
     private static LinearLayout emptyGallery;
@@ -165,6 +166,7 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
 
                         tempGalleryList = new ArrayList<>();
                         List<TaskGallery> taskGalleries = new ArrayList<>();
+                        deleteFiles = new ArrayList<>();
 
                         soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0, Constants.DOCUMENT_FILE_TYPE);
 
@@ -203,7 +205,21 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                                         documentServer.setLocalURI(decodeDocument.getLocalURI());
 
                                         taskGalleries.add(documentServer);
+                                    } else {
+
+                                        if (documentLocal.getSync_type().equals(Constants.ITEM_SYNC_SERVER_CLOUD)) {
+
+                                            documentLocal.setDescription(documentServer.getDescription());
+
+                                            BDTasksManagerQuery.updateTaskFile(getContext(), documentLocal);
+                                        }
+
                                     }
+
+                                    Integer status = Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                                    if (status.equals(Constants.INACTIVE)) deleteFiles.add(documentServer.getId());
+
                                 }
                             }
                         }
@@ -223,8 +239,15 @@ public class DocumentGalleryFragment extends Fragment implements View.OnClickLis
                             List<TaskGallery> allDocuments = BDTasksManagerQuery.getGalleryFiles(
                                     getContext(), taskGallery, Constants.DOCUMENT_FILE_TYPE, null, Constants.ACTIVE);
 
+                            for (TaskGallery document : allDocuments) {
 
-                            tempGalleryList.addAll(allDocuments);
+                                if (deleteFiles.contains(document.getId())) {
+                                    BDTasksManagerQuery.deleteTaskFile(getContext(),document);
+                                    continue;
+                                }
+
+                                tempGalleryList.add(document);
+                            }
                         }
 
                         validOperation = true;

@@ -639,6 +639,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             BDTasksManagerQuery.addLink(getApplicationContext(), webServiceLink, u);
                         }
 
+
                         if (validOperation) {
                             soapObject = SoapServices.checkAppVersion(getApplicationContext());
 
@@ -690,7 +691,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.i("INFO MSG", textError);
 
                     } catch (Exception ex) {
-                        textError = ex.getMessage();
+                        textError = (e != null) ? e.getMessage() : "Error desconocido ...";
 
                         ex.printStackTrace();
                         Log.e("ValidationUserException: ", "Unknown error");
@@ -707,7 +708,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            pDialog.dismiss();
+
+            try {
+                pDialog.dismiss();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             if (success) {
 
                 Intent intentNavigationDrawer = new Intent(MainActivity.this, NavigationDrawerActivity.class);

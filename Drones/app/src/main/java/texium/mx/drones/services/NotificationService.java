@@ -13,8 +13,13 @@ import android.util.Log;
 
 import org.ksoap2.serialization.SoapObject;
 
+import java.util.List;
+
 import texium.mx.drones.R;
+import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.Users;
@@ -46,6 +51,7 @@ public class NotificationService {
         Intent resultIntent = new Intent(context, activity.getClass());
         resultIntent.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_ACTUAL_FRAGMENT, Constants.MAP_STATUS_FRAGMENT.get(task.getTask_status()));
         resultIntent.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN, user);
+        resultIntent.putExtra(Constants.ACTIVITY_EXTRA_PARAMS_ACTUAL_TASK_NOTIFICATION, task);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -59,11 +65,64 @@ public class NotificationService {
     }
 
     public static void callNotification(Activity activity, Integer idUser) {
-
         try {
             Context context = activity.getApplicationContext();
 
-            SoapObject soapObject = SoapServices.getServerAllTasks(context, idUser, Constants.NEWS_TASK);
+            buildTaskNotification(activity, SoapServices.getServerAllTasks(context, idUser, Constants.NEWS_TASK), idUser);
+            buildMemberNotification(activity, SoapServices.getServerAllMembers(context, 0), idUser);
+            buildFinishNotification(activity, idUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Tasks getTaskServerByUser(Context context, Integer idUser, Integer idTask) {
+
+        Tasks t = null;
+        try {
+
+            SoapObject soapObject = SoapServices.getServerAllTasks(context, idUser, Constants.ALL_TASK);
+
+            if (soapObject.getPropertyCount() > 0) {
+
+                for (int i = 0; i < soapObject.getPropertyCount(); i++) {
+
+                    t = new Tasks();
+
+                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+
+                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+
+                    if (!t.getTask_id().equals(idTask)) {
+                        continue;
+                    }
+
+                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+
+                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                    t.setTask_user_id(idUser);
+
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return t;
+    }
+
+    private static void buildTaskNotification(Activity activity, SoapObject soapObject, Integer idUser) {
+        try {
+
+            Context context = activity.getApplicationContext();
 
             if (soapObject.getPropertyCount() > 0) {
 
@@ -106,7 +165,15 @@ public class NotificationService {
                 }
             }
 
-            soapObject = SoapServices.getServerAllMembers(context, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void buildMemberNotification(Activity activity, SoapObject soapObject, Integer idUser) {
+        try {
+
+            Context context = activity.getApplicationContext();
 
             for (int i = 0; i < soapObject.getPropertyCount(); i++) {
 
@@ -149,51 +216,50 @@ public class NotificationService {
                     BDTasksManagerQuery.updateMember(context, memberLocal);
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static Tasks getTaskServerByUser(Context context, Integer idUser, Integer idTask) {
-
-        Tasks t = null;
+    private static void buildFinishNotification(Activity activity, Integer idUser) {
         try {
 
-            SoapObject soapObject = SoapServices.getServerAllTasks(context, idUser, Constants.ALL_TASK);
+            Context context = activity.getApplicationContext();
 
-            if (soapObject.getPropertyCount() > 0) {
+            Tasks tasks = new Tasks(Constants.ALL_TASK, idUser);
 
-                for (int i = 0; i < soapObject.getPropertyCount(); i++) {
+            List<Tasks> allTask = BDTasksManagerQuery.getListTaskByStatus(context, tasks, null);
 
-                    t = new Tasks();
+            for (Tasks task : allTask) {
 
-                    SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                    SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+                SoapObject soapObject = SoapServices.getServerTaskById(context, task.getTask_id());
 
-                    t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                Integer serverStatus = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
 
-                    if (!t.getTask_id().equals(idTask)) {
-                        continue;
+                if (!task.getTask_status().equals(serverStatus)) {
+
+                    BDTasksManagerQuery.updateCommonTask(context
+                            , task.getTask_id()
+                            , task.getTask_content()
+                            , serverStatus
+                            , task.getTask_user_id()
+                            , new FilesManager()
+                            , true
+                            , new LegalManager());
+
+                    if (serverStatus.equals(Constants.CANCEL_TASK) || serverStatus.equals(Constants.REVISION_TASK)) {
+
+                        task.setTask_status(serverStatus);
+
+                        String description = (serverStatus.equals(Constants.CANCEL_TASK)) ? "Tarea cancelada " : "Tarea finalizada";
+                        NotificationService.taskNotification(activity, task.getTask_id(), description, task);
                     }
 
-                    t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-
-                    t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                    t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                    t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                    t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                    t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                    t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                    t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                    t.setTask_user_id(idUser);
-
-                    break;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return t;
     }
 }

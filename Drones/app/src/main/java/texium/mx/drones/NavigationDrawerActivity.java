@@ -119,6 +119,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     //Sessions control//
     private static Users SESSION_DATA;
     private static String ACTUAL_FRAGMENT;
+    private static Tasks ACTUAL_TASK_NOTIFICATION;
 
     //Collections Controls//
     public Map<Long, Object> taskToken = new HashMap<>();
@@ -156,6 +157,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         try {
             ACTUAL_FRAGMENT = (String) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_ACTUAL_FRAGMENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ACTUAL_TASK_NOTIFICATION = (Tasks) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_ACTUAL_TASK_NOTIFICATION);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -378,6 +385,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 LegalDescriptionFragment.setRequited();
 
                 break;
+            case Constants.MESSAGE_ALERT_NO_FRAGMENT:
+
+                Tasks task = ACTUAL_TASK_NOTIFICATION;
+
+                String status =  (task.getTask_status().equals(Constants.REVISION_TASK)) ? "Finalizada" : "Cancelada";
+
+                ad.setTitle(getString(R.string.default_title_alert_dialog));
+                ad.setMessage("La tarea ha sido " + status + ", gracias por su aportación." );
+                ad.setNeutralButton(getString(R.string.default_positive_button), this);
+
+                break;
             default:
 
                 ad.setTitle(getString(R.string.default_title_alert_dialog));
@@ -500,13 +518,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 if (task.getTask_user_id().equals(SESSION_DATA.getIdUser())) {
 
-                    tasksDecode.setTask_update_to((tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK);
-                    tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-                    tasksDecode.setLegalInformation(getLegalInformation());
+                    Integer status = (tasksDecode.getOrigin_button() == R.id.finish_task_button) ? Constants.CLOSE_TASK : Constants.PENDING_TASK;
 
-                    if (legalRequired != null) {
-                        showQuestion(legalRequired);
-                        return;
+                    tasksDecode.setTask_update_to(status);
+                    tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+
+
+                    if (status.equals(Constants.CLOSE_TASK)) {
+
+                        tasksDecode.setLegalInformation(getLegalInformation());
+
+                        if (legalRequired != null) {
+                            showQuestion(legalRequired);
+                            return;
+                        }
+
                     }
 
                     closeActiveTaskFragment(v);
@@ -746,6 +772,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         removeAllFragment(fragmentManager);
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
         if (id == R.id.nav_news_task) {
 
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -807,11 +836,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
             stopThread = true;
             handler.removeCallbacks(runnable);
             taskToken.clear();
-            finish();
-        }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        }
         return true;
     }
 
@@ -861,6 +887,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     fragmentTransaction.commit();
 
                     taskToken.clear();
+
+                    break;
+                default:
+
+                    showQuestion(-1);
 
                     break;
             }
@@ -1458,7 +1489,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             FilesManager filesManager = new FilesManager(webServiceTaskDecode.getSendImgFiles());
                             LegalManager legalInformation = getLegalInformation(webServiceTaskDecode.getLegalInformation());
 
-                            BDTasksManagerQuery.updateCommonTask(getApplicationContext(), webServiceTask.getTask_id()
+                            BDTasksManagerQuery.updateCommonTask(getApplicationContext()
+                                    , webServiceTask.getTask_id()
                                     , webServiceTaskDecode.getTask_comment()
                                     , webServiceTaskDecode.getTask_update_to()
                                     , webServiceTaskDecode.getTask_user_id()
@@ -1555,6 +1587,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             Log.i("CHECK TASK", "Buscando nuevas tareas");
                         }
                         break;
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
+
+                        finish();
+
+                        break;
                     default:
                         break;
                 }
@@ -1566,7 +1603,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
-                        pDialog.dismiss();
+
+                            try {
+                                pDialog.dismiss();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                     }
                 }
 
@@ -1577,6 +1619,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         onMapReady(mMap);
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+                        break;
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
+
+                        finish();
+
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
                     case Constants.WS_KEY_UPDATE_TASK:

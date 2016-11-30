@@ -24,7 +24,7 @@ import texium.mx.drones.utils.Constants;
 /**
  * Created by saurett on 14/01/2016.
  */
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHolder>{
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHolder> {
 
     /* En caso de llamar una actividad desde el adapter
     Context context = v.getContext();
@@ -71,11 +71,17 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         this.onClickListener = onClickListener;
     }
 
-    public Tasks getItemByPosition(int position) { return tasks_list.get(position);}
+    public Tasks getItemByPosition(int position) {
+        return tasks_list.get(position);
+    }
 
-    public void addAll(List<Tasks> tasks_list) { this.tasks_list.addAll(tasks_list);}
+    public void addAll(List<Tasks> tasks_list) {
+        this.tasks_list.addAll(tasks_list);
+    }
 
-    public void remove(int position) { this.tasks_list.remove(position);}
+    public void remove(int position) {
+        this.tasks_list.remove(position);
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -103,14 +109,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         holder.agree_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentJumper(v,task,taskDecode);
+                fragmentJumper(v, task, taskDecode);
             }
         });
 
         holder.finish_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    fragmentJumper(v,task,taskDecode);
+                fragmentJumper(v, task, taskDecode);
             }
         });
 
@@ -118,7 +124,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         holder.decline_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentJumper(v,task,taskDecode);
+                fragmentJumper(v, task, taskDecode);
             }
         });
 
@@ -126,19 +132,19 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
 
             @Override
             public void onClick(View v) {
-                fragmentJumper(v,task,taskDecode);
+                fragmentJumper(v, task, taskDecode);
             }
         });
 
         holder.task_location_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragmentJumper(view,task,taskDecode);
+                fragmentJumper(view, task, taskDecode);
             }
         });
     }
 
-    private void fragmentJumper(View v, Tasks task,TasksDecode _tasksDecode) {
+    private void fragmentJumper(View v, Tasks task, TasksDecode _tasksDecode) {
 
         switch (_tasksDecode.getTask_status()) {
             case Constants.NEWS_TASK:
@@ -148,13 +154,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
                 PendingTasksFragment.fragmentJump(v, task, _tasksDecode);
                 break;
             case Constants.PROGRESS_TASK:
-                ProgressTasksFragment.fragmentJump(v,task,_tasksDecode);
+                ProgressTasksFragment.fragmentJump(v, task, _tasksDecode);
                 break;
             case Constants.CLOSE_TASK:
-                CloseTasksFragment.fragmentJump(v,task,_tasksDecode);
+                CloseTasksFragment.fragmentJump(v, task, _tasksDecode);
                 break;
             case Constants.REVISION_TASK:
-                RevisionTasksFragment.fragmentJump(v,task,_tasksDecode);
+                RevisionTasksFragment.fragmentJump(v, task, _tasksDecode);
                 break;
             default:
                 Snackbar.make(v, "No action", Snackbar.LENGTH_LONG)
@@ -163,7 +169,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         }
     }
 
-    private void buttonVisibilityControl(ViewHolder holder,int task_type) {
+    private void buttonVisibilityControl(ViewHolder holder, int task_type) {
         switch (task_type) {
             case Constants.NEWS_TASK:
                 holder.decline_task_button.setVisibility(View.VISIBLE);
@@ -201,11 +207,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         return tasks_list == null ? 0 : tasks_list.size();
     }
 
-    public int scrollByIdTask(int idTask) {
+    public int getScrollPosition(int idTask) {
         int position = 0;
-        for (Tasks task: tasks_list) {
 
-
+        for (Tasks task : tasks_list) {
             if (task.getTask_id().equals(idTask)) {
                 return position;
             }

@@ -25,6 +25,8 @@ import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
@@ -80,6 +82,12 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
         SESSION_DATA = (Users) getActivity().getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
 
+        try {
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         AsyncCallWS wsTaskList = new AsyncCallWS(Constants.WS_KEY_TASK_SERVICE_NEWS,Constants.NEWS_TASK);
         wsTaskList.execute();
     }
@@ -114,6 +122,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
         private Integer webServiceOperation;
         private Integer idStatus;
         private List<Tasks> tempTaskList;
+        private List<Tasks> memberTaskList;
         private String textError;
 
         private AsyncCallWS(Integer wsOperation, Integer wsIdStatus) {
@@ -121,6 +130,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
             idStatus = wsIdStatus;
             textError = "";
             tempTaskList = new ArrayList<>();
+            memberTaskList = new ArrayList<>();
         }
 
         @Override
@@ -149,6 +159,33 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
                         Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
 
+                        memberTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
+
+                        for (Tasks temp : memberTaskList) {
+                            Integer tempTaskID = temp.getTask_user_id();
+
+                            soapObject = SoapServices.getServerTaskById(getContext(), tempTaskID);
+
+                            if (soapObject.getPropertyCount() > 0 ) {
+
+                                Integer tempStatus = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                                if (!temp.getTask_status().equals(tempStatus)) {
+                                    BDTasksManagerQuery.updateCommonTask(getContext()
+                                            , temp.getTask_id()
+                                            , temp.getTask_content()
+                                            , tempStatus
+                                            , temp.getTask_user_id()
+                                            , new FilesManager()
+                                            , textError.length() == 0
+                                            , new LegalManager());
+                                }
+                            }
+                        }
+
+                        memberTaskList = new ArrayList<>();
+
+
                         soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
@@ -157,7 +194,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                             tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
                             if (tempTaskList.size() > 0) validOperation = true;
                         } else {
-                            tempTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
+                            memberTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
                         }
 
                         break;
@@ -257,6 +294,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
 
                         Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
                         tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync);
+                        tempTaskList.addAll(memberTaskList);
 
                         for (Tasks tempTask : tempTaskList) {
                             Boolean contain = false;
@@ -283,7 +321,6 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                         tasks_list.setLayoutManager(linearLayoutManager);
 
-                        tasks_list.scrollToPosition(1);
 
                         LinearLayoutManager linearLayoutManagerTitle = new LinearLayoutManager(getContext());
                         tasks_list_tittle.setLayoutManager(linearLayoutManagerTitle);

@@ -30,6 +30,8 @@ public final class Constants {
     public static final int DOCUMENT_FILE_TYPE = 3;
     public static final int MEMBER_TYPE = 4;
 
+    public static final int MESSAGE_ALERT_NO_FRAGMENT = -1;
+
     //endregion SYS CONSTANTS//
 
     //region DATABASE STATUS//
@@ -40,7 +42,8 @@ public final class Constants {
     public static final int PROGRESS_TASK = 4;
     public static final int PENDING_TASK = 5;
     public static final int CLOSE_TASK = 6;
-    @Deprecated  public static final int REVISION_TASK = 7;
+    public static final int REVISION_TASK = 7;
+    public static final int CANCEL_TASK = 8;
     //endregion DATABASE STATUS
 
     //region MAP ACCESS//
@@ -76,6 +79,7 @@ public final class Constants {
     public static final String FRAGMENT_PREVIEW_MEMBER_GALLERY_TAG = "fragment_preview_member_gallery";
     public static final String FRAGMENT_LEGAL = "fragment_legal";
     public static final String FRAGMENT_LEGAL_DESCRIPTION = "fragment_legal_description";
+    public static final String NO_FRAGMENT_TAG = "no_fragment_tag";
     //endregion FRAGMENT TAGS//
 
     //region WEB SERVICE ID //
@@ -153,18 +157,19 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_ADD_MEMBER = "192.168.12.10/AgregarMiembro";
     public static final String WEB_SERVICE_SOAP_ACTION_DELETE_MEMBER = "192.168.12.10/EliminarMiembro";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_TASKS_MEMBERS   = "192.168.12.10/ConsultarMiembrosTarea";
+    public static final String WEB_SERVICE_SOAP_ACTION_SERVER_TASK   = "192.168.12.10/ConsultarTarea";
 
 
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.64/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-    public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-
     /*
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.0.103/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+    */
+
     public static final String WEB_SERVICE_COMPLETE_URL = "http://170.0.12.51/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas
-    */
 
     //endregion SOAP CONFIGURATION//
 
@@ -191,6 +196,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_ADD_MEMBER = "AgregarMiembro";
     public static final String WEB_SERVICE_METHOD_NAME_DELETE_MEMBER = "EliminarMiembro";
     public static final String WEB_SERVICE_METHOD_NAME_ALL_TASKS_MEMBERS = "ConsultarMiembrosTarea";
+    public static final String WEB_SERVICE_METHOD_NAME_SERVER_TASK = "ConsultarTarea";
 
 
     //endregion SOAP OPERATION//
@@ -269,6 +275,7 @@ public final class Constants {
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY = "task_gallery_info";
     public static final String ACTIVITY_EXTRA_PARAMS_TASK_GALLERY_DESCRIPTION = "task_gallery_description";
     public static final String ACTIVITY_EXTRA_PARAMS_ACTUAL_FRAGMENT = "actual_fragment";
+    public static final String ACTIVITY_EXTRA_PARAMS_ACTUAL_TASK_NOTIFICATION = "actual_task_notification";
     //endregion ACTIVITY PARAMS//
 
     //region ACCESS TO MAP TASK PRIORITY//
@@ -327,6 +334,8 @@ public final class Constants {
         MAP_STATUS_FRAGMENT.put(PROGRESS_TASK,FRAGMENT_PROGRESS_TAG);
         MAP_STATUS_FRAGMENT.put(PENDING_TASK,FRAGMENT_PENDING_TAG);
         MAP_STATUS_FRAGMENT.put(CLOSE_TASK,FRAGMENT_CLOSE_TAG);
+        MAP_STATUS_FRAGMENT.put(REVISION_TASK,NO_FRAGMENT_TAG);
+        MAP_STATUS_FRAGMENT.put(CANCEL_TASK,NO_FRAGMENT_TAG);
     }
 
 

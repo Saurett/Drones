@@ -45,8 +45,9 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
     private SoapObject soapObject;
     private static Users SESSION_DATA;
 
-    static FragmentGalleryListener activityListener;
-    static List<TaskGallery> videoGallery;
+    private static FragmentGalleryListener activityListener;
+    private static List<TaskGallery> videoGallery;
+    private static List<Integer> deleteFiles;
 
     private static RecyclerView videos_list;
     private static LinearLayout emptyGallery;
@@ -55,8 +56,8 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
     private ProgressDialog pDialog;
     static FragmentManager fragmentManager;
-
     private Button videoGalleryBtn;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -170,6 +171,7 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
 
                         tempGalleryList = new ArrayList<>();
                         List<TaskGallery> taskGalleries = new ArrayList<>();
+                        deleteFiles = new ArrayList<>();
 
                         soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0, Constants.VIDEO_FILE_TYPE);
 
@@ -210,7 +212,20 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
                                         videoServer.setBase_package(FileServices.attachImgFromBitmap(videoServer.getPhoto_bitmap(),100));
 
                                         taskGalleries.add(videoServer);
+                                    } else {
+
+                                        if (videoLocal.getSync_type().equals(Constants.ITEM_SYNC_SERVER_CLOUD)) {
+
+                                            videoLocal.setDescription(videoServer.getDescription());
+
+                                            BDTasksManagerQuery.updateTaskFile(getContext(), videoLocal);
+                                        }
+
                                     }
+
+                                    Integer status = Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                                    if (status.equals(Constants.INACTIVE)) deleteFiles.add(videoServer.getId());
                                 }
                             }
                         }
@@ -231,6 +246,11 @@ public class VideoGalleryFragment extends Fragment implements View.OnClickListen
                                     getContext(), taskGallery, Constants.VIDEO_FILE_TYPE, null, Constants.ACTIVE);
 
                             for (TaskGallery video : allPhotos) {
+
+                                if (deleteFiles.contains(video.getId())) {
+                                    BDTasksManagerQuery.deleteTaskFile(getContext(),video);
+                                    continue;
+                                }
 
                                 if (!video.getBase_package().isEmpty()) {
                                     byte[] decodedString = Base64.decode(video.getBase_package(), Base64.DEFAULT);

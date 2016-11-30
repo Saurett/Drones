@@ -584,6 +584,7 @@ public class SoapServices {
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, idTask);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_SYSTEM_ID, idSystem);
             Request.addProperty(Constants.WEB_SERVICE_PARAM_SYSTEM_EXTENSION, extension);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_STATUS, 0);
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;
@@ -875,6 +876,54 @@ public class SoapServices {
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_ALL_TASKS_MEMBERS;
             String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_ALL_TASKS_MEMBERS;
+            String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
+            String URL = BDTasksManagerQuery.getServer(context);
+
+            SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID, idTask);
+
+            SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            soapEnvelope.dotNet = true;
+            soapEnvelope.setOutputSoapObject(Request);
+
+            HttpTransportSE transport = new HttpTransportSE(URL);
+
+            transport.call(SOAP_ACTION, soapEnvelope);
+            soapObject = (SoapObject) soapEnvelope.getResponse();
+
+        } catch (EOFException e ) {
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (ConnectException e) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SocketTimeoutException e ) {
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (HttpResponseException e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (SoapFault e){
+            e.printStackTrace();
+            throw  new ConnectException(context.getString(R.string.default_connect_error));
+        } catch (Exception e) {
+
+            if (e != null) {
+                e.printStackTrace();
+                throw new Exception(context.getString(R.string.default_exception_error));
+            } else {
+                throw  new ConnectException(context.getString(R.string.default_connect_error));
+            }
+        }
+
+        return soapObject;
+    }
+
+    public static SoapObject getServerTaskById(Context context, Integer idTask) throws Exception {
+        SoapObject soapObject;
+        try {
+            String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_SERVER_TASK;
+            String METHOD_NAME = Constants.WEB_SERVICE_METHOD_NAME_SERVER_TASK;
             String NAMESPACE = Constants.WEB_SERVICE_NAMESPACE;
             String URL = BDTasksManagerQuery.getServer(context);
 

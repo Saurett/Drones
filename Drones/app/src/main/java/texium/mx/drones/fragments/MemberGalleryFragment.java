@@ -45,7 +45,8 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
     private static Users SESSION_DATA;
 
     static FragmentGalleryListener activityListener;
-    static List<TaskGallery> taskGallery;
+    private static List<TaskGallery> taskGallery;
+    private static List<Integer> deleteMembers;
 
     static RecyclerView member_list;
     private static LinearLayout emptyGallery;
@@ -188,6 +189,7 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                     case Constants.WS_KEY_ITEM_MEMBER_GALLERY:
 
                         tempGalleryList = new ArrayList<>();
+                        deleteMembers = new ArrayList<>();
 
                         soapObject = SoapServices.getServerAllMembers(getContext(), _TASK_INFO.getTask_id());
 
@@ -210,6 +212,10 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                             if (!exist) {
                                 BDTasksManagerQuery.addMember(getContext(),member);
                             }
+
+                            Integer status = Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                            if (status.equals(Constants.INACTIVE)) deleteMembers.add(member.getId());
                         }
 
                         List<Integer> serverSync = new ArrayList<>();
@@ -233,6 +239,12 @@ public class MemberGalleryFragment extends Fragment implements View.OnClickListe
                             member.setIdTask(memberGallery.getIdTask());
 
                             member.setPhoto_bitmap(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.empty_member_profile));
+
+                            if (deleteMembers.contains(member.getId())) {
+                                BDTasksManagerQuery.deleteMember(getContext(), member);
+                                continue;
+                            }
+
 
                             if (memberGallery.getBase_package() != null) {
                                 byte[] decodedString = Base64.decode(memberGallery.getBase_package(), Base64.DEFAULT);

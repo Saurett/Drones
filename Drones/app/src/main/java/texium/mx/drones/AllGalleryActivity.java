@@ -1224,7 +1224,6 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
                                 BDTasksManagerQuery.deleteMember(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
                                 txtDelete = txtDelete.replaceAll("Archivo", "Miembro");
                             } else {
-
                                 BDTasksManagerQuery.deleteTaskFile(getApplicationContext(), _DECODE_GALLERY.getTaskGallery());
                             }
 

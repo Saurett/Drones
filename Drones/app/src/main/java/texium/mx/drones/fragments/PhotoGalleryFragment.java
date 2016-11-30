@@ -47,9 +47,10 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
     private static Users SESSION_DATA;
 
     static FragmentGalleryListener activityListener;
-    static List<TaskGallery> taskGallery;
+    private static List<TaskGallery> taskGallery;
+    private static List<Integer> deleteFiles;
 
-    static RecyclerView photos_list;
+    private static RecyclerView photos_list;
     private static LinearLayout emptyGallery;
 
     static PhotoGalleryAdapter photo_gallery_adapter;
@@ -169,6 +170,7 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
 
                         tempGalleryList = new ArrayList<>();
                         List<TaskGallery> photoGalleries = new ArrayList<>();
+                        deleteFiles = new ArrayList<>();
 
                         soapObject = SoapServices.getTaskFiles(getContext(), _TASK_INFO.getTask_id(), 0, Constants.PICTURE_FILE_TYPE);
 
@@ -209,7 +211,20 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                                         photoServer.setPhoto_bitmap(decodePhoto.getPhoto_bitmap());
                                         photoServer.setBase_package(FileServices.attachImgFromBitmap(photoServer.getPhoto_bitmap(), 50));
                                         photoGalleries.add(photoServer);
+                                    } else {
+
+                                        if (photoLocal.getSync_type().equals(Constants.ITEM_SYNC_SERVER_CLOUD)) {
+
+                                            photoLocal.setDescription(photoServer.getDescription());
+
+                                            BDTasksManagerQuery.updateTaskFile(getContext(), photoLocal);
+                                        }
+
                                     }
+
+                                    Integer status = Integer.valueOf(soItem.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                                    if (status.equals(Constants.INACTIVE)) deleteFiles.add(photoServer.getId());
                                 }
                             }
                         }
@@ -233,6 +248,11 @@ public class PhotoGalleryFragment extends Fragment implements View.OnClickListen
                             for (TaskGallery photo : allPhotos) {
 
                                 if (photo.getBase_package() == null) continue;
+
+                                if (deleteFiles.contains(photo.getId())) {
+                                    BDTasksManagerQuery.deleteTaskFile(getContext(),photo);
+                                    continue;
+                                }
 
                                 byte[] decodedString = Base64.decode(photo.getBase_package(), Base64.DEFAULT);
                                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);

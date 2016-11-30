@@ -23,8 +23,11 @@ import java.util.List;
 import texium.mx.drones.R;
 import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
+import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
@@ -151,7 +154,34 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
                         serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
 
                         NotificationService.callNotification(getActivity(), SESSION_DATA.getIdUser());
-                        soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
+
+                        memberTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
+
+                        for (Tasks temp : memberTaskList) {
+                            Integer tempTaskID = temp.getTask_id();
+
+                            soapObject = SoapServices.getServerTaskById(getContext(), tempTaskID);
+
+                            if (soapObject.getPropertyCount() > 0 ) {
+
+                                Integer tempStatus = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                                if (!temp.getTask_status().equals(tempStatus)) {
+                                    BDTasksManagerQuery.updateCommonTask(getContext()
+                                            , temp.getTask_id()
+                                            , temp.getTask_content()
+                                            , tempStatus
+                                            , temp.getTask_user_id()
+                                            , new FilesManager()
+                                            , textError.length() == 0
+                                            , new LegalManager());
+                                }
+                            }
+                        }
+
+                        memberTaskList = new ArrayList<>();
+
+                        soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), 0);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {

@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
+import android.support.annotation.IntegerRes;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -855,20 +856,22 @@ public class BDTasksManagerQuery {
             querySync = querySync.replace("[", "");
             querySync = querySync.replace("]", "");
 
-            String queryStatus = (null != serverStatus) ? " and " + BDTasksManager.ColumnTasksMembers.SERVER_STATUS + " = " + serverStatus : "";
+            String queryServerStatus = (null != serverStatus) ? " and " + BDTasksManager.ColumnTasksMembers.SERVER_STATUS + " = " + serverStatus : "";
 
             Cursor result = bd.rawQuery("select * from  " + BDTasksManager.TASKS_MEMBERS_TABLE_NAME
                     + " where " + BDTasksManager.ColumnTasksMembers.TASK_ID_USER + " = " + tasks.getTask_user_id()
-                    + querySync + queryStatus
+                    + querySync + queryServerStatus
                     + " order by 1 ASC", null);
 
             if (result.moveToFirst()) {
                 do {
 
+                    String queryTaskStatus =  (tasks.getTask_status().equals(Constants.ALL_TASK))
+                            ? "" : " and " + BDTasksManager.ColumnTasks.TASK_STATUS + " = " + tasks.getTask_status();
+
                     Cursor resultTwo = bd.rawQuery("select * from  " + BDTasksManager.TASKS_TABLE_NAME
                             + " where " + BDTasksManager.ColumnTasks.TASK_ID + " = " + result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID))
-                            + " and " + BDTasksManager.ColumnTasks.TASK_STATUS + " = " + tasks.getTask_status()
-                            + " order by 1 ASC", null);
+                            + queryTaskStatus + " order by 1 ASC", null);
 
                     if (resultTwo.moveToFirst()) {
                         do {
@@ -1309,8 +1312,12 @@ public class BDTasksManagerQuery {
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
             //TODO COSA DE admin
 
-            Cursor result = bd.rawQuery("select * from tasks where task_status=" + t.getTask_status()
-                    + " and " + BDTasksManager.ColumnTasks.TASK_USER_ID + " = " + t.getTask_user_id(), null);
+            String queryTaskStatus = (t.getTask_status().equals(Constants.ALL_TASK))
+                    ? "" : " and " + BDTasksManager.ColumnTasks.TASK_STATUS + " = " + t.getTask_status();
+
+            Cursor result = bd.rawQuery("select * from tasks where "
+                    + BDTasksManager.ColumnTasks.TASK_USER_ID + " = " + t.getTask_user_id()
+                    + queryTaskStatus , null);
 
             if (result.moveToFirst()) {
                 do {

@@ -25,6 +25,8 @@ import texium.mx.drones.adapters.TaskListAdapter;
 import texium.mx.drones.adapters.TaskListTitleAdapter;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
+import texium.mx.drones.models.FilesManager;
+import texium.mx.drones.models.LegalManager;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
 import texium.mx.drones.models.TasksTitle;
@@ -153,6 +155,34 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                         Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
 
                         NotificationService.callNotification(getActivity(), SESSION_DATA.getIdUser());
+
+                        memberTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
+
+                        for (Tasks temp : memberTaskList) {
+                            Integer tempTaskID = temp.getTask_id();
+
+                            soapObject = SoapServices.getServerTaskById(getContext(), tempTaskID);
+
+                            if (soapObject.getPropertyCount() > 0 ) {
+
+                                Integer tempStatus = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString());
+
+                                if (!temp.getTask_status().equals(tempStatus)) {
+                                    BDTasksManagerQuery.updateCommonTask(getContext()
+                                            , temp.getTask_id()
+                                            , temp.getTask_content()
+                                            , tempStatus
+                                            , temp.getTask_user_id()
+                                            , new FilesManager()
+                                            , textError.length() == 0
+                                            , new LegalManager());
+                                }
+                            }
+                        }
+
+                        memberTaskList = new ArrayList<>();
+
+
                         soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 

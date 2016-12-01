@@ -97,7 +97,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     //Principal Buttons//
-    private FloatingActionButton fab, direction_fab, camera_fab, video_fab;
+    private FloatingActionButton fab, direction_fab, camera_fab, video_fab, map_fab;
 
     //Dynamic Header//
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
@@ -183,12 +183,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         direction_fab = (FloatingActionButton) findViewById(R.id.direction_fab);
         camera_fab = (FloatingActionButton) findViewById(R.id.camera_fab);
         video_fab = (FloatingActionButton) findViewById(R.id.video_fab);
+        map_fab = (FloatingActionButton) findViewById(R.id.map_fab);
 
         //Button listeners//
         fab.setOnClickListener(this);
         direction_fab.setOnClickListener(this);
         camera_fab.setOnClickListener(this);
         video_fab.setOnClickListener(this);
+        map_fab.setOnClickListener(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -275,6 +277,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             case R.id.fab:
                 callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION);
+                break;
+
+            case R.id.map_fab:
+
+                mMap.setMapType(( mMap.getMapType() == GoogleMap.MAP_TYPE_HYBRID) ? GoogleMap.MAP_TYPE_TERRAIN : GoogleMap.MAP_TYPE_HYBRID);
+
                 break;
             case R.id.direction_fab:
 

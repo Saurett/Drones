@@ -185,6 +185,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         video_fab = (FloatingActionButton) findViewById(R.id.video_fab);
         map_fab = (FloatingActionButton) findViewById(R.id.map_fab);
 
+
+
         //Button listeners//
         fab.setOnClickListener(this);
         direction_fab.setOnClickListener(this);
@@ -291,8 +293,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         "http://maps.google.com/maps?saddr=51.5, 0.125&daddr=51.5, 0.15"));
                 startActivity(intent);
 
-                Snackbar.make(v, "El chat no esta activo", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 break;
             case R.id.camera_fab:
                 mediaContent(MediaStore.ACTION_IMAGE_CAPTURE, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);

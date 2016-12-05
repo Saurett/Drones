@@ -70,6 +70,7 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
     private static DecodeGallery _DECODE_GALLERY;
     private Integer ACTUAL_GALLERY;
     private Button photoBtn, videoBtn, documentBtn, memberBtn;
+    private View photoSelect, videoSelect, documentSelect, memberSelect;
 
     public static FragmentManager fragmentManager;
     public static FilesManager fileManager;
@@ -112,6 +113,13 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         videoBtn = (Button) findViewById(R.id.video_gallery);
         documentBtn = (Button) findViewById(R.id.document_gallery);
         memberBtn = (Button) findViewById(R.id.member_gallery);
+
+        photoSelect =  findViewById(R.id.photos_gallery_select);
+        videoSelect =  findViewById(R.id.video_gallery_select);
+        documentSelect =  findViewById(R.id.document_gallery_select);
+        memberSelect =  findViewById(R.id.member_gallery_select);
+
+        photoSelect.setBackgroundResource(R.color.colorAccent);
 
         photoBtn.setOnClickListener(this);
         videoBtn.setOnClickListener(this);
@@ -659,21 +667,30 @@ public class AllGalleryActivity extends AppCompatActivity implements DialogInter
         closeFragment(Constants.FRAGMENT_DOCUMENT_GALLERY_TAG);
         closeFragment(Constants.FRAGMENT_MEMBER_GALLERY_TAG);
 
+        photoSelect.setBackgroundResource(R.color.colorPrimaryWhite);
+        videoSelect.setBackgroundResource(R.color.colorPrimaryWhite);
+        documentSelect.setBackgroundResource(R.color.colorPrimaryWhite);
+        memberSelect.setBackgroundResource(R.color.colorPrimaryWhite);
+
         switch (v.getId()) {
             case R.id.photos_gallery:
                 ACTUAL_GALLERY = Constants.PICTURE_FILE_TYPE;
+                photoSelect.setBackgroundResource(R.color.colorAccent);
                 replaceFragmentPhotoFragment();
                 break;
             case R.id.video_gallery:
                 ACTUAL_GALLERY = Constants.VIDEO_FILE_TYPE;
+                videoSelect.setBackgroundResource(R.color.colorAccent);
                 replaceFragmentVideoFragment();
                 break;
             case R.id.document_gallery:
                 ACTUAL_GALLERY = Constants.DOCUMENT_FILE_TYPE;
+                documentSelect.setBackgroundResource(R.color.colorAccent);
                 replaceFragmentDocumentFragment();
                 break;
             case R.id.member_gallery:
                 ACTUAL_GALLERY = Constants.MEMBER_TYPE;
+                memberSelect.setBackgroundResource(R.color.colorAccent);
                 replaceFragmentMemberFragment();
 
         }

@@ -16,7 +16,7 @@
         <Button
             android:id="@+id/photos_gallery"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_weight="1"
             android:background="@null"
             android:text="Fotos"
@@ -25,7 +25,7 @@
         <Button
             android:id="@+id/video_gallery"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_weight="1"
             android:background="@null"
             android:text="Videos"
@@ -34,7 +34,7 @@
         <Button
             android:id="@+id/document_gallery"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_weight="1"
             android:background="@null"
             android:text="Documentos"
@@ -43,10 +43,43 @@
         <Button
             android:id="@+id/member_gallery"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_weight="1"
             android:background="@null"
             android:text="Miembros"
+            android:textColor="@color/colorPrimaryDark" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_gallery_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="65dp"
+        >
+
+        <View
+            android:id="@+id/photos_gallery_select"
+            android:layout_width="263dp"
+            android:layout_height="5dp"
+            android:background="@null"
+            android:textColor="@color/colorPrimaryDark" />
+        <View
+            android:id="@+id/video_gallery_select"
+            android:layout_width="263dp"
+            android:layout_height="5dp"
+            android:background="@null"
+            android:textColor="@color/colorPrimaryDark" />
+        <View
+            android:id="@+id/document_gallery_select"
+            android:layout_width="263dp"
+            android:layout_height="5dp"
+            android:background="@null"
+            android:textColor="@color/colorPrimaryDark" />
+        <View
+            android:id="@+id/member_gallery_select"
+            android:layout_width="263dp"
+            android:layout_height="5dp"
+            android:background="@null"
             android:textColor="@color/colorPrimaryDark" />
     </LinearLayout>
 

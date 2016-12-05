@@ -463,6 +463,7 @@ public class BDTasksManagerQuery {
                     data.setFile_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.FILE_TYPE)));
                     data.setSync_type(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.SERVER_SYNC)));
                     data.setDescription(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE)));
+                    data.setLocalURI(result.getString(result.getColumnIndex(BDTasksManager.ColumnTasksFiles.LOCAL_URI)));
 
                     Log.i("SQLite: ", "Get file in the bd ");
                 } while (result.moveToNext());
@@ -612,7 +613,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID, gallery.getId());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
-            cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
+            if (null != gallery.getLocalURI())  cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
 
             bd.update(BDTasksManager.TASKS_FILES_TABLE_NAME, cv,
                     BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE + " = " + gallery.getCve(), null);

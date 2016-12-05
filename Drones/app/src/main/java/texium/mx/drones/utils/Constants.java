@@ -11,7 +11,7 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
-    public static final int LOOP_TIME = 600000; //60000 * 1 = 1 Minute
+    public static final int LOOP_TIME = 180000; //60000 * 1 = 1 Minute
     public static final int VIDEO_SIZE = 54915200;  //X MB*1048*1048= X MB
 
     //region SYS CONSTANTS//

@@ -78,6 +78,7 @@ import texium.mx.drones.fragments.RevisionTasksFragment;
 import texium.mx.drones.fragments.inetrface.FragmentTaskListener;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.LegalManager;
+import texium.mx.drones.models.MemberLocation;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.Tasks;
 import texium.mx.drones.models.TasksDecode;
@@ -87,6 +88,7 @@ import texium.mx.drones.services.FileSoapServices;
 import texium.mx.drones.services.NotificationService;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
+import texium.mx.drones.utils.DateTimeUtils;
 
 
 public class NavigationDrawerActivity extends AppCompatActivity
@@ -186,7 +188,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         map_fab = (FloatingActionButton) findViewById(R.id.map_fab);
 
 
-
         //Button listeners//
         fab.setOnClickListener(this);
         direction_fab.setOnClickListener(this);
@@ -283,7 +284,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             case R.id.map_fab:
 
-                mMap.setMapType(( mMap.getMapType() == GoogleMap.MAP_TYPE_HYBRID) ? GoogleMap.MAP_TYPE_TERRAIN : GoogleMap.MAP_TYPE_HYBRID);
+                mMap.setMapType((mMap.getMapType() == GoogleMap.MAP_TYPE_HYBRID) ? GoogleMap.MAP_TYPE_TERRAIN : GoogleMap.MAP_TYPE_HYBRID);
 
                 break;
             case R.id.direction_fab:
@@ -397,10 +398,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 Tasks task = ACTUAL_TASK_NOTIFICATION;
 
-                String status =  (task.getTask_status().equals(Constants.REVISION_TASK)) ? "Finalizada" : "Cancelada";
+                String status = (task.getTask_status().equals(Constants.REVISION_TASK)) ? "Finalizada" : "Cancelada";
 
                 ad.setTitle(getString(R.string.default_title_alert_dialog));
-                ad.setMessage("La tarea ha sido " + status + ", gracias por su aportación." );
+                ad.setMessage("La tarea ha sido " + status + ", gracias por su aportación.");
                 ad.setNeutralButton(getString(R.string.default_positive_button), this);
 
                 break;
@@ -413,9 +414,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 break;
         }
-
-
-
 
 
         ad.show();
@@ -625,12 +623,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } else {
             legalManager = LegalFragment.getLegalInformation(legalManager);
 
-            if (legalManager.getFileNumber().isEmpty()){
+            if (legalManager.getFileNumber().isEmpty()) {
                 legalRequired = R.id.file_number;
             }
         }
 
-        return  legalManager;
+        return legalManager;
     }
 
 
@@ -1378,11 +1376,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     case Constants.WS_KEY_SEND_LOCATION:
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
+
+                        Log.i("CHECK", "consultar coordenada");
+
                         soapPrimitive = SoapServices.updateLocation(getApplicationContext()
                                 , webServiceTaskDecode.getTask_latitude()
                                 , webServiceTaskDecode.getTask_longitude()
                                 , webServiceTaskDecode.getTask_user_id()
                                 , connection);
+
+                        //TODO SYNC ALL NO SERVER LOCATION
 
                         validOperation = (soapPrimitive != null);
                         break;
@@ -1444,6 +1447,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 switch (webServiceOperation) {
                     case Constants.WS_KEY_UPDATE_TASK:
                         validOperation = true;
+                        break;
+                    case Constants.WS_KEY_SEND_LOCATION:
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
+
+                        MemberLocation memberLocation = new MemberLocation();
+
+                        memberLocation.setLatitude(Double.valueOf(webServiceTaskDecode.getTask_latitude()));
+                        memberLocation.setLongitude(Double.valueOf(webServiceTaskDecode.getTask_longitude()));
+                        memberLocation.setUserId(webServiceTaskDecode.getTask_user_id());
+                        memberLocation.setServerSync(Constants.SERVER_SYNC_FALSE);
+                        memberLocation.setSyncTime(DateTimeUtils.getActualTime());
+
+
+                        BDTasksManagerQuery.addMemberLocation(getBaseContext(),memberLocation);
                         break;
 
                 }
@@ -1612,11 +1630,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)) {
 
-                            try {
-                                pDialog.dismiss();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        try {
+                            pDialog.dismiss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 

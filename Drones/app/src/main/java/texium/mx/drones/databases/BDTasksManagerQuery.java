@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
-import android.support.annotation.IntegerRes;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.List;
 import texium.mx.drones.models.AppVersion;
 import texium.mx.drones.models.FilesManager;
 import texium.mx.drones.models.LegalManager;
+import texium.mx.drones.models.MemberLocation;
 import texium.mx.drones.models.SyncTaskServer;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.models.Tasks;
@@ -225,20 +225,20 @@ public class BDTasksManagerQuery {
 
     public static void addLink(Context context, String tempLink, Users user) throws Exception {
         try {
-            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
-            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+                BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+                SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-            ContentValues cv = new ContentValues();
+                ContentValues cv = new ContentValues();
 
-            cv.put(BDTasksManager.ColumnLinks.LINK, tempLink);
-            cv.put(BDTasksManager.ColumnLinks.USER_ID, user.getIdUser());
-            cv.put(BDTasksManager.ColumnLinks.CREATION_DATE, DateTimeUtils.getActualTime());
-            cv.put(BDTasksManager.ColumnLinks.LINK_STATUS, Constants.ACTIVE);
+                cv.put(BDTasksManager.ColumnLinks.LINK, tempLink);
+                cv.put(BDTasksManager.ColumnLinks.USER_ID, user.getIdUser());
+                cv.put(BDTasksManager.ColumnLinks.CREATION_DATE, DateTimeUtils.getActualTime());
+                cv.put(BDTasksManager.ColumnLinks.LINK_STATUS, Constants.ACTIVE);
 
-            bd.insert(BDTasksManager.LINKS_TABLE_NAME, null, cv);
-            bd.close();
+                bd.insert(BDTasksManager.LINKS_TABLE_NAME, null, cv);
+                bd.close();
 
-            Log.i("SQLite: ", "Add link in the bd with link name :" + tempLink);
+                Log.i("SQLite: ", "Add link in the bd with link name :" + tempLink);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Database error");
@@ -496,7 +496,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
-            cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI,gallery.getLocalURI());
+            if (null !=  gallery.getLocalURI()) cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI,gallery.getLocalURI());
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
 
@@ -527,7 +527,8 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
-            cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
+
+            if (null != gallery.getLocalURI()) cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
 
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
@@ -1500,6 +1501,30 @@ public class BDTasksManagerQuery {
         }
 
         return data;
+    }
+
+    public static void addMemberLocation(Context context, MemberLocation memberLocation) {
+
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnMembersLocation.LATITUDE, memberLocation.getLatitude());
+            cv.put(BDTasksManager.ColumnMembersLocation.LONGITUDE, memberLocation.getLongitude());
+            cv.put(BDTasksManager.ColumnMembersLocation.SERVER_SYNC, memberLocation.getServerSync());
+            cv.put(BDTasksManager.ColumnMembersLocation.SYNC_TIME, memberLocation.getSyncTime());
+            cv.put(BDTasksManager.ColumnMembersLocation.USER_ID, memberLocation.getUserId());
+
+            bd.insert(BDTasksManager.MEMBERS_LOCATION_TABLE_NAME, null, cv);
+            bd.close();
+
+            Log.i("SQLite: ", "save row");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

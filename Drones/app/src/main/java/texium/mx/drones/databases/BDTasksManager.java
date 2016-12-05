@@ -18,6 +18,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
     public static final String LINKS_TABLE_NAME = "Links";
     public static final String APP_VERSION_TABLE_NAME = "App_Version";
     public static final String TASKS_MEMBERS_TABLE_NAME = "Tasks_Members";
+    public static final String MEMBERS_LOCATION_TABLE_NAME ="Members_Location";
 
     public static final String STRING_TYPE = "text";
     public static final String INT_TYPE = "integer";
@@ -112,6 +113,16 @@ public class BDTasksManager extends SQLiteOpenHelper {
         public static final String SERVER_STATUS = "server_status";
         public static final String NOTIFICATION = "notification";
 
+    }
+
+    public static class ColumnMembersLocation {
+        public static final String MEMBER_LOCATION_CVE = "member_location_cve";
+        public static final String MEMBER_LOCATION_ID = "member_location_id";
+        public static final String USER_ID = "user_id";
+        public static final String LATITUDE = "latitude";
+        public static final String LONGITUDE = "longitude";
+        public static final String SYNC_TIME = "sync_time";
+        public static final String SERVER_SYNC = "server_sync";
     }
 
     public static final String CREATE_TASKS_TABLE_SCRIPT =
@@ -211,6 +222,17 @@ public class BDTasksManager extends SQLiteOpenHelper {
                     ColumnTasksMembers.NOTIFICATION + " " +
                     ")";
 
+    public static final String CREATE_MEMBERS_LOCATION_TABLE_SCRIPT =
+            "create table " + MEMBERS_LOCATION_TABLE_NAME + "(" +
+                    ColumnMembersLocation.MEMBER_LOCATION_CVE + " " + INT_TYPE + " primary key autoincrement, " +
+                    ColumnMembersLocation.MEMBER_LOCATION_ID + " " + INT_TYPE + " , " +
+                    ColumnMembersLocation.USER_ID + " " + INT_TYPE + " , " +
+                    ColumnMembersLocation.LATITUDE + " " + REAL_TYPE + " , " +
+                    ColumnMembersLocation.LONGITUDE + " " + REAL_TYPE + " , " +
+                    ColumnMembersLocation.SYNC_TIME + " " + STRING_TYPE + " , " +
+                    ColumnMembersLocation.SERVER_SYNC + " " + INT_TYPE + " " +
+                    ")";
+
     public static  final String DROP_TABLE_IF_EXISTS = "drop table if exists ";
 
     public BDTasksManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -227,6 +249,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_LINKS_TABLE_SCRIPT);
         db.execSQL(CREATE_APP_VERSION_TABLE_SCRIPT);
         db.execSQL(CREATE_TASKS_MEMBERS_TABLE_SCRIPT);
+        db.execSQL(CREATE_MEMBERS_LOCATION_TABLE_SCRIPT);
     }
 
     @Override
@@ -240,6 +263,7 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.LINKS_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.APP_VERSION_TABLE_NAME);
         db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.TASKS_MEMBERS_TABLE_NAME);
+        db.execSQL(BDTasksManager.DROP_TABLE_IF_EXISTS + BDTasksManager.MEMBERS_LOCATION_TABLE_NAME);
 
         db.execSQL(CREATE_TASKS_TABLE_SCRIPT);
         db.execSQL(CREATE_USERS_TABLE_SCRIPT);
@@ -249,5 +273,6 @@ public class BDTasksManager extends SQLiteOpenHelper {
         db.execSQL(CREATE_LINKS_TABLE_SCRIPT);
         db.execSQL(CREATE_APP_VERSION_TABLE_SCRIPT);
         db.execSQL(CREATE_TASKS_MEMBERS_TABLE_SCRIPT);
+        db.execSQL(CREATE_MEMBERS_LOCATION_TABLE_SCRIPT);
     }
 }

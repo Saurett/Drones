@@ -64,6 +64,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import texium.mx.drones.adapters.TaskListAdapter;
+import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.CloseTasksFragment;
@@ -1379,13 +1380,32 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         Log.i("CHECK", "consultar coordenada");
 
+                        MemberLocation memberLocation = new MemberLocation(
+                                        SESSION_DATA.getIdUser(),
+                                        Constants.SERVER_SYNC_FALSE);
+
+                        List<MemberLocation> allLocations = BDTasksManagerQuery.getMemberLocations(
+                                getApplicationContext(),memberLocation);
+
+                        for (MemberLocation tempML : allLocations) {
+
+
+                            soapPrimitive = SoapServices.updateLocation(getApplicationContext()
+                                    , tempML.getLatitude().toString()
+                                    , tempML.getLongitude().toString()
+                                    , tempML.getUserId()
+                                    , true);
+
+                            tempML.setServerSync(Constants.SERVER_SYNC_TRUE);
+
+                            BDTasksManagerQuery.updateTaskDetail(getApplicationContext(), tempML);
+                        }
+
                         soapPrimitive = SoapServices.updateLocation(getApplicationContext()
                                 , webServiceTaskDecode.getTask_latitude()
                                 , webServiceTaskDecode.getTask_longitude()
                                 , webServiceTaskDecode.getTask_user_id()
                                 , connection);
-
-                        //TODO SYNC ALL NO SERVER LOCATION
 
                         validOperation = (soapPrimitive != null);
                         break;
@@ -1645,9 +1665,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         onMapReady(mMap);
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
+
+
                         break;
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
-
                         finish();
 
                         break;

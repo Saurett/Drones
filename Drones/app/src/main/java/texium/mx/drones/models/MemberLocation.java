@@ -15,6 +15,14 @@ public class MemberLocation implements Serializable {
     private String syncTime;
     private Integer serverSync;
 
+    public MemberLocation() {
+    }
+
+    public MemberLocation(Integer userId, Integer serverSync) {
+        this.userId = userId;
+        this.serverSync = serverSync;
+    }
+
     public Integer getCve() {
         return cve;
     }

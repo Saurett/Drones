@@ -29,7 +29,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 public class BDTasksManagerQuery {
 
     static String BDName = "BDTasksManager";
-    static Integer BDVersion = 45;
+    static Integer BDVersion = 47;
 
     public static String getServer(Context context) throws Exception {
         String data = "";
@@ -1524,6 +1524,65 @@ public class BDTasksManagerQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static List<MemberLocation> getMemberLocations(Context context, MemberLocation memberLocation) throws Exception {
+        List<MemberLocation> data = new ArrayList<>();
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            Cursor result = bd.rawQuery("select * from " + BDTasksManager.MEMBERS_LOCATION_TABLE_NAME
+                    + " where " + BDTasksManager.ColumnMembersLocation.SERVER_SYNC + " = " + memberLocation.getServerSync()
+                    + " and " + BDTasksManager.ColumnMembersLocation.USER_ID + " = " + memberLocation.getUserId()
+                    + " order by 1 asc", null);
+
+            if (result.moveToFirst()) {
+                do {
+
+                    MemberLocation temp = new MemberLocation();
+
+                    temp.setCve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.MEMBER_LOCATION_CVE)));
+                    temp.setId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.MEMBER_LOCATION_ID)));
+                    temp.setUserId(result.getInt(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.USER_ID)));
+                    temp.setLatitude(result.getDouble(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.LATITUDE)));
+                    temp.setLongitude(result.getDouble(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.LONGITUDE)));
+                    temp.setSyncTime(result.getString(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.SYNC_TIME)));
+                    temp.setServerSync(result.getInt(result.getColumnIndex(BDTasksManager.ColumnMembersLocation.SERVER_SYNC)));
+
+                    data.add(temp);
+
+                    Log.i("SQLite: ", "Get task_details in the bd");
+                } while (result.moveToNext());
+            }
+
+            bd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+
+        return data;
+    }
+
+    public static void updateTaskDetail(Context context, MemberLocation memberLocation) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+
+            cv.put(BDTasksManager.ColumnMembersLocation.SERVER_SYNC, memberLocation.getServerSync());
+
+            bd.update(BDTasksManager.MEMBERS_LOCATION_TABLE_NAME, cv,
+                    BDTasksManager.ColumnMembersLocation.MEMBER_LOCATION_CVE + " = " + memberLocation.getCve(), null);
+            bd.close();
+
+            Log.i("SQLite: ", "Update  : " + memberLocation.getCve());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
         }
     }
 

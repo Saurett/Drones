@@ -163,8 +163,8 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
-    /*
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.0.103/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
+/*
+    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.64/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     public static final String WEB_SERVICE_URL = "/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
     */
 
@@ -226,6 +226,7 @@ public final class Constants {
     public static final String WEB_SERVICE_PARAM_LOGIN_EMAIL = "CorreoElectronico";
     public static final String WEB_SERVICE_PARAM_DESCRIPTION = "Descripcion";
     public static final String WEB_SERVICE_PARAM_NAME = "Nombre";
+    public static final String WEB_SERVICE_PARAM_LOCATION_DATE = "Fecha";
     //endregion WEB SERVICE PARAMS//
 
     //region Google Maps LOCATION//

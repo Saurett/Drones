@@ -18,6 +18,7 @@ import java.util.List;
 
 import texium.mx.drones.R;
 import texium.mx.drones.databases.BDTasksManagerQuery;
+import texium.mx.drones.models.MemberLocation;
 import texium.mx.drones.models.TaskGallery;
 import texium.mx.drones.utils.Constants;
 
@@ -473,7 +474,7 @@ public class SoapServices {
         return soapPrimitive;
     }
 
-    public static SoapPrimitive updateLocation(Context context, String latitude, String longitude,Integer user, Boolean connection) throws Exception {
+    public static SoapPrimitive updateLocation(Context context, MemberLocation memberLocation) throws Exception {
         SoapPrimitive soapPrimitive;
         try {
             String SOAP_ACTION = Constants.WEB_SERVICE_SOAP_ACTION_UPDATE_LOCATION;
@@ -483,10 +484,11 @@ public class SoapServices {
 
             SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, user);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LATITUDE, latitude);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LONGITUDE, longitude);
-            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_CONNECTION, connection);
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_ID_USER, memberLocation.getUserId());
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LATITUDE, memberLocation.getLatitude().toString());
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LONGITUDE, memberLocation.getLongitude().toString());
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_CONNECTION, memberLocation.getServerSync());
+            //Request.addProperty(Constants.WEB_SERVICE_PARAM_LOCATION_DATE, memberLocation.getSyncTime());
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;

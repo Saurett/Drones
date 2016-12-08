@@ -64,7 +64,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import texium.mx.drones.adapters.TaskListAdapter;
-import texium.mx.drones.databases.BDTasksManager;
 import texium.mx.drones.databases.BDTasksManagerQuery;
 import texium.mx.drones.exceptions.VideoSyncSoapException;
 import texium.mx.drones.fragments.CloseTasksFragment;
@@ -1389,23 +1388,24 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         for (MemberLocation tempML : allLocations) {
 
-
-                            soapPrimitive = SoapServices.updateLocation(getApplicationContext()
-                                    , tempML.getLatitude().toString()
-                                    , tempML.getLongitude().toString()
-                                    , tempML.getUserId()
-                                    , true);
-
                             tempML.setServerSync(Constants.SERVER_SYNC_TRUE);
 
-                            BDTasksManagerQuery.updateTaskDetail(getApplicationContext(), tempML);
+                            soapPrimitive = SoapServices.updateLocation(getApplicationContext(), tempML);
+
+                            if (soapPrimitive != null) {
+                                if (soapPrimitive.toString().contains("BD")) {
+                                    BDTasksManagerQuery.updateTaskDetail(getApplicationContext(), tempML);
+                                }
+                            }
+
                         }
 
-                        soapPrimitive = SoapServices.updateLocation(getApplicationContext()
-                                , webServiceTaskDecode.getTask_latitude()
-                                , webServiceTaskDecode.getTask_longitude()
-                                , webServiceTaskDecode.getTask_user_id()
-                                , connection);
+                        memberLocation.setServerSync(Constants.SERVER_SYNC_TRUE);
+                        memberLocation.setLatitude(Double.valueOf(webServiceTaskDecode.getTask_latitude()));
+                        memberLocation.setLongitude(Double.valueOf(webServiceTaskDecode.getTask_longitude()));
+                        memberLocation.setSyncTime(DateTimeUtils.getActualTime());
+
+                        soapPrimitive = SoapServices.updateLocation(getApplicationContext() , memberLocation);
 
                         validOperation = (soapPrimitive != null);
                         break;
@@ -1598,19 +1598,23 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         for (int i = 0; i < soapObject.getPropertyCount(); i++) {
                             Tasks t = new Tasks();
 
-                            SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                            SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+                           try {
+                               SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                               SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
 
-                            t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                            t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
-                            t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                            t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                            t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                            t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                            t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                            t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                            t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                            t.setTask_user_id(SESSION_DATA.getIdUser());
+                               t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                               t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                               t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                               t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                               t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                               t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                               t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                               t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                               t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                               t.setTask_user_id(SESSION_DATA.getIdUser());
+                           } catch (Exception e) {
+                               continue;
+                           }
 
                             try {
                                 Tasks tempTask = BDTasksManagerQuery.getTaskById(getApplicationContext(), t);

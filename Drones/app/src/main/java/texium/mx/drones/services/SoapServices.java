@@ -488,7 +488,7 @@ public class SoapServices {
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LATITUDE, memberLocation.getLatitude().toString());
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_LONGITUDE, memberLocation.getLongitude().toString());
             Request.addProperty(Constants.WEB_SERVICE_PARAM_TASK_CONNECTION, memberLocation.getServerSync());
-            //Request.addProperty(Constants.WEB_SERVICE_PARAM_LOCATION_DATE, memberLocation.getSyncTime());
+            Request.addProperty(Constants.WEB_SERVICE_PARAM_LOCATION_DATE, memberLocation.getSyncTime());
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;

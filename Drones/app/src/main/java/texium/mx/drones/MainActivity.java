@@ -756,7 +756,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         try {
                             BDTasksManagerQuery.cleanTables(getApplicationContext());
-
                             if (updateVersion) showQuestion();
 
                         } catch (Exception e) {

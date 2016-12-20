@@ -18,6 +18,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -38,9 +40,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -93,7 +95,7 @@ import texium.mx.drones.utils.DateTimeUtils;
 
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        View.OnClickListener, FragmentTaskListener, LocationListener, DialogInterface.OnClickListener {
+        View.OnClickListener, FragmentTaskListener, LocationListener, DialogInterface.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     //Google Maps manager//
     private GoogleMap mMap;
@@ -149,6 +151,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         handler = new Handler();
+
+        // Create an instance of GoogleAPIClient.
+        if (client == null) {
+            client = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
 
         try {
             SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
@@ -219,9 +230,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         AsyncCallWS wsAllTask = new AsyncCallWS(Constants.WS_KEY_ALL_TASKS, tasksDecode);
         wsAllTask.execute();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
         showFragment(getActualFragment());
     }
@@ -334,6 +342,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     public void run() {
                         try {
                             if (!stopThread) {
+
                                 TasksDecode tasksDecode = new TasksDecode();
 
                                 tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
@@ -1148,6 +1157,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
+        /*
         Action viewAction = Action.newAction(
                 Action.TYPE_VIEW, // TODO: choose an action type.
                 "NavigationDrawer Page", // TODO: Define a title for the content shown.
@@ -1159,6 +1169,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 Uri.parse("android-app://texium.mx.drones/http/host/path")
         );
         AppIndex.AppIndexApi.start(client, viewAction);
+        */
     }
 
     @Override
@@ -1167,7 +1178,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
+        /*Action viewAction = Action.newAction(
                 Action.TYPE_VIEW, // TODO: choose an action type.
                 "NavigationDrawer Page", // TODO: Define a title for the content shown.
                 // TODO: If you have web page content that matches this app activity's content,
@@ -1177,7 +1188,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 // TODO: Make sure this auto-generated app deep link URI is correct.
                 Uri.parse("android-app://texium.mx.drones/http/host/path")
         );
-        AppIndex.AppIndexApi.end(client, viewAction);
+        AppIndex.AppIndexApi.end(client, viewAction);*/
         client.disconnect();
     }
 
@@ -1200,6 +1211,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
 
         return legalInformation;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
 
@@ -1380,11 +1406,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         Log.i("CHECK", "consultar coordenada");
 
                         MemberLocation memberLocation = new MemberLocation(
-                                        SESSION_DATA.getIdUser(),
-                                        Constants.SERVER_SYNC_FALSE);
+                                SESSION_DATA.getIdUser(),
+                                Constants.SERVER_SYNC_FALSE);
 
                         List<MemberLocation> allLocations = BDTasksManagerQuery.getMemberLocations(
-                                getApplicationContext(),memberLocation);
+                                getApplicationContext(), memberLocation);
 
                         for (MemberLocation tempML : allLocations) {
 
@@ -1400,12 +1426,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         }
 
+                        getLocation();
+
                         memberLocation.setServerSync(Constants.SERVER_SYNC_TRUE);
-                        memberLocation.setLatitude(Double.valueOf(webServiceTaskDecode.getTask_latitude()));
-                        memberLocation.setLongitude(Double.valueOf(webServiceTaskDecode.getTask_longitude()));
+                        memberLocation.setLatitude(locationGPS.getLatitude());
+                        memberLocation.setLongitude(locationGPS.getLongitude());
                         memberLocation.setSyncTime(DateTimeUtils.getActualTime());
 
-                        soapPrimitive = SoapServices.updateLocation(getApplicationContext() , memberLocation);
+                        soapPrimitive = SoapServices.updateLocation(getApplicationContext(), memberLocation);
 
                         validOperation = (soapPrimitive != null);
                         break;
@@ -1472,16 +1500,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
 
-                        MemberLocation memberLocation = new MemberLocation();
-
-                        memberLocation.setLatitude(Double.valueOf(webServiceTaskDecode.getTask_latitude()));
-                        memberLocation.setLongitude(Double.valueOf(webServiceTaskDecode.getTask_longitude()));
-                        memberLocation.setUserId(webServiceTaskDecode.getTask_user_id());
-                        memberLocation.setServerSync(Constants.SERVER_SYNC_FALSE);
-                        memberLocation.setSyncTime(DateTimeUtils.getActualTime());
-
-
-                        BDTasksManagerQuery.addMemberLocation(getBaseContext(),memberLocation);
+                        textError = "Habilitar guardado de GPS";
                         break;
 
                 }
@@ -1598,23 +1617,23 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         for (int i = 0; i < soapObject.getPropertyCount(); i++) {
                             Tasks t = new Tasks();
 
-                           try {
-                               SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
-                               SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
+                            try {
+                                SoapObject soTemp = (SoapObject) soapObject.getProperty(i);
+                                SoapObject soLocation = (SoapObject) soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LOCATION);
 
-                               t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
-                               t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
-                               t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
-                               t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
-                               t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
-                               t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
-                               t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
-                               t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
-                               t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
-                               t.setTask_user_id(SESSION_DATA.getIdUser());
-                           } catch (Exception e) {
-                               continue;
-                           }
+                                t.setTask_tittle(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString());
+                                t.setTask_id(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_ID).toString()));
+                                t.setTask_content(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_CONTENT).toString());
+                                t.setTask_latitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LATITUDE).toString()));
+                                t.setTask_longitude(Double.valueOf(soLocation.getProperty(Constants.SOAP_OBJECT_KEY_TASK_LONGITUDE).toString()));
+                                t.setTask_priority(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_PRIORITY).toString()));
+                                t.setTask_begin_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_BEGIN_DATE).toString());
+                                t.setTask_end_date(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_END_DATE).toString());
+                                t.setTask_status(Integer.valueOf(soTemp.getProperty(Constants.SOAP_OBJECT_KEY_TASK_STATUS).toString()));
+                                t.setTask_user_id(SESSION_DATA.getIdUser());
+                            } catch (Exception e) {
+                                continue;
+                            }
 
                             try {
                                 Tasks tempTask = BDTasksManagerQuery.getTaskById(getApplicationContext(), t);
@@ -1664,15 +1683,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 String tempText = "";
                 switch (webServiceOperation) {
-
+                    case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
+                        saveOfflineGPS();
+                        break;
                     case Constants.WS_KEY_SEND_LOCATION:
+                        saveOfflineGPS();
                         onMapReady(mMap);
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
 
-
                         break;
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
+                        saveOfflineGPS();
                         finish();
 
                         break;
@@ -1693,6 +1715,29 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                 }
             }
+        }
+
+        private void saveOfflineGPS() {
+
+            MemberLocation memberLocation = new MemberLocation();
+
+            try {
+                memberLocation.setLatitude(mMap.getMyLocation().getLatitude());
+            } catch (NullPointerException e) {
+                memberLocation.setLatitude(locationGPS.getLatitude());
+            }
+
+            try {
+                memberLocation.setLongitude(mMap.getMyLocation().getLongitude());
+            } catch (NullPointerException e) {
+                memberLocation.setLongitude(locationGPS.getLongitude());
+            }
+
+            memberLocation.setUserId(webServiceTaskDecode.getTask_user_id());
+            memberLocation.setServerSync(Constants.SERVER_SYNC_FALSE);
+            memberLocation.setSyncTime(DateTimeUtils.getActualTime());
+
+            BDTasksManagerQuery.addMemberLocation(getBaseContext(),memberLocation);
         }
     }
 }

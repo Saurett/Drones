@@ -1520,7 +1520,7 @@ public class BDTasksManagerQuery {
             bd.insert(BDTasksManager.MEMBERS_LOCATION_TABLE_NAME, null, cv);
             bd.close();
 
-            Log.i("SQLite: ", "save row");
+            Log.i("SQLite GPS: ", "save location lat: " + memberLocation.getLatitude() + " " + "lon: " + memberLocation.getLongitude());
 
         } catch (Exception e) {
             e.printStackTrace();

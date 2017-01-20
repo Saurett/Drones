@@ -106,6 +106,11 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
 
         buttonVisibilityControl(holder, taskDecode.getTask_status());
 
+        if (taskDecode.getTask_status().equals(Constants.PENDING_TASK))
+        {
+            holder.agree_task_button.setText("Continuar");
+        }
+
         holder.agree_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

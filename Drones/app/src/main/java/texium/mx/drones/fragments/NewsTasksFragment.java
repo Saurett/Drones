@@ -304,8 +304,7 @@ public class NewsTasksFragment extends Fragment implements View.OnClickListener{
                             Boolean contain = false;
 
                             for (Tasks actualTask : newsTask) {
-                                contain = (actualTask.getTask_id()
-                                        == tempTask.getTask_id());
+                                contain = (actualTask.getTask_id().equals(tempTask.getTask_id()));
                                 if (contain) break;
                             }
 

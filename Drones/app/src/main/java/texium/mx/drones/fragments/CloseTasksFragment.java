@@ -309,8 +309,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                             Boolean contain = false;
 
                             for (Tasks actualTask : closeTask) {
-                                contain = (actualTask.getTask_id()
-                                        == tempTask.getTask_id());
+                                contain = (actualTask.getTask_id().equals(tempTask.getTask_id()));
                                 if (contain) break;
                             }
 

@@ -180,7 +180,7 @@ public class ProgressTasksFragment extends Fragment implements View.OnClickListe
 
                         memberTaskList = new ArrayList<>();
 
-                        soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), 0);
+                        soapObject = SoapServices.getServerAllTasks(getContext(), SESSION_DATA.getIdUser(), idStatus);
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {

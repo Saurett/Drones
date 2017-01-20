@@ -300,8 +300,7 @@ public class PendingTasksFragment extends Fragment implements View.OnClickListen
                             Boolean contain = false;
 
                             for (Tasks actualTask : pendingTask) {
-                                contain = (actualTask.getTask_id()
-                                        == tempTask.getTask_id());
+                                contain = (actualTask.getTask_id().equals(tempTask.getTask_id()));
                                 if (contain) break;
                             }
 

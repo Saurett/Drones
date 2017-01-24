@@ -194,7 +194,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                         validOperation = (soapObject.getPropertyCount() > 0);
 
                         if (!validOperation) {
-                            tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync);
+                            tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t, serverSync,Constants.ACTIVE);
                             if (tempTaskList.size() > 0) validOperation = true;
                         }  else {
                             memberTaskList.addAll(BDTasksManagerQuery.getMemberTasks(getContext(), t,serverSync,null));
@@ -217,7 +217,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
                     serverSync.add(Constants.ITEM_SYNC_SERVER_CLOUD);
                     serverSync.add(Constants.ITEM_SYNC_SERVER_DEFAULT);
 
-                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync);
+                    tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync,Constants.INACTIVE);
                     validOperation = (tempTaskList.size() > 0);
                     textError =  (tempTaskList.size() > 0) ? textError
                             : getString(R.string.default_empty_task_list);
@@ -302,7 +302,7 @@ public class CloseTasksFragment extends Fragment implements View.OnClickListener
 
 
                         Tasks t = new Tasks(idStatus,SESSION_DATA.getIdUser());
-                        tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync);
+                        tempTaskList = BDTasksManagerQuery.getListTaskByStatus(getContext(), t,serverSync,Constants.INACTIVE);
                         tempTaskList.addAll(memberTaskList);
 
                         for (Tasks tempTask : tempTaskList) {

@@ -163,12 +163,6 @@ public final class Constants {
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
     public static final String WEB_SERVICE_PARTIAL_URL = "http://170.0.12.51"; //Sin / al final
 
-    /*
-    //Desarrollo//
-    public static final String WEB_SERVICE_COMPLETE_URL = "http://192.168.1.77/ServicioWeb/Servicio_Android.asmx";
-    public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx";
-    */
-
     //Producción//
     public static final String WEB_SERVICE_COMPLETE_URL = "http://170.0.12.51/ServicioWeb/Servicio_Android.asmx"; //Ruta completa publicada
     public static final String WEB_SERVICE_URL = "/ServicioWeb/Servicio_Android.asmx"; //Ruta de las carpetas

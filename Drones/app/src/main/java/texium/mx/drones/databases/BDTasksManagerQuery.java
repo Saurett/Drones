@@ -648,6 +648,22 @@ public class BDTasksManagerQuery {
         }
     }
 
+    public static void deleteTask(Context context, Tasks task) throws Exception {
+        try {
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+
+            bd.delete(BDTasksManager.TASKS_TABLE_NAME,
+                    BDTasksManager.ColumnTasks.TASK_CVE+ " = " + task.getTask_cve(), null);
+            bd.close();
+
+            Log.i("SQLite: ", "Update task_file in the bd ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Database error");
+        }
+    }
+
     public static void addUser(Context context, Users u) throws Exception {
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
@@ -1311,7 +1327,7 @@ public class BDTasksManagerQuery {
         return data;
     }
 
-    public static List<Tasks> getListTaskByStatus(Context context, Tasks t, List<Integer> serverSync) throws Exception {
+    public static List<Tasks> getListTaskByStatus(Context context, Tasks t, List<Integer> serverSync, Integer delete) throws Exception {
         List<Tasks> dataList = new ArrayList<>();
         try {
             BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
@@ -1345,6 +1361,12 @@ public class BDTasksManagerQuery {
 
                     Log.i("SQLite: ", "Get task in the bd with task_id :" + data.getTask_id());
                 } while (result.moveToNext());
+            }
+
+            if (delete.equals(Constants.ACTIVE)) {
+                for (Tasks task : dataList) {
+                    deleteTask(context,task);
+                }
             }
 
             dataList.addAll(getMemberTasks(context,t,serverSync,null));

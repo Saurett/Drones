@@ -234,7 +234,7 @@ public class NotificationService {
 
             Tasks tasks = new Tasks(Constants.ALL_TASK, idUser);
 
-            List<Tasks> allTask = BDTasksManagerQuery.getListTaskByStatus(context, tasks, null);
+            List<Tasks> allTask = BDTasksManagerQuery.getListTaskByStatus(context, tasks, null,Constants.INACTIVE);
 
             for (Tasks task : allTask) {
 

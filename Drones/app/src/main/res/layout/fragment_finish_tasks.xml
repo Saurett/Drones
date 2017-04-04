@@ -68,9 +68,10 @@
                         android:background="@color/colorPrimaryGray"
                         android:gravity="top"
                         android:inputType="textMultiLine"
-                        android:maxLength="200"
+                        android:maxLength="5000"
                         android:paddingBottom="20dp"
                         android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
                         android:paddingTop="20dp"
                         android:textColor="@color/colorPrimaryWhite"
                         android:textSize="15sp" />

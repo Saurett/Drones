@@ -1268,7 +1268,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 case Constants.WS_KEY_SERVER_SYNC:
 
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
-                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
+                                || (webServiceTaskDecode.getOrigin_button() ==  R.id.agree_task_button)) {
                         pDialog = new ProgressDialog(NavigationDrawerActivity.this);
                         pDialog.setTitle("Actualizando");
                         //pDialog.setProgressStyle(pDialog.STYLE_HORIZONTAL);
@@ -1535,7 +1536,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.action_server_sync)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.drawer_layout)
-                            || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.nav_sync)
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.agree_task_button)) {
                         pDialog.dismiss();
                     }
                 }

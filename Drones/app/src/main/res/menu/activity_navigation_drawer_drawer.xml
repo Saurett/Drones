@@ -31,7 +31,7 @@
         android:id="@+id/other_group" >
         <item
             android:id="@+id/restore_device"
-            android:icon="@drawable/ic_setting_dark"
+            android:icon="@mipmap/ic_settings_white_48dp"
             android:title="Restaurar Tareas" />
         <item
             android:id="@+id/nav_sync"
@@ -39,7 +39,7 @@
             android:title="Sincronizar" />
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/common_full_open_on_phone"
+            android:icon="@mipmap/ic_input_white_48dp"
             android:title="Cerrar Sesión" />
     </group>
 </menu>

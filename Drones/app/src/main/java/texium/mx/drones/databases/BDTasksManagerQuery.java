@@ -65,55 +65,12 @@ public class BDTasksManagerQuery {
         return data;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static AppVersion getAppVersion(Context context) throws Exception {
         AppVersion appVersion = new AppVersion();
-        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),0);
-        //String data = "";
-
+        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
         try {
-            /*
-            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
-            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
-
-            Cursor result = bd.rawQuery("select * from app_version where app_version_cve = 1", null);
-
-            if (result.moveToFirst()) {
-                do {
-
-                    appVersion.setApp_version_cve(result.getInt(result.getColumnIndex(BDTasksManager.ColumnAppVersion.APP_VERSION_CVE)));
-                    appVersion.setApp_version(result.getString(result.getColumnIndex(BDTasksManager.ColumnAppVersion.APP_VERSION)));
-                    appVersion.setVersion_msg(result.getString(result.getColumnIndex(BDTasksManager.ColumnAppVersion.VERSION_MSG)));
-
-                    Log.i("SQLite: ", "Get link in the bd :" + data);
-
-                    Log.i("SQLite: ", "cve :" + appVersion.getApp_version_cve());
-                    Log.i("SQLite: ", "app version :" + appVersion.getApp_version());
-                    Log.i("SQLite: ", "msg :" + appVersion.getVersion_msg());
-
-
-                    updateAppVersion(context, packageInfo.versionName, appVersion.getVersion_msg());
-
-                } while (result.moveToNext());
-            }
-
-            bd.close();
-
-            if (appVersion.getApp_version_cve() == null) {
-                addAppVersion(context, packageInfo.versionName, "Si");
-
-                appVersion.setApp_version_cve(1);
-                appVersion.setApp_version(packageInfo.versionName);
-                appVersion.setVersion_msg("Si");
-            }
-
-            */
-
             appVersion.setApp_version(packageInfo.versionName);
-
-            Log.i("SQLite: ", "app version 2 :" + appVersion.getApp_version());
-
-
+            Log.i("SQLite: ", "app version :" + appVersion.getApp_version());
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Database error");
@@ -225,20 +182,20 @@ public class BDTasksManagerQuery {
 
     public static void addLink(Context context, String tempLink, Users user) throws Exception {
         try {
-                BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
-                SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
+            BDTasksManager bdTasksManager = new BDTasksManager(context, BDName, null, BDVersion);
+            SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
-                ContentValues cv = new ContentValues();
+            ContentValues cv = new ContentValues();
 
-                cv.put(BDTasksManager.ColumnLinks.LINK, tempLink);
-                cv.put(BDTasksManager.ColumnLinks.USER_ID, user.getIdUser());
-                cv.put(BDTasksManager.ColumnLinks.CREATION_DATE, DateTimeUtils.getActualTime());
-                cv.put(BDTasksManager.ColumnLinks.LINK_STATUS, Constants.ACTIVE);
+            cv.put(BDTasksManager.ColumnLinks.LINK, tempLink);
+            cv.put(BDTasksManager.ColumnLinks.USER_ID, user.getIdUser());
+            cv.put(BDTasksManager.ColumnLinks.CREATION_DATE, DateTimeUtils.getActualTime());
+            cv.put(BDTasksManager.ColumnLinks.LINK_STATUS, Constants.ACTIVE);
 
-                bd.insert(BDTasksManager.LINKS_TABLE_NAME, null, cv);
-                bd.close();
+            bd.insert(BDTasksManager.LINKS_TABLE_NAME, null, cv);
+            bd.close();
 
-                Log.i("SQLite: ", "Add link in the bd with link name :" + tempLink);
+            Log.i("SQLite: ", "Add link in the bd with link name :" + tempLink);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Database error");
@@ -496,7 +453,8 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
-            if (null !=  gallery.getLocalURI()) cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI,gallery.getLocalURI());
+            if (null != gallery.getLocalURI())
+                cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
 
@@ -528,7 +486,8 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.SERVER_SYNC, gallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
 
-            if (null != gallery.getLocalURI()) cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
+            if (null != gallery.getLocalURI())
+                cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
 
 
             bd.insert(BDTasksManager.TASKS_FILES_TABLE_NAME, null, cv);
@@ -614,7 +573,8 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksFiles.DESCRIPTION_FILE, gallery.getDescription());
             cv.put(BDTasksManager.ColumnTasksFiles.TASK_FILE_ID, gallery.getId());
             cv.put(BDTasksManager.ColumnTasksFiles.FILE_STATUS, fileStatus);
-            if (null != gallery.getLocalURI())  cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
+            if (null != gallery.getLocalURI())
+                cv.put(BDTasksManager.ColumnTasksFiles.LOCAL_URI, gallery.getLocalURI());
 
             bd.update(BDTasksManager.TASKS_FILES_TABLE_NAME, cv,
                     BDTasksManager.ColumnTasksFiles.TASK_FILE_CVE + " = " + gallery.getCve(), null);
@@ -654,7 +614,7 @@ public class BDTasksManagerQuery {
             SQLiteDatabase bd = bdTasksManager.getWritableDatabase();
 
             bd.delete(BDTasksManager.TASKS_TABLE_NAME,
-                    BDTasksManager.ColumnTasks.TASK_CVE+ " = " + task.getTask_cve(), null);
+                    BDTasksManager.ColumnTasks.TASK_CVE + " = " + task.getTask_cve(), null);
             bd.close();
 
             Log.i("SQLite: ", "Update task_file in the bd ");
@@ -682,7 +642,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION, u.getLastTeamConnection());
             cv.put(BDTasksManager.ColumnUsers.PASSWORD, u.getPassword());
             cv.put(BDTasksManager.ColumnUsers.PROFILE_PICTURE, u.getProfilePicture());
-            cv.put(BDTasksManager.ColumnUsers.COMPLETE_ACTOR_NAME, u.getActorName().replaceAll("-"," ").trim());
+            cv.put(BDTasksManager.ColumnUsers.COMPLETE_ACTOR_NAME, u.getActorName().replaceAll("-", " ").trim());
 
             bd.insert(BDTasksManager.USERS_TABLE_NAME, null, cv);
             bd.close();
@@ -702,13 +662,12 @@ public class BDTasksManagerQuery {
             ContentValues cv = new ContentValues();
 
 
-
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID, member.getIdTask());
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_ID_USER, member.getIdMember());
             cv.put(BDTasksManager.ColumnTasksMembers.SERVER_STATUS, member.getServerSync());
             cv.put(BDTasksManager.ColumnTasksMembers.SERVER_SYNC, member.getSync_type());
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_ID, member.getId());
-            cv.put(BDTasksManager.ColumnTasksMembers.NOTIFICATION, (member.getNotification()) ? Constants.SERVER_SYNC_TRUE : Constants.SERVER_SYNC_FALSE );
+            cv.put(BDTasksManager.ColumnTasksMembers.NOTIFICATION, (member.getNotification()) ? Constants.SERVER_SYNC_TRUE : Constants.SERVER_SYNC_FALSE);
 
             bd.insert(BDTasksManager.TASKS_MEMBERS_TABLE_NAME, null, cv);
             bd.close();
@@ -747,11 +706,11 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnTasksMembers.SERVER_STATUS, memberGallery.getServerSync());
             cv.put(BDTasksManager.ColumnTasksMembers.SERVER_SYNC, memberGallery.getSync_type());
             cv.put(BDTasksManager.ColumnTasksMembers.TASK_MEMBER_ID, memberGallery.getId());
-            cv.put(BDTasksManager.ColumnTasksMembers.NOTIFICATION, (memberGallery.getNotification()) ? Constants.SERVER_SYNC_TRUE : Constants.SERVER_SYNC_FALSE );
+            cv.put(BDTasksManager.ColumnTasksMembers.NOTIFICATION, (memberGallery.getNotification()) ? Constants.SERVER_SYNC_TRUE : Constants.SERVER_SYNC_FALSE);
 
 
             bd.update(BDTasksManager.TASKS_MEMBERS_TABLE_NAME, cv,
-                    BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE + " = " + memberGallery.getCve(),null) ;
+                    BDTasksManager.ColumnTasksMembers.TASK_MEMBER_CVE + " = " + memberGallery.getCve(), null);
             bd.close();
 
         } catch (Exception e) {
@@ -798,7 +757,6 @@ public class BDTasksManagerQuery {
                             temp.setBase_package(resultTwo.getString(resultTwo.getColumnIndex(BDTasksManager.ColumnUsers.PROFILE_PICTURE)));
                             temp.setIdTask(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.TASK_ID)));
                             temp.setServerSync(result.getInt(result.getColumnIndex(BDTasksManager.ColumnTasksMembers.SERVER_STATUS)));
-
 
 
                             data.add(temp);
@@ -888,7 +846,7 @@ public class BDTasksManagerQuery {
             if (result.moveToFirst()) {
                 do {
 
-                    String queryTaskStatus =  (tasks.getTask_status().equals(Constants.ALL_TASK))
+                    String queryTaskStatus = (tasks.getTask_status().equals(Constants.ALL_TASK))
                             ? "" : " and " + BDTasksManager.ColumnTasks.TASK_STATUS + " = " + tasks.getTask_status();
 
                     Cursor resultTwo = bd.rawQuery("select * from  " + BDTasksManager.TASKS_TABLE_NAME
@@ -936,7 +894,7 @@ public class BDTasksManagerQuery {
 
             //TODO COSA DE ADMIN
 
-            String query = (t.getTask_user_id() != null ) ? " and " + BDTasksManager.ColumnTasks.TASK_USER_ID + " = "  + t.getTask_user_id() : "";
+            String query = (t.getTask_user_id() != null) ? " and " + BDTasksManager.ColumnTasks.TASK_USER_ID + " = " + t.getTask_user_id() : "";
 
 
             Cursor result = bd.rawQuery("select * from tasks where task_id =" + t.getTask_id() + query
@@ -1252,7 +1210,7 @@ public class BDTasksManagerQuery {
 
 
             String extraQuery = (searchName.isEmpty() ? searchName
-                    : "where " + BDTasksManager.ColumnUsers.ACTOR_NAME + " LIKE '%" + searchName + "%'" );
+                    : "where " + BDTasksManager.ColumnUsers.ACTOR_NAME + " LIKE '%" + searchName + "%'");
 
             Cursor result = bd.rawQuery("select * from users "
                     + extraQuery
@@ -1339,7 +1297,7 @@ public class BDTasksManagerQuery {
 
             Cursor result = bd.rawQuery("select * from tasks where "
                     + BDTasksManager.ColumnTasks.TASK_USER_ID + " = " + t.getTask_user_id()
-                    + queryTaskStatus , null);
+                    + queryTaskStatus, null);
 
             if (result.moveToFirst()) {
                 do {
@@ -1365,11 +1323,11 @@ public class BDTasksManagerQuery {
 
             if (delete.equals(Constants.ACTIVE)) {
                 for (Tasks task : dataList) {
-                    deleteTask(context,task);
+                    deleteTask(context, task);
                 }
             }
 
-            dataList.addAll(getMemberTasks(context,t,serverSync,null));
+            dataList.addAll(getMemberTasks(context, t, serverSync, null));
 
             bd.close();
         } catch (Exception e) {
@@ -1443,7 +1401,7 @@ public class BDTasksManagerQuery {
             cv.put(BDTasksManager.ColumnUsers.ACTOR_TYPE_NAME, user.getActorTypeName());
             cv.put(BDTasksManager.ColumnUsers.LAST_TEAM_CONNECTION, user.getLastTeamConnection());
             cv.put(BDTasksManager.ColumnUsers.PROFILE_PICTURE, user.getProfilePicture());
-            cv.put(BDTasksManager.ColumnUsers.COMPLETE_ACTOR_NAME, user.getActorName().replaceAll("-"," ").trim());
+            cv.put(BDTasksManager.ColumnUsers.COMPLETE_ACTOR_NAME, user.getActorName().replaceAll("-", " ").trim());
 
             bd.update(BDTasksManager.USERS_TABLE_NAME, cv, BDTasksManager.ColumnUsers.USER_ID + " = " + user.getIdUser(), null);
             bd.close();

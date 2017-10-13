@@ -45,27 +45,24 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBZiNl8N64UwpUUbPwY3ZyRLGyS-Wxtfz8" />
-        <!--
-             ATTENTION: This was auto-generated to add Google Play services to your project for
-             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <!-- Fred AIzaSyDqoRaX3UBDPaCoE5thJ7TbMT7Kgvgv4sE -->
+            android:value="AIzaSyDBO2_OUwN65EorjrvgDhRDtaAmAC8OFjg" />
 
-        <activity android:name=".AllGalleryActivity"
+        <activity
+            android:name=".AllGalleryActivity"
             android:label="@string/title_activity_tab"
             android:parentActivityName=".NavigationDrawerActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".SearchMemberActivity"
+        <activity
+            android:name=".SearchMemberActivity"
             android:label="@string/title_activity_search_member"
             android:parentActivityName=".AllGalleryActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <provider android:name=".utils.MyProvider" android:authorities="texium.mx.drones" android:exported="true" />
+        <provider
+            android:name=".utils.MyProvider"
+            android:authorities="texium.mx.drones"
+            android:exported="true" />
     </application>
 
 </manifest>

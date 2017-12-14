@@ -184,7 +184,6 @@ public class FileServices {
             String tempData = Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT);
             data.setEncodeSingleFile(tempData);
             data.setTitle(uriFileVideo.toString());
-
 /*
             String realPath = FileServices.getPath(activity.getApplicationContext(), Uri.parse(uriFileVideo.toString()));
             InputStream is = new BufferedInputStream(new FileInputStream(realPath));
@@ -435,7 +434,7 @@ public class FileServices {
         }
     }
 
-    public static TaskGallery downloadFile(Activity activity,String fileURL) throws IOException {
+    public static TaskGallery downloadFile(Activity activity, String fileURL) throws IOException {
         TaskGallery taskGallery = new TaskGallery();
         try {
 
@@ -503,7 +502,7 @@ public class FileServices {
 
             Uri uri = Uri.fromFile(new File(videoURIPath));
 
-            Bitmap bitmap = (isImage) ? attachImgBitmap(activity,uri,100) :
+            Bitmap bitmap = (isImage) ? attachImgBitmap(activity, uri, 100) :
                     ThumbnailUtils.createVideoThumbnail(new File(videoURIPath).getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
 
             taskGallery.setLocalURI(uri.toString());
@@ -516,15 +515,13 @@ public class FileServices {
         return taskGallery;
     }
 
-    public static Bitmap createVideoThumbnail(Context context, Uri uri)
-    {
+    public static Bitmap createVideoThumbnail(Context context, Uri uri) {
         MediaMetadataRetriever mediametadataretriever = new MediaMetadataRetriever();
 
         try {
             mediametadataretriever.setDataSource(context, uri);
             Bitmap bitmap = mediametadataretriever.getFrameAtTime(-1L);
-            if(null != bitmap)
-            {
+            if (null != bitmap) {
                 return ThumbnailUtils.extractThumbnail(bitmap, 100, 100, 2);
             }
             return bitmap;
@@ -532,11 +529,10 @@ public class FileServices {
             t.printStackTrace();
             return null;
         } finally {
-            try
-            {
+            try {
                 mediametadataretriever.release();
+            } catch (RuntimeException e) {
             }
-            catch(RuntimeException e) { }
         }
     }
 
@@ -591,8 +587,7 @@ public class FileServices {
                 return getDataColumn(context, contentUri, null, null);
             }
             // MediaProvider
-            else
-            if (isMediaDocument(uri)) {
+            else if (isMediaDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
@@ -605,7 +600,7 @@ public class FileServices {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {split[1]};
+                final String[] selectionArgs = new String[]{split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         }
@@ -626,7 +621,7 @@ public class FileServices {
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         final String column = "_data";
-        final String[] projection = { column };
+        final String[] projection = {column};
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {

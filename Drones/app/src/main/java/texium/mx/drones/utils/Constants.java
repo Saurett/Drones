@@ -12,7 +12,7 @@ import texium.mx.drones.R;
 public final class Constants {
 
     public static final int LOOP_TIME = 180000; //60000 * 1 = 1 Minute
-    public static final int VIDEO_SIZE = 54915200;  //X MB*1048*1048= X MB
+    public static final int VIDEO_SIZE = 43932160;  //X MB*1048*1048= X MB
 
     //region SYS CONSTANTS//
     //region SYS CONSTANTS//
@@ -47,7 +47,8 @@ public final class Constants {
     //endregion DATABASE STATUS
 
     //region MAP ACCESS//
-    @Deprecated public static final String JSON_DATA_ACCESS_TASK_TYPE = "task_type";
+    @Deprecated
+    public static final String JSON_DATA_ACCESS_TASK_TYPE = "task_type";
     //endregion MAP ACCESS//
 
     //region TOKEN ACCESS//
@@ -62,11 +63,13 @@ public final class Constants {
     public static final String FRAGMENT_NEWS_TAG = "fragment_news_task";
     public static final String FRAGMENT_PROGRESS_TAG = "fragment_progress_task";
     public static final String FRAGMENT_PENDING_TAG = "fragment_pending_task";
-    @Deprecated public static final String FRAGMENT_REVISION_TAG = "fragment_revision_task";
+    @Deprecated
+    public static final String FRAGMENT_REVISION_TAG = "fragment_revision_task";
     public static final String FRAGMENT_CLOSE_TAG = "fragment_close_task";
     public static final String FRAGMENT_FINISH_TAG = "fragment_finish_task";
     public static final String FRAGMENT_RESTORE_TAG = "fragment_restore";
-    @Deprecated  public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
+    @Deprecated
+    public static final String FRAGMENT_UPLOAD_FILE = "fragment_upload_file";
     public static final String FRAGMENT_PHOTO_GALLERY_LIST_TAG = "fragment_photo_gallery_list";
     public static final String FRAGMENT_VIDEO_GALLERY_LIST_TAG = "fragment_video_gallery_list";
     public static final String FRAGMENT_DOCUMENT_GALLERY_LIST_TAG = "fragment_document_gallery_list";
@@ -93,8 +96,10 @@ public final class Constants {
     public static final int WS_KEY_UPDATE_TASK_FILE = 8;
     public static final int WS_KEY_SEND_LOCATION = 9;
     public static final int WS_KEY_SEND_LOCATION_HIDDEN = 10;
-    @Deprecated public static final int WS_KEY_FIND_TASK = 11;
-    @Deprecated public static final int WS_KEY_TASK_SERVICE_REVISION = 12; //ONLY WEB
+    @Deprecated
+    public static final int WS_KEY_FIND_TASK = 11;
+    @Deprecated
+    public static final int WS_KEY_TASK_SERVICE_REVISION = 12; //ONLY WEB
     public static final int WS_KEY_TASK_SERVICE_CLOSE = 13;
     public static final int WS_KEY_ALL_TASKS = 14;
     public static final int WS_KEY_ALL_USERS = 15;
@@ -126,19 +131,18 @@ public final class Constants {
     //region SOAP CONFIGURATION//
     /**
      * NEVER CHANGE IP SERVICE_NAMESPACE
-     *
+     * <p>
      * TEXIUM MANAGER
      * *********************************
-     *
+     * <p>
      * WEB_SERVICE_URL = "http://192.168.1.138/SistemaMedioAmbienteDF/ServicioWeb/Servicio_Android.asmx";
-     *
+     * <p>
      * **********************************
      * SEDEMA MANAGER
-     *
+     * <p>
      * WEB_SERVICE_URL http://192.168.1.98/ServicioWeb/Servicio_Android.asmx
-     *
+     * <p>
      * **********************************
-     *
      */
     public static final String WEB_SERVICE_SOAP_ACTION = "192.168.12.10/LoginMovil";
     public static final String WEB_SERVICE_SOAP_ACTION_ALL_TASKS = "192.168.12.10/ListadoTareas";
@@ -156,8 +160,8 @@ public final class Constants {
     public static final String WEB_SERVICE_SOAP_ACTION_TASK_FILES = "192.168.12.10/ArchivosTareas";
     public static final String WEB_SERVICE_SOAP_ACTION_ADD_MEMBER = "192.168.12.10/AgregarMiembro";
     public static final String WEB_SERVICE_SOAP_ACTION_DELETE_MEMBER = "192.168.12.10/EliminarMiembro";
-    public static final String WEB_SERVICE_SOAP_ACTION_ALL_TASKS_MEMBERS   = "192.168.12.10/ConsultarMiembrosTarea";
-    public static final String WEB_SERVICE_SOAP_ACTION_SERVER_TASK   = "192.168.12.10/ConsultarTarea";
+    public static final String WEB_SERVICE_SOAP_ACTION_ALL_TASKS_MEMBERS = "192.168.12.10/ConsultarMiembrosTarea";
+    public static final String WEB_SERVICE_SOAP_ACTION_SERVER_TASK = "192.168.12.10/ConsultarTarea";
 
 
     public static final String WEB_SERVICE_NAMESPACE = "192.168.12.10";
@@ -179,7 +183,7 @@ public final class Constants {
     public static final String WEB_SERVICE_METHOD_NAME_ALL_TASKS = "ListadoTareas";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_TASK = "ActualizarTarea";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_LOCATION = "SincronizarCoordenadas";
-    public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE= "AgregarArchivos";
+    public static final String WEB_SERVICE_METHOD_NAME_SEND_FILE = "AgregarArchivos";
     public static final String WEB_SERVICE_METHOD_NAME_ALL_USERS = "ListadoUsuarios";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_VIDEO = "AgregarVideo";
     public static final String WEB_SERVICE_METHOD_NAME_UPDATE_DOCUMENT = "AgregarPDF";
@@ -260,7 +264,7 @@ public final class Constants {
     public static final String SOAP_OBJECT_KEY_TASK_URL = "Ruta";
     public static final String SOAP_OBJECT_KEY_TASK_SERVER_ADDRESS = "RutaServidor";
     public static final String SOAP_OBJECT_KEY_TASK_SYSTEM_ID = "IDSistema";
-    public static final String SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID= "IDArchivo";
+    public static final String SOAP_OBJECT_KEY_TASK_PHOTO_FILE_ID = "IDArchivo";
     public static final String SOAP_OBJECT_KEY_TASK_ID = "IDTarea";
     public static final String SOAP_OBJECT_KEY_DECODE_BASE_64 = "Base64";
     public static final String SOAP_OBJECT_KEY_FILE_DESCRIPTION = "Descripcion";
@@ -286,13 +290,14 @@ public final class Constants {
     public static final String TASK_PRIORITY_TOP_STR = "Alta";
     public static final String TASK_PRIORITY_EXPRESS_STR = "Urgente";
 
-    public static Map<Integer,String> MAP_STATUS_NAME;
+    public static Map<Integer, String> MAP_STATUS_NAME;
+
     static {
         MAP_STATUS_NAME = new HashMap<>();
-        MAP_STATUS_NAME.put(TASK_PRIORITY_LOW_ID,TASK_PRIORITY_LOW_STR);
-        MAP_STATUS_NAME.put(TASK_PRIORITY_MID_ID,TASK_PRIORITY_MID_STR);
-        MAP_STATUS_NAME.put(TASK_PRIORITY_TOP_ID,TASK_PRIORITY_TOP_STR);
-        MAP_STATUS_NAME.put(TASK_PRIORITY_EXPRESS_ID,TASK_PRIORITY_EXPRESS_STR);
+        MAP_STATUS_NAME.put(TASK_PRIORITY_LOW_ID, TASK_PRIORITY_LOW_STR);
+        MAP_STATUS_NAME.put(TASK_PRIORITY_MID_ID, TASK_PRIORITY_MID_STR);
+        MAP_STATUS_NAME.put(TASK_PRIORITY_TOP_ID, TASK_PRIORITY_TOP_STR);
+        MAP_STATUS_NAME.put(TASK_PRIORITY_EXPRESS_ID, TASK_PRIORITY_EXPRESS_STR);
     }
 
     /*
@@ -306,33 +311,36 @@ public final class Constants {
     }
     */
 
-    public static Map<Integer,Integer> MAP_STATUS_ICON;
+    public static Map<Integer, Integer> MAP_STATUS_ICON;
+
     static {
         MAP_STATUS_ICON = new HashMap<>();
-        MAP_STATUS_ICON.put(TASK_PRIORITY_LOW_ID,R.drawable.task_priority_low);
-        MAP_STATUS_ICON.put(TASK_PRIORITY_MID_ID,R.drawable.task_priority_mid);
-        MAP_STATUS_ICON.put(TASK_PRIORITY_TOP_ID,R.drawable.task_priority_top);
-        MAP_STATUS_ICON.put(TASK_PRIORITY_EXPRESS_ID,R.drawable.task_priority_express);
+        MAP_STATUS_ICON.put(TASK_PRIORITY_LOW_ID, R.drawable.task_priority_low);
+        MAP_STATUS_ICON.put(TASK_PRIORITY_MID_ID, R.drawable.task_priority_mid);
+        MAP_STATUS_ICON.put(TASK_PRIORITY_TOP_ID, R.drawable.task_priority_top);
+        MAP_STATUS_ICON.put(TASK_PRIORITY_EXPRESS_ID, R.drawable.task_priority_express);
     }
 
-    public static Map<Integer,Integer> MAP_STATUS_COLOR;
+    public static Map<Integer, Integer> MAP_STATUS_COLOR;
+
     static {
         MAP_STATUS_COLOR = new HashMap<>();
-        MAP_STATUS_COLOR.put(TASK_PRIORITY_LOW_ID,R.color.colorPriorityLow);
-        MAP_STATUS_COLOR.put(TASK_PRIORITY_MID_ID,R.color.colorPriorityMid);
-        MAP_STATUS_COLOR.put(TASK_PRIORITY_TOP_ID,R.color.colorPriorityTop);
-        MAP_STATUS_COLOR.put(TASK_PRIORITY_EXPRESS_ID,R.color.colorPriorityExpress);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_LOW_ID, R.color.colorPriorityLow);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_MID_ID, R.color.colorPriorityMid);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_TOP_ID, R.color.colorPriorityTop);
+        MAP_STATUS_COLOR.put(TASK_PRIORITY_EXPRESS_ID, R.color.colorPriorityExpress);
     }
 
-    public static Map<Integer,String> MAP_STATUS_FRAGMENT;
+    public static Map<Integer, String> MAP_STATUS_FRAGMENT;
+
     static {
         MAP_STATUS_FRAGMENT = new HashMap<>();
-        MAP_STATUS_FRAGMENT.put(NEWS_TASK,FRAGMENT_NEWS_TAG);
-        MAP_STATUS_FRAGMENT.put(PROGRESS_TASK,FRAGMENT_PROGRESS_TAG);
-        MAP_STATUS_FRAGMENT.put(PENDING_TASK,FRAGMENT_PENDING_TAG);
-        MAP_STATUS_FRAGMENT.put(CLOSE_TASK,FRAGMENT_CLOSE_TAG);
-        MAP_STATUS_FRAGMENT.put(REVISION_TASK,NO_FRAGMENT_TAG);
-        MAP_STATUS_FRAGMENT.put(CANCEL_TASK,NO_FRAGMENT_TAG);
+        MAP_STATUS_FRAGMENT.put(NEWS_TASK, FRAGMENT_NEWS_TAG);
+        MAP_STATUS_FRAGMENT.put(PROGRESS_TASK, FRAGMENT_PROGRESS_TAG);
+        MAP_STATUS_FRAGMENT.put(PENDING_TASK, FRAGMENT_PENDING_TAG);
+        MAP_STATUS_FRAGMENT.put(CLOSE_TASK, FRAGMENT_CLOSE_TAG);
+        MAP_STATUS_FRAGMENT.put(REVISION_TASK, NO_FRAGMENT_TAG);
+        MAP_STATUS_FRAGMENT.put(CANCEL_TASK, NO_FRAGMENT_TAG);
     }
 
 

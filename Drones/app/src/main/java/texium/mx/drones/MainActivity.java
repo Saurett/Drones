@@ -478,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case Constants.WS_KEY_LOGIN_SERVICE:
 
-                        if (checkVersion()) return  true;
+                        if (checkVersion()) return true;
 
                         soapObject = SoapServices.checkUser(getApplicationContext(), username, password);
                         Integer id = Integer.valueOf(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_ID).toString());
@@ -487,14 +487,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case Constants.WS_KEY_CHECK_VERSION:
 
-                        if (checkVersion()) return  true;
+                        if (checkVersion()) return true;
 
                         validOperation = true;
 
                         break;
                     case Constants.WS_KEY_ALL_USERS:
 
-                        if (checkVersion()) return  true;
+                        if (checkVersion()) return true;
 
                         soapObject = SoapServices.getServerAllUsers(getApplicationContext(), "");
 
@@ -596,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         if (validOperation) {
-                            if (checkVersion()) return  true;
+                            if (checkVersion()) return true;
                         }
 
                         break;
@@ -650,30 +650,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return validOperation;
         }
 
-        private Boolean checkVersion()  {
+        private Boolean checkVersion() {
 
             Boolean version = false;
 
-           try {
+            try {
 
-               soapObject = SoapServices.checkAppVersion(getApplicationContext());
+                soapObject = SoapServices.checkAppVersion(getApplicationContext());
 
-               String serverAppVersion = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
+                String serverAppVersion = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_TITTLE).toString();
 
-               AppVersion localAV = BDTasksManagerQuery.getAppVersion(getApplicationContext());
+                AppVersion localAV = BDTasksManagerQuery.getAppVersion(getApplicationContext());
 
-               if (!localAV.getApp_version().equals(serverAppVersion)) {
-                   _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
-                   updateVersion = true;
-                   version = true;
-               }
+                if (!localAV.getApp_version().equals(serverAppVersion)) {
+                    _URL_ACTUAL_VERSION = soapObject.getProperty(Constants.SOAP_OBJECT_KEY_TASK_URL).toString();
+                    updateVersion = true;
+                    version = true;
+                }
 
-           } catch (Exception e) {
-               e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
 
-           }
+            }
 
-            return  version;
+            return version;
         }
 
         @Override
@@ -731,7 +731,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 user.setLatitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LATITUDE).toString()));
                                 user.setLongitude(Double.valueOf(location.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LONGITUDE).toString()));
                                 user.setLastTeamConnection(soapObject.getProperty(Constants.SOAP_OBJECT_KEY_LOGIN_LAST_CONNECTION).toString());
-                            } else  showQuestion();
+                            } else showQuestion();
 
                         }
 

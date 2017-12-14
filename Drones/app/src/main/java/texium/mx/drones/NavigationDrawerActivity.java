@@ -307,7 +307,10 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 mediaContent(MediaStore.ACTION_IMAGE_CAPTURE, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.video_fab:
-                mediaContent(MediaStore.ACTION_VIDEO_CAPTURE, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+                /**Abre el app d comprension**/
+                Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("com.czh.testmpeg");
+                startActivity(LaunchIntent);
+                //mediaContent(MediaStore.ACTION_VIDEO_CAPTURE, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
                 break;
             default:
                 Snackbar.make(v, "La opción no esta habilitada", Snackbar.LENGTH_LONG)
@@ -975,7 +978,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
             mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
 
@@ -1107,7 +1110,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         providerEnabled = locationManagerGPS.isProviderEnabled(provider);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             } else {
                 locationManagerGPS.requestLocationUpdates(provider, 1000, 0, this);
@@ -1120,7 +1123,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private void getLocation() {
         if (providerEnabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
                 locationGPS = locationManagerGPS.getLastKnownLocation(provider);
@@ -1269,7 +1272,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                     if ((webServiceTaskDecode.getOrigin_button() == R.id.finish_task_button)
                             || (webServiceTaskDecode.getOrigin_button() == R.id.decline_task_button)
-                                || (webServiceTaskDecode.getOrigin_button() ==  R.id.agree_task_button)) {
+                            || (webServiceTaskDecode.getOrigin_button() == R.id.agree_task_button)) {
                         pDialog = new ProgressDialog(NavigationDrawerActivity.this);
                         pDialog.setTitle("Actualizando");
                         //pDialog.setProgressStyle(pDialog.STYLE_HORIZONTAL);
@@ -1736,7 +1739,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             memberLocation.setServerSync(Constants.SERVER_SYNC_FALSE);
             memberLocation.setSyncTime(DateTimeUtils.getActualTime());
 
-            BDTasksManagerQuery.addMemberLocation(getBaseContext(),memberLocation);
+            BDTasksManagerQuery.addMemberLocation(getBaseContext(), memberLocation);
         }
     }
 }

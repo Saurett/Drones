@@ -308,8 +308,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
             case R.id.video_fab:
                 /**Abre el app d comprension**/
-                Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("com.czh.testmpeg");
-                startActivity(LaunchIntent);
+                try {
+                    Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("com.czh.testmpeg");
+                    startActivity(LaunchIntent);
+                } catch (Exception e) {
+                    Toast.makeText(ctx, "Es necesario instalar la aplicación para gabrar y comprimir video", Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(Constants.VIDEO_COMPRESOR_APP_URL));
+                    startActivity(i);
+                }
                 //mediaContent(MediaStore.ACTION_VIDEO_CAPTURE, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
                 break;
             default:

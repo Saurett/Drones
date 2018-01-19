@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //permission is denied (and never ask again is  checked)
                         //shouldShowRequestPermissionRationale will return false
                         else {
-                            Toast.makeText(this, "Go to settings and enable permissions", Toast.LENGTH_LONG)
+                            Toast.makeText(this, "Ir a configuraciones para modificar permisos", Toast.LENGTH_LONG)
                                     .show();
                             //                            //proceed with logic by disabling the related features or quit the app.
                         }

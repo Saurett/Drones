@@ -11,6 +11,7 @@ import texium.mx.drones.R;
  */
 public final class Constants {
 
+    public static final String VIDEO_COMPRESOR_APP_URL = "https://drive.google.com/open?id=1G37boyZynBEn_A9dvoWKWYpHcxuAoj_Q";
     public static final int LOOP_TIME = 180000; //60000 * 1 = 1 Minute
     public static final int VIDEO_SIZE = 43932160;  //X MB*1048*1048= X MB
 

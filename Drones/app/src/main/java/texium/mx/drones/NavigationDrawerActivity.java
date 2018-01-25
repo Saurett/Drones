@@ -2,16 +2,15 @@ package texium.mx.drones;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -42,7 +41,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -88,6 +95,7 @@ import texium.mx.drones.models.Users;
 import texium.mx.drones.services.FileServices;
 import texium.mx.drones.services.FileSoapServices;
 import texium.mx.drones.services.NotificationService;
+import texium.mx.drones.services.SharedPreferencesService;
 import texium.mx.drones.services.SoapServices;
 import texium.mx.drones.utils.Constants;
 import texium.mx.drones.utils.DateTimeUtils;
@@ -95,23 +103,16 @@ import texium.mx.drones.utils.DateTimeUtils;
 
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        View.OnClickListener, FragmentTaskListener, LocationListener, DialogInterface.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        View.OnClickListener, FragmentTaskListener, DialogInterface.OnClickListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    //Google Maps manager//
-    private GoogleMap mMap;
+    private final String TAG = this.getClass().getName();
 
     //Principal Buttons//
     private FloatingActionButton fab, direction_fab, camera_fab, video_fab, map_fab;
 
     //Dynamic Header//
     private TextView task_force_name, task_element_name, task_force_location, task_force_latitude, task_force_longitude;
-
-    //GPS Manager//
-    private static final String provider = LocationManager.PASSIVE_PROVIDER; //GPS Provider
-    private LocationManager locationManagerGPS;
-    private Location locationGPS;
-    private Context ctx;
-    private boolean providerEnabled;
 
     //Camera manager//
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
@@ -135,13 +136,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    private GoogleApiClient client;
-    private Boolean stopThread = false;
     private Handler handler;
     private Runnable runnable;
-    private Boolean connection = true;
-
+    private Boolean enviarUbicacion;
     private Integer legalRequired;
+
+    /**
+     * Servicios de ubicaciones
+     **/
+    private static final int PETICION_PERMISO_LOCALIZACION = 101;
+    private static final int PETICION_CONFIG_UBICACION = 201;
+    private GoogleMap mapa;
+    private GoogleApiClient apiClient;
+    public LocationRequest locRequest;
+    private Intent locationServiceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,16 +158,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        handler = new Handler();
+        apiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
 
-        // Create an instance of GoogleAPIClient.
-        if (client == null) {
-            client = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        locationServiceIntent = new Intent(this, LocationService.class);
+        handler = new Handler();
 
         try {
             SESSION_DATA = (Users) getIntent().getExtras().getSerializable(Constants.ACTIVITY_EXTRA_PARAMS_LOGIN);
@@ -179,8 +185,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        connection = true;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -219,9 +223,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //GPS manager location//
-        defineLocationManager(this);
-
         //Header dynamic manager//
         getTaskForceData(navigationView);
 
@@ -232,6 +233,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
         wsAllTask.execute();
 
         showFragment(getActualFragment());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     private void getTaskForceData(NavigationView navigationView) {
@@ -248,38 +260,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         task_element_name.setText(SESSION_DATA.getActorName().replace("-", "\n"));
         task_force_location.setText("CIUDAD DE MÉXICO");
 
-        getLocation();
-
-        if (locationGPS != null) {
-
-            double lat = locationGPS.getLatitude();
-            double lon = locationGPS.getLongitude();
-
-            double x = Math.abs(lat);
-            double dx = Math.floor(x);
-            double mx = Math.floor((x - dx) * 60);
-            double sx = Math.floor(((x - dx) - (mx / 60)) * 3600);
-
-            if (lat < 0) dx = -dx;
-
-            double y = Math.abs(lon);
-            double dy = Math.floor(y);
-            double my = Math.floor((y - dy) * 60);
-            double sy = Math.floor(((y - dy) - (my / 60)) * 3600);
-
-            if (lon < 0) dy = -dy;
-
-            task_force_latitude.setText(BigDecimal.valueOf(dx).longValue() + "° " + BigDecimal.valueOf(mx).longValue() + "' " + BigDecimal.valueOf(sx).longValue() + "'' N");
-            task_force_longitude.setText(BigDecimal.valueOf(dy).longValue() + "° " + BigDecimal.valueOf(my).longValue() + "' " + BigDecimal.valueOf(sy).longValue() + "'' O");
-
-            callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN);
-        } else {
-            ACTUAL_FRAGMENT = null;
-            Toast.makeText(this, getString(R.string.default_gps_error), Toast.LENGTH_LONG).show();
-            taskToken.clear();
-            finish();
-        }
-
+        this.enableLocationUpdates();
+        this.enableLocationBackground();
     }
 
     @Override
@@ -292,7 +274,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             case R.id.map_fab:
 
-                mMap.setMapType((mMap.getMapType() == GoogleMap.MAP_TYPE_HYBRID) ? GoogleMap.MAP_TYPE_TERRAIN : GoogleMap.MAP_TYPE_HYBRID);
+                mapa.setMapType((mapa.getMapType() == GoogleMap.MAP_TYPE_HYBRID) ? GoogleMap.MAP_TYPE_TERRAIN : GoogleMap.MAP_TYPE_HYBRID);
 
                 break;
             case R.id.direction_fab:
@@ -312,7 +294,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage("com.czh.testmpeg");
                     startActivity(LaunchIntent);
                 } catch (Exception e) {
-                    Toast.makeText(ctx, "Es necesario instalar la aplicación para gabrar y comprimir video", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Es necesario instalar la aplicación para gabrar y comprimir video", Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(Constants.VIDEO_COMPRESOR_APP_URL));
                     startActivity(i);
@@ -326,53 +308,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
-    private void callWebServiceLocation(final int type) {
-
-        if (type == Constants.WS_KEY_SEND_LOCATION_HIDDEN) {
-            loopWebServiceLocation(type);
-        } else {
-
-            TasksDecode tasksDecode = new TasksDecode();
-
-            tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
-            tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
-            tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-
-            AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
-            wsLocation.execute();
-        }
-    }
-
-    private void loopWebServiceLocation(final int type) {
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                runnable = new Runnable() {
-                    public void run() {
-                        try {
-                            if (!stopThread) {
-
-                                TasksDecode tasksDecode = new TasksDecode();
-
-                                tasksDecode.setTask_longitude(String.valueOf(locationGPS.getLongitude()));
-                                tasksDecode.setTask_latitude(String.valueOf(locationGPS.getLatitude()));
-                                tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
-
-                                AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
-                                wsLocation.execute();
-                            }
-                        } catch (Exception e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    }
-                };
-                handler.post(runnable);
-            }
-        };
-
-        timer.schedule(task, 0, Constants.LOOP_TIME);
-    }
 
     //Save media content
     private void mediaContent(String mediaType, int requestType) {
@@ -595,11 +530,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 //mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
                 mo.icon(BitmapDescriptorFactory.fromResource(Constants.MAP_STATUS_ICON.get(task.getTask_priority())));
 
-                Marker marker = mMap.addMarker(mo);
+                Marker marker = mapa.addMarker(mo);
                 marker.showInfoWindow();
 
                 LatLng cdMx = new LatLng(task.getTask_latitude(), task.getTask_longitude() - 0.002);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
+                mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
 
                 CameraPosition cameraPosition1 = new CameraPosition.Builder()
                         .target(cdMx)
@@ -607,7 +542,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         .zoom(17)
                         .build();
 
-                mMap.animateCamera(CameraUpdateFactory
+                mapa.animateCamera(CameraUpdateFactory
                         .newCameraPosition(cameraPosition1));
 
                 break;
@@ -666,6 +601,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
+            case PETICION_CONFIG_UBICACION:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        //startLocationUpdates();
+                        Toast.makeText(getApplicationContext(), "UBICACION BIEN", Toast.LENGTH_SHORT).show();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        /**Realizar la petición de ubicacion nuevamente*/
+                        enableLocationUpdates();
+                        break;
+                }
+                break;
             case GALLERY_IMAGE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
 
@@ -854,14 +801,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             wsServerSync.execute();
 
         } else if (id == R.id.nav_logout) {
-
-            connection = false;
             callWebServiceLocation(Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT);
-            ACTUAL_FRAGMENT = null;
-            stopThread = true;
-            handler.removeCallbacks(runnable);
-            taskToken.clear();
-
         }
         return true;
     }
@@ -966,41 +906,28 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
-
-            mMap = googleMap;
-            mMap.setMyLocationEnabled(true);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
-            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
+        mapa = googleMap;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PETICION_PERMISO_LOCALIZACION);
         } else {
 
             LatLng cdMx = new LatLng(Constants.GOOGLE_MAPS_LATITUDE, Constants.GOOGLE_MAPS_LONGITUDE);
 
-            mMap = googleMap;
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
-            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-
-            mMap.setMyLocationEnabled(true);
-
+            mapa.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, Constants.GOOGLE_MAPS_DEFAULT_CAMERA));
+            mapa.setMyLocationEnabled(true);
+            mapa.getUiSettings().setZoomControlsEnabled(true);
+            mapa.getUiSettings().setCompassEnabled(true);
         }
-        mMap.getUiSettings().setMapToolbarEnabled(true);
-
     }
 
     @Override
     public void addTasksListMarkers(List<Tasks> tasksList) {
-        if (mMap != null) {
+        if (mapa != null) {
 
-            mMap.clear();
+            mapa.clear();
 
             for (Tasks actualTask : tasksList) {
 
@@ -1012,18 +939,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 mo.snippet(Constants.MAP_STATUS_NAME.get(actualTask.getTask_priority()));
                 //mo.icon(BitmapDescriptorFactory.defaultMarker(Constants.MAP_STATUS_COLOR.get(actualTask.getTask_priority())));
                 mo.icon(BitmapDescriptorFactory.fromResource(Constants.MAP_STATUS_ICON.get(actualTask.getTask_priority())));
-                mMap.addMarker(mo);
+                mapa.addMarker(mo);
 
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                mapa.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        // TODO Auto-generated method stub
-
                         LatLng latLng = marker.getPosition();
                         LatLng cdMx = new LatLng(latLng.latitude, latLng.longitude - 0.002);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
+                        mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(cdMx, 17));
 
-                        //TODO EN CASO QUE PIDAN LA DIRECCIÓN
                         //direction_fab.setVisibility(View.VISIBLE);
 
                         marker.showInfoWindow();
@@ -1032,7 +956,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 });
             }
 
-            mMap.getUiSettings().setMapToolbarEnabled(true);
+            mapa.getUiSettings().setMapToolbarEnabled(true);
         }
     }
 
@@ -1110,94 +1034,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
         return taskToken;
     }
 
-    private void defineLocationManager(Context context) {
-        this.ctx = context;
-
-        locationManagerGPS = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        providerEnabled = locationManagerGPS.isProviderEnabled(provider);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            } else {
-                locationManagerGPS.requestLocationUpdates(provider, 1000, 0, this);
-            }
-        } else {
-            locationManagerGPS.requestLocationUpdates(provider, 1000, 0, this);
-        }
-    }
-
-    private void getLocation() {
-        if (providerEnabled) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                locationGPS = locationManagerGPS.getLastKnownLocation(provider);
-            } else {
-                locationGPS = locationManagerGPS.getLastKnownLocation(provider);
-            }
-        }
-    }
-
     @Override
     public void onLocationChanged(Location location) {
-        getLocation();
+        updateUI(location);
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        /*
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "NavigationDrawer Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://texium.mx.drones/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
-        */
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        /*Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "NavigationDrawer Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://texium.mx.drones/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);*/
-        client.disconnect();
-    }
 
     private LegalManager getLegalInformation(LegalManager legalManager) {
 
@@ -1222,7 +1063,31 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PETICION_PERMISO_LOCALIZACION);
+        } else {
+            Location lastLocation =
+                    LocationServices.FusedLocationApi.getLastLocation(apiClient);
+
+            updateUI(lastLocation);
+        }
+    }
+
+    private void updateUI(Location location) {
+
+        if (location != null) {
+            /**Actualiza la ubicacion en la memoria**/
+            SharedPreferencesService.saveSessionPreferences(getApplicationContext(), location);
+            /**Actualiza la ubicacion en el menu**/
+            setUILocation(location);
+            /**Actualiza la ubicacion en el servidor**/
+            sendLocationWS();
+            Log.d(TAG, "Location > Ubicacion nueva: " + location);
+        }
     }
 
     @Override
@@ -1411,8 +1276,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
 
-                        Log.i("CHECK", "consultar coordenada");
-
                         MemberLocation memberLocation = new MemberLocation(
                                 SESSION_DATA.getIdUser(),
                                 Constants.SERVER_SYNC_FALSE);
@@ -1434,11 +1297,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         }
 
-                        getLocation();
+                        /**Obtiene la ultima ubicacion registrada**/
+                        TasksDecode lastLocation = SharedPreferencesService.getLocalizacion(getApplicationContext());
 
-                        memberLocation.setServerSync(Constants.SERVER_SYNC_TRUE);
-                        memberLocation.setLatitude(locationGPS.getLatitude());
-                        memberLocation.setLongitude(locationGPS.getLongitude());
+                        memberLocation.setServerSync((webServiceOperation.equals(Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT)) ? Constants.SERVER_SYNC_FALSE : Constants.SERVER_SYNC_TRUE);
+                        memberLocation.setLatitude(Double.valueOf(lastLocation.getTask_latitude()));
+                        memberLocation.setLongitude(Double.valueOf(lastLocation.getTask_longitude()));
                         memberLocation.setSyncTime(DateTimeUtils.getActualTime());
 
                         soapPrimitive = SoapServices.updateLocation(getApplicationContext(), memberLocation);
@@ -1606,7 +1470,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
-                        onMapReady(mMap);
+                        onMapReady(mapa);
                         Toast.makeText(NavigationDrawerActivity.this, soapPrimitive.toString(), Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
@@ -1660,15 +1524,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         Toast.makeText(NavigationDrawerActivity.this, textError, Toast.LENGTH_LONG).show();
                         break;
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN:
-
-                        if (!stopThread) {
-                            Log.i("CHECK TASK", "Buscando nuevas tareas");
-                        }
+                        Log.w(TAG, "Location > Ubicacion automatica recibida exitosamente : " + enviarUbicacion);
                         break;
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
-
-                        finish();
-
+                        clearSesion();
+                        Log.w(TAG, "Location > Ubicacion al cerrar sesión enviada exitosamente : " + enviarUbicacion);
                         break;
                     default:
                         break;
@@ -1697,15 +1557,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         break;
                     case Constants.WS_KEY_SEND_LOCATION:
                         saveOfflineGPS();
-                        onMapReady(mMap);
+                        onMapReady(mapa);
                         tempText = (textError.isEmpty() ? getString(R.string.default_ws_operation) : textError);
                         Toast.makeText(getBaseContext(), tempText, Toast.LENGTH_LONG).show();
 
                         break;
                     case Constants.WS_KEY_SEND_LOCATION_HIDDEN_LOGOUT:
                         saveOfflineGPS();
-                        finish();
-
+                        clearSesion();
                         break;
                     case Constants.WS_KEY_UPDATE_TASK_FILE:
                     case Constants.WS_KEY_UPDATE_TASK:
@@ -1729,17 +1588,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
         private void saveOfflineGPS() {
 
             MemberLocation memberLocation = new MemberLocation();
+            TasksDecode lastLocation = SharedPreferencesService.getLocalizacion(getApplicationContext());
 
             try {
-                memberLocation.setLatitude(mMap.getMyLocation().getLatitude());
+                memberLocation.setLatitude(mapa.getMyLocation().getLatitude());
             } catch (NullPointerException e) {
-                memberLocation.setLatitude(locationGPS.getLatitude());
+                memberLocation.setLatitude(Double.valueOf(lastLocation.getTask_latitude()));
             }
 
             try {
-                memberLocation.setLongitude(mMap.getMyLocation().getLongitude());
+                memberLocation.setLongitude(mapa.getMyLocation().getLongitude());
             } catch (NullPointerException e) {
-                memberLocation.setLongitude(locationGPS.getLongitude());
+                memberLocation.setLongitude(Double.valueOf(lastLocation.getTask_longitude()));
             }
 
             memberLocation.setUserId(webServiceTaskDecode.getTask_user_id());
@@ -1748,5 +1608,154 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             BDTasksManagerQuery.addMemberLocation(getBaseContext(), memberLocation);
         }
+    }
+
+    private void clearSesion() {
+        ACTUAL_FRAGMENT = null;
+        enviarUbicacion = false;
+        handler.removeCallbacks(runnable);
+        taskToken.clear();
+        SESSION_DATA = null;
+        finish();
+    }
+
+    private void enableLocationUpdates() {
+
+        locRequest = new LocationRequest();
+        locRequest.setInterval(10000);
+        locRequest.setFastestInterval(2000);
+        locRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest locSettingsRequest =
+                new LocationSettingsRequest.Builder()
+                        .addLocationRequest(locRequest)
+                        .build();
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(
+                        apiClient, locSettingsRequest);
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult locationSettingsResult) {
+                final Status status = locationSettingsResult.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        startLocationUpdates();
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        try {
+                            status.startResolutionForResult(NavigationDrawerActivity.this, PETICION_CONFIG_UBICACION);
+                        } catch (IntentSender.SendIntentException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        Toast.makeText(getApplicationContext(), "UBICACION SETTINGS_CHANGE_UNAVAILABLE", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            //Ojo: estamos suponiendo que ya tenemos concedido el permiso.
+            //Sería recomendable implementar la posible petición en caso de no tenerlo.
+            LocationServices.FusedLocationApi.requestLocationUpdates(apiClient, locRequest, NavigationDrawerActivity.this);
+        }
+    }
+
+    private void setUILocation(Location location) {
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+
+        double x = Math.abs(lat);
+        double dx = Math.floor(x);
+        double mx = Math.floor((x - dx) * 60);
+        double sx = Math.floor(((x - dx) - (mx / 60)) * 3600);
+
+        if (lat < 0) dx = -dx;
+
+        double y = Math.abs(lon);
+        double dy = Math.floor(y);
+        double my = Math.floor((y - dy) * 60);
+        double sy = Math.floor(((y - dy) - (my / 60)) * 3600);
+
+        if (lon < 0) dy = -dy;
+
+        task_force_latitude.setText(BigDecimal.valueOf(dx).longValue() + "° "
+                + BigDecimal.valueOf(mx).longValue() + "' "
+                + BigDecimal.valueOf(sx).longValue() + "'' N");
+        task_force_longitude.setText(BigDecimal.valueOf(dy).longValue() + "° "
+                + BigDecimal.valueOf(my).longValue() + "' "
+                + BigDecimal.valueOf(sy).longValue() + "'' O");
+    }
+
+    private void enableLocationBackground() {
+        startService(locationServiceIntent);
+        enviarUbicacion = true;
+        loopWebServiceLocation();
+    }
+
+    private void loopWebServiceLocation() {
+        final Timer timer = new Timer();
+        final TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                runnable = new Runnable() {
+                    public void run() {
+                        try {
+                            Log.w(TAG, "Location > Loop de ubicacion en estado : " + enviarUbicacion);
+                            if (enviarUbicacion) {
+                                sendLocationWS();
+                            } else {
+                                timer.cancel();
+                                timer.purge();
+                                stopService(locationServiceIntent);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                handler.post(runnable);
+            }
+        };
+
+        timer.schedule(task, Constants.LOADING_TIME, Constants.LOOP_TIME);
+    }
+
+    private void sendLocationWS() {
+        TasksDecode lastLocation = SharedPreferencesService.getLocalizacion(getApplicationContext());
+
+        TasksDecode tasksDecode = new TasksDecode();
+
+        tasksDecode.setTask_longitude(lastLocation.getTask_longitude());
+        tasksDecode.setTask_latitude(lastLocation.getTask_latitude());
+        tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+
+        Log.w(TAG, "Location > Ubicacion enviada automaticamente" + " Longitud : " + lastLocation.getTask_longitude()
+                + " Latitude :" + lastLocation.getTask_latitude());
+
+        AsyncCallWS wsLocation = new AsyncCallWS(Constants.WS_KEY_SEND_LOCATION_HIDDEN, tasksDecode);
+        wsLocation.execute();
+    }
+
+    private void callWebServiceLocation(final int type) {
+
+        TasksDecode tasksDecode = new TasksDecode();
+        TasksDecode lastLocation = SharedPreferencesService.getLocalizacion(getApplicationContext());
+        tasksDecode.setTask_longitude(lastLocation.getTask_longitude());
+        tasksDecode.setTask_latitude(lastLocation.getTask_latitude());
+        tasksDecode.setTask_user_id(SESSION_DATA.getIdUser());
+
+        AsyncCallWS wsLocation = new AsyncCallWS(type, tasksDecode);
+        wsLocation.execute();
+
+        Log.w(TAG, "Location > Ubicacion enviada manualmente" + " Longitud : " + lastLocation.getTask_longitude()
+                + " Latitude :" + lastLocation.getTask_latitude());
     }
 }

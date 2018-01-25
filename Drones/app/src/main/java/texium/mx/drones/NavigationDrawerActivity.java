@@ -587,6 +587,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
 
     private void setActualFragment(FragmentManager fragmentManager) {
+        //TODO EN REVISION
         List<Fragment> fragments = fragmentManager.getFragments();
         if (fragments.size() > 0) {
             ACTUAL_FRAGMENT = fragments.get(0).getTag();
@@ -604,8 +605,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
             case PETICION_CONFIG_UBICACION:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        //startLocationUpdates();
-                        Toast.makeText(getApplicationContext(), "UBICACION BIEN", Toast.LENGTH_SHORT).show();
+                        startLocationUpdates();
+                        Toast.makeText(getApplicationContext(), "GPS ACTIVADO CORRECTAMENTE", Toast.LENGTH_SHORT).show();
                         break;
                     case Activity.RESULT_CANCELED:
                         /**Realizar la petición de ubicacion nuevamente*/

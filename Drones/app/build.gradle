@@ -9,7 +9,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 23
         versionCode 1
-        versionName "1.1.1"
+        versionName "1.1.2"
     }
     buildTypes {
         release {
@@ -32,5 +32,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:10.2.1'
     compile 'com.google.android.gms:play-services-places:10.2.1'
     compile 'com.google.android.gms:play-services-location:10.2.1'
-    compile files('libs/ksoap2-android-assembly-3.4.0-jar-with-dependencies.jar')
+    compile files('libs/ksoap2-android-assembly-3.4.0-jar-with-dependencie' +
+            's.jar')
 }
